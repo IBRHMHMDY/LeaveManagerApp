@@ -25,7 +25,7 @@ dependencies:
   # --- UI & Utilities ---
   intl: ^0.20.2           # لتنسيق التواريخ (Date Formatting)
   google_fonts: ^6.1.0     # (اختياري) لاستخدام خطوط عصرية مثل Cairo أو Almarai
-  flutter_localizations:   # لدعم اللغة العربية والاتجاه من اليمين لليسار (RTL)
+  flutter_localizations:    # لدعم اللغة العربية والاتجاه من اليمين لليسار (RTL)
     sdk: flutter
 
 dev_dependencies:
