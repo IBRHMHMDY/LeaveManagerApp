@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vacation_tracker/core/utils/string_extension.dart';
 import 'package:vacation_tracker/presentation/blocs/leaves/leaves_bloc.dart';
 import '../../domain/entities/settings.dart';
 import '../blocs/settings/settings_bloc.dart';
@@ -26,22 +27,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
     // تمت إزالة محاولة القراءة من هنا لأننا سنعتمد على المستمع (Listener) أدناه
   }
 
-  int _parseNumberSafely(String value) {
-    String normalized = value
-        .trim()
-        .replaceAll('٠', '0')
-        .replaceAll('١', '1')
-        .replaceAll('٢', '2')
-        .replaceAll('٣', '3')
-        .replaceAll('٤', '4')
-        .replaceAll('٥', '5')
-        .replaceAll('٦', '6')
-        .replaceAll('٧', '7')
-        .replaceAll('٨', '8')
-        .replaceAll('٩', '9');
 
-    return int.tryParse(normalized) ?? 0;
-  }
 
   void _saveSettings() {
     if (_formKey.currentState!.validate()) {
@@ -49,8 +35,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
         id: 1,
         employeeName: _nameController.text.trim(),
         jobTitle: _jobController.text.trim(),
-        totalRegularLeaves: _parseNumberSafely(_regularLeavesController.text),
-        totalCasualLeaves: _parseNumberSafely(_casualLeavesController.text),
+        totalRegularLeaves: _regularLeavesController.text.toIntSafely(),
+        totalCasualLeaves: _casualLeavesController.text.toIntSafely(),
       );
 
       context.read<SettingsBloc>().add(SaveSettingsEvent(settings));
@@ -59,7 +45,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   String? _numberValidator(String? value) {
     if (value == null || value.trim().isEmpty) return 'مطلوب';
-    if (_parseNumberSafely(value) == 0 && value.trim() != '0') {
+   if (value.toIntSafely() == 0 && value.trim() != '0' && value.trim() != '٠') {
       return 'أرقام فقط';
     }
     return null;
@@ -90,12 +76,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           );
           context.read<SettingsBloc>().add(LoadSettingsEvent());
-
-          if (widget.isFirstTime) {
-            Navigator.of(context).pushReplacement(
-              MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
-            );
-          }
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
+          );
         }
         // 3. معالجة الأخطاء
         else if (state is SettingsError) {

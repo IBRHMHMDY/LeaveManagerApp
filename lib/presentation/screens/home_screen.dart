@@ -113,19 +113,26 @@ class __AddLeaveFormState extends State<_AddLeaveForm> {
   DateTime? _endDate;
   final TextEditingController _notesController = TextEditingController();
 
-  void _pickDate(bool isStart) async {
+  void _pickDateRange() async {
     final startFinYear = FinancialYearCalculator.currentFinancialYearStart;
     final endFinYear = FinancialYearCalculator.currentFinancialYearEnd;
-    final now = DateTime.now();
 
-    final date = await showDatePicker(
+    final DateTimeRange? picked = await showDateRangePicker(
       context: context,
-      initialDate: now.isBefore(startFinYear)
-          ? startFinYear
-          : (now.isAfter(endFinYear) ? endFinYear : now),
       firstDate: startFinYear,
       lastDate: endFinYear,
-      // ضمان توافق أداة اختيار التاريخ مع الوضع الليلي/النهاري للنظام
+      // إذا كان هناك تاريخ مختار مسبقاً، نظهره كقيمة مبدئية
+      initialDateRange: _startDate != null && _endDate != null
+          ? DateTimeRange(start: _startDate!, end: _endDate!)
+          : null,
+      
+      // --- تخصيص النصوص لتناسب اللغة العربية ---
+      saveText: 'تأكيد',
+      cancelText: 'إلغاء',
+      helpText: 'اختر فترة الإجازة (من - إلى)',
+      errorInvalidRangeText: 'نطاق غير صحيح',
+      
+      // ضمان استجابة الأداة للوضع الليلي/النهاري للنظام
       builder: (context, child) {
         return Theme(
           data: Theme.of(context),
@@ -134,17 +141,11 @@ class __AddLeaveFormState extends State<_AddLeaveForm> {
       },
     );
 
-    if (date != null) {
+    if (picked != null) {
       setState(() {
-        if (isStart) {
-          _startDate = date;
-          // إعادة ضبط تاريخ النهاية إذا كان يسبق البداية بعد التعديل
-          if (_endDate != null && _endDate!.isBefore(_startDate!)) {
-            _endDate = null;
-          }
-        } else {
-          _endDate = date;
-        }
+        // يتم تحديث البداية والنهاية معاً في خطوة واحدة
+        _startDate = picked.start;
+        _endDate = picked.end;
       });
     }
   }
@@ -184,32 +185,30 @@ class __AddLeaveFormState extends State<_AddLeaveForm> {
             onChanged: (val) => setState(() => _selectedType = val!),
           ),
           const SizedBox(height: 16),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.calendar_today),
-                  label: Text(
-                    _startDate != null
-                        ? _startDate!.toFormattedDate()
-                        : 'تاريخ البداية',
-                  ),
-                  onPressed: () => _pickDate(true),
-                ),
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              side: BorderSide(
+                color: _startDate != null 
+                    ? AppColors.primaryTeal 
+                    : Colors.grey.shade400,
               ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: OutlinedButton.icon(
-                  icon: const Icon(Icons.calendar_today),
-                  label: Text(
-                    _endDate != null
-                        ? _endDate!.toFormattedDate()
-                        : 'تاريخ النهاية',
-                  ),
-                  onPressed: _startDate == null ? null : () => _pickDate(false),
-                ),
+            ),
+            icon: Icon(
+              Icons.date_range, 
+              color: _startDate != null ? AppColors.primaryTeal : Colors.grey,
+            ),
+            label: Text(
+              _startDate != null && _endDate != null
+                  // نستخدم الـ Extension الذي أنشأناه سابقاً لتوحيد الصيغة
+                  ? '${_startDate!.toFormattedDate()}   إلى   ${_endDate!.toFormattedDate()}'
+                  : 'اضغط لاختيار فترة الإجازة',
+              style: TextStyle(
+                fontSize: 16,
+                color: _startDate != null ? AppColors.primaryTeal : Colors.black87,
               ),
-            ],
+            ),
+            onPressed: _pickDateRange,
           ),
           const SizedBox(height: 16),
           TextField(

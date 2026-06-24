@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart'; // إضافة لدعم اللغات
+import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:vacation_tracker/presentation/screens/main_navigation_screen.dart';
 import 'package:vacation_tracker/presentation/screens/settings_screen.dart';
 
