@@ -1,0 +1,45 @@
+import 'package:dartz/dartz.dart';
+import 'package:drift/drift.dart';
+import '../../core/errors/exceptions.dart';
+import '../../core/errors/failures.dart';
+import '../../domain/entities/leave_record.dart';
+import '../../domain/entities/leave_type.dart';
+import '../../domain/repositories/leave_repository.dart';
+import '../database/app_database.dart';
+import '../datasources/local_data_source.dart';
+import '../models/mappers.dart';
+
+class LeaveRepositoryImpl implements LeaveRepository {
+  final LocalDataSource localDataSource;
+
+  LeaveRepositoryImpl(this.localDataSource);
+
+  @override
+  Future<Either<Failure, Unit>> addLeave(LeaveRecord leave) async {
+    try {
+      final companion = LeaveRecordsTableCompanion(
+        leaveType: Value(leave.leaveType == LeaveType.regular ? 0 : 1),
+        startDate: Value(leave.startDate),
+        endDate: Value(leave.endDate),
+        daysCount: Value(leave.daysCount),
+        notes: Value(leave.notes ?? ''),
+      );
+
+      await localDataSource.addLeaveRecord(companion);
+      return const Right(unit);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, List<LeaveRecord>>> getLeavesBetweenDates(DateTime start, DateTime end) async {
+    try {
+      final models = await localDataSource.getLeavesBetween(start, end);
+      final domainRecords = models.map((model) => model.toDomain()).toList();
+      return Right(domainRecords);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+}
