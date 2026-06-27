@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation_tracker/core/constants/app_colors.dart';
+import 'package:vacation_tracker/core/utils/app_notifications.dart';
 import 'package:vacation_tracker/core/utils/date_extension.dart';
 import 'package:vacation_tracker/core/utils/financial_year_calculator.dart';
 import 'package:vacation_tracker/domain/entities/leave_record.dart';
@@ -38,10 +39,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
         lastDate: endFinYear,
         helpText: 'اختر يوم الإجازة العارضة',
         builder: (context, child) {
-          return Theme(
-            data: Theme.of(context),
-            child: child!,
-          );
+          return Theme(data: Theme.of(context), child: child!);
         },
       );
 
@@ -57,17 +55,15 @@ class AddLeaveFormState extends State<AddLeaveForm> {
         context: context,
         firstDate: startFinYear,
         lastDate: endFinYear,
-        initialDateRange: _startDate != null && _endDate != null && _startDate != _endDate
+        initialDateRange:
+            _startDate != null && _endDate != null && _startDate != _endDate
             ? DateTimeRange(start: _startDate!, end: _endDate!)
             : null,
         saveText: 'تأكيد',
         cancelText: 'إلغاء',
         helpText: 'اختر فترة الإجازة الاعتيادية (من - إلى)',
         builder: (context, child) {
-          return Theme(
-            data: Theme.of(context),
-            child: child!,
-          );
+          return Theme(data: Theme.of(context), child: child!);
         },
       );
 
@@ -105,7 +101,10 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               border: OutlineInputBorder(),
             ),
             items: const [
-              DropdownMenuItem(value: LeaveType.regular, child: Text('اعتيادية')),
+              DropdownMenuItem(
+                value: LeaveType.regular,
+                child: Text('اعتيادية'),
+              ),
               DropdownMenuItem(value: LeaveType.casual, child: Text('عارضة')),
             ],
             onChanged: (val) {
@@ -118,33 +117,39 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             },
           ),
           const SizedBox(height: 16),
-          
+
           // زر اختيار التاريخ التكيفي
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               side: BorderSide(
-                color: _startDate != null ? AppColors.primaryTeal : Colors.grey.shade400,
+                color: _startDate != null
+                    ? AppColors.primaryTeal
+                    : Colors.grey.shade400,
               ),
             ),
             icon: Icon(
-              Icons.date_range, 
+              Icons.date_range,
               color: _startDate != null ? AppColors.primaryTeal : Colors.grey,
             ),
             label: Text(
-              _startDate == null 
-                  ? (_selectedType == LeaveType.casual ? 'اضغط لاختيار يوم الإجازة' : 'اضغط لاختيار فترة الإجازة')
-                  : (_selectedType == LeaveType.casual 
-                      ? _startDate!.toFormattedDate()
-                      : '${_startDate!.toFormattedDate()}   إلى   ${_endDate!.toFormattedDate()}'),
+              _startDate == null
+                  ? (_selectedType == LeaveType.casual
+                        ? 'اضغط لاختيار يوم الإجازة'
+                        : 'اضغط لاختيار فترة الإجازة')
+                  : (_selectedType == LeaveType.casual
+                        ? _startDate!.toFormattedDate()
+                        : '${_startDate!.toFormattedDate()}   إلى   ${_endDate!.toFormattedDate()}'),
               style: TextStyle(
                 fontSize: 16,
-                color: _startDate != null ? AppColors.primaryTeal : Colors.black87,
+                color: _startDate != null
+                    ? AppColors.primaryTeal
+                    : Colors.black87,
               ),
             ),
             onPressed: _selectLeaveDate,
           ),
-          
+
           const SizedBox(height: 16),
           TextField(
             controller: _notesController,
@@ -154,7 +159,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             ),
           ),
           const SizedBox(height: 24),
-          
+
           BlocBuilder<LeavesBloc, LeavesState>(
             bloc: widget.parentContext.read<LeavesBloc>(),
             builder: (context, state) {
@@ -165,31 +170,42 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                   foregroundColor: Colors.white,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onPressed: isLoading ? null : () {
-                  if (_startDate != null && _endDate != null) {
-                    final daysCount = _endDate!.difference(_startDate!).inDays + 1;
-                    final record = LeaveRecord(
-                      id: 0,
-                      leaveType: _selectedType,
-                      startDate: _startDate!,
-                      endDate: _endDate!,
-                      daysCount: daysCount,
-                      notes: _notesController.text,
-                    );
-                    widget.parentContext.read<LeavesBloc>().add(
-                      AddNewLeaveEvent(record),
-                    );
-                  } else {
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('الرجاء اختيار التاريخ أولاً')),
-                    );
-                  }
-                },
-                child: isLoading 
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                onPressed: isLoading
+                    ? null
+                    : () {
+                        if (_startDate != null && _endDate != null) {
+                          final daysCount =
+                              _endDate!.difference(_startDate!).inDays + 1;
+                          final record = LeaveRecord(
+                            id: 0,
+                            leaveType: _selectedType,
+                            startDate: _startDate!,
+                            endDate: _endDate!,
+                            daysCount: daysCount,
+                            notes: _notesController.text,
+                          );
+                          widget.parentContext.read<LeavesBloc>().add(
+                            AddNewLeaveEvent(record),
+                          );
+                        } else {
+                          AppNotifications.showWarning(
+                            context,
+                            'الرجاء اختيار التاريخ أولاً',
+                          );
+                        }
+                      },
+                child: isLoading
+                    ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
                     : const Text('حفظ الإجازة', style: TextStyle(fontSize: 16)),
               );
-            }
+            },
           ),
           const SizedBox(height: 16),
         ],

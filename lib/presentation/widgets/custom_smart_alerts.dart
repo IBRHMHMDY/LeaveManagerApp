@@ -3,8 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation_tracker/presentation/blocs/leaves/leaves_bloc.dart';
 import 'package:vacation_tracker/presentation/widgets/custom_alert_banner.dart';
 
-class BuildSmartAlerts extends StatelessWidget {
-  const BuildSmartAlerts({super.key}); // تم تصحيح الـ Constructor
+class CustomSmartAlerts extends StatelessWidget {
+  const CustomSmartAlerts({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -23,12 +23,18 @@ class BuildSmartAlerts extends StatelessWidget {
               ),
             );
           }
-
           // إضافة تحذير / خطأ (Error)
           if (state.balance.remainingRegular <= 3) {
             alerts.add(
               const CustomAlertBanner(
-                message: 'تحذير: متبقى من رصيد اجازاتك الاعتياديه 3 ايام فقط.',
+                message: 'تنبيه: رصيد اجازاتك الإعتياديه قارب على النفاذ.',
+                type: AlertType.warning,
+              ),
+            );
+          }else if (state.balance.remainingRegular == 0){
+            alerts.add(
+              const CustomAlertBanner(
+                message: 'تحذير: لقد نفذ رصيد الاجازات الإعتياديه',
                 type: AlertType.error,
               ),
             );
@@ -36,7 +42,22 @@ class BuildSmartAlerts extends StatelessWidget {
           if (state.balance.remainingCasual <= 3) {
             alerts.add(
               const CustomAlertBanner(
-                message: 'تحذير: متبقى من رصيد اجازاتك العارضه 3 ايام فقط.',
+                message: 'تنبيه: رصيد اجازاتك العارضه قارب على النفاذ.',
+                type: AlertType.error,
+              ),
+            );
+          }else if (state.balance.remainingCasual == 0){
+            alerts.add(
+              const CustomAlertBanner(
+                message: 'تحذير: نفذ رصيد الاجازات العارضه',
+                type: AlertType.error,
+              ),
+            );
+          }
+          if (state.balance.remainingCasual == 0 && state.balance.remainingRegular == 0){
+            alerts.add(
+              const CustomAlertBanner(
+                message: 'تحذير: لقد نفذ رصيدكم',
                 type: AlertType.error,
               ),
             );

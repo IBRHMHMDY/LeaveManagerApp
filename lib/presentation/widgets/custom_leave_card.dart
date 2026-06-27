@@ -1,14 +1,13 @@
 import 'package:flutter/material.dart';
-// تأكد من تعديل مسارات الاستيراد التالية بناءً على هيكل مشروعك
 import '../../domain/entities/leave_record.dart'; // مسار كلاس LeaveRecord
 import '../../domain/entities/leave_type.dart';     // مسار Enum الخاص بـ LeaveType
 import '../../core/constants/app_colors.dart';      // مسار الألوان
 import '../../core/utils/date_extension.dart';      // مسار إضافة تهيئة التاريخ
 
-class LeaveCard extends StatelessWidget {
+class CustomLeaveCard extends StatelessWidget {
   final LeaveRecord leave;
 
-  const LeaveCard({
+  const CustomLeaveCard({
     super.key,
     required this.leave,
   });

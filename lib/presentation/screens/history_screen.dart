@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vacation_tracker/presentation/widgets/build_leave_card.dart';
+import 'package:vacation_tracker/presentation/widgets/custom_leave_card.dart';
 
 import '../../domain/entities/leave_type.dart';
 import '../../core/constants/app_colors.dart';
@@ -36,7 +36,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('سجل الإجازات'), centerTitle: true),
+      appBar: AppBar(title: const Text('دفتر الإجازات'), centerTitle: true),
       body: Column(
         children: [
           _buildFilterChips(),
@@ -68,7 +68,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     itemCount: filteredLeaves.length,
                     itemBuilder: (context, index) {
                       final leave = filteredLeaves[index];
-                      return LeaveCard(leave: leave);
+                      return CustomLeaveCard(leave: leave);
                     },
                   );
                 }

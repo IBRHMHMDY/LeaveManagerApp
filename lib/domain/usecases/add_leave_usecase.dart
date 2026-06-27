@@ -17,7 +17,7 @@ class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
     // 1. التحقق من أن الإجازة تقع ضمن السنة المالية الحالية
     if (!FinancialYearCalculator.isDateInCurrentFinancialYear(leave.startDate) ||
         !FinancialYearCalculator.isDateInCurrentFinancialYear(leave.endDate)) {
-      return const Left(ValidationFailure('تاريخ الإجازة يجب أن يكون ضمن السنة المالية الحالية.'));
+      return const Left(ValidationFailure('يبدو أن التاريخ المختار خارج النطاق. يرجى التأكد من أن الإجازة تقع ضمن السنة المالية الحالية.'));
     }
 
     // 2. جلب إجازات السنة المالية الحالية للتحقق من عدم وجود تداخل
@@ -43,7 +43,7 @@ class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
           if (isOverlapping) {
             final leaveTypeName = existingLeave.leaveType == LeaveType.regular ? 'اعتيادية' : 'عارضة';
             
-            return Left(ValidationFailure('يوجد إجازة "$leaveTypeName" مسجلة مسبقاً في هذه الفترة.'));
+            return Left(ValidationFailure('تداخل في التواريخ: لديك إجازة "$leaveTypeName" مسجلة بالفعل في نفس الفترة، يرجى مراجعة السجل.'));
           }
         }
 

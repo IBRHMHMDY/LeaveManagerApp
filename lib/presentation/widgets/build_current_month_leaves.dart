@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation_tracker/presentation/blocs/leaves/leaves_bloc.dart';
-import 'package:vacation_tracker/presentation/widgets/build_leave_card.dart';
+import 'package:vacation_tracker/presentation/widgets/custom_leave_card.dart';
 
 class BuildCurrentMonthLeaves extends StatelessWidget {
   const BuildCurrentMonthLeaves(BuildContext context, {super.key});
@@ -42,7 +42,7 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
                 // final color = isRegular
                 //     ? AppColors.regularLeaveColor
                 //     : AppColors.casualLeaveColor;
-                return LeaveCard(leave: leave);
+                return CustomLeaveCard(leave: leave);
                 // return Card(
                 //   margin: const EdgeInsets.only(bottom: 8),
                 //   child: ListTile(

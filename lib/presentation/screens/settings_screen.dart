@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vacation_tracker/core/utils/app_notifications.dart';
 import 'package:vacation_tracker/core/utils/string_extension.dart';
 import 'package:vacation_tracker/presentation/blocs/leaves/leaves_bloc.dart';
 import 'package:vacation_tracker/presentation/widgets/custom_text_field.dart';
@@ -43,7 +44,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   String? _numberValidator(String? value) {
     if (value == null || value.trim().isEmpty) return 'مطلوب';
-    if (value.toIntSafely() == 0 && value.trim() != '0' && value.trim() != '٠') {
+    if (value.toIntSafely() == 0 &&
+        value.trim() != '0' &&
+        value.trim() != '٠') {
       return 'أرقام فقط';
     }
     return null;
@@ -67,12 +70,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
         // 2. معالجة نجاح الحفظ
         else if (state is SettingsSavedSuccess) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('تم حفظ الإعدادات بنجاح'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          AppNotifications.showSuccess(context, 'تم حفظ الإعدادات بنجاح');
           context.read<SettingsBloc>().add(LoadSettingsEvent());
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
@@ -105,14 +103,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   label: 'اسم الموظف',
                   icon: Icons.person_outline,
                   controller: _nameController,
-                  validator: (val) => val == null || val.trim().isEmpty ? 'مطلوب' : null,
+                  validator: (val) =>
+                      val == null || val.trim().isEmpty ? 'مطلوب' : null,
                 ),
-                
+
                 CustomTextField(
                   label: 'المسمى الوظيفي',
                   icon: Icons.work_outline,
                   controller: _jobController,
-                  validator: (val) => val == null || val.trim().isEmpty ? 'مطلوب' : null,
+                  validator: (val) =>
+                      val == null || val.trim().isEmpty ? 'مطلوب' : null,
                 ),
 
                 const SizedBox(height: 16),
@@ -121,7 +121,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-                
+
                 Row(
                   children: [
                     Expanded(
@@ -195,11 +195,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 ResetAllLeavesEvent(),
                               );
                               Navigator.pop(ctx);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(
-                                  content: Text('تم تصفير الأرصدة بنجاح'),
-                                  backgroundColor: Colors.green,
-                                ),
+                              AppNotifications.showSuccess(
+                                context,
+                                'تم تصفير الأرصدة بنجاح',
                               );
                             },
                             child: const Text('نعم، مسح'),

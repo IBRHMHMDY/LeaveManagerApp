@@ -59,8 +59,15 @@ class BuildBalancesSection extends StatelessWidget {
       elevation: 4, // Enhanced elevation for better depth
       shadowColor: color.withAlpha(
         50,
-      ), // Colored shadow matching the leave type
+      ),
+      color: AppColors.lightSurface, // Colored shadow matching the leave type
       shape: RoundedRectangleBorder(
+        side: BorderSide(
+          color: color,
+          strokeAlign: BorderSide.strokeAlignCenter,
+          style: BorderStyle.solid,
+          width: 1,
+        ),
         borderRadius: BorderRadius.circular(20),
       ), // Smoother radius
       child: Padding(
@@ -86,7 +93,7 @@ class BuildBalancesSection extends StatelessWidget {
                     value: progress,
                     strokeWidth: 10,
                     // FIX: Changed withAlpha(2) to withAlpha(25)
-                    backgroundColor: color.withAlpha(25),
+                    backgroundColor: color.withAlpha(50),
                     color: color,
                     strokeCap: StrokeCap.round, // Modern rounded stroke
                   ),
@@ -107,7 +114,7 @@ class BuildBalancesSection extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 13,
                         color: Colors.grey.shade600,
-                        fontWeight: FontWeight.w500,
+                        fontWeight: FontWeight.w700,
                       ),
                     ),
                   ],

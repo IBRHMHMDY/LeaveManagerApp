@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart'; // ضروري للتحكم في أشرطة النظام
+import 'package:flutter/services.dart'; 
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../blocs/settings/settings_bloc.dart';
 import 'main_navigation_screen.dart';
@@ -14,28 +14,54 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
+  late Animation<double> _logoScaleAnimation;
+  late Animation<Offset> _textSlideAnimation;
   late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
-    
-    // 1. تفعيل وضع immersiveSticky: يخفي الأشرطة ولن تظهر إلا بالسحب، ثم تختفي مجدداً
+
+    // إخفاء الأشرطة للحصول على شاشة كاملة
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
 
+    // 1. إعداد المتحكم في الحركة (Animation Controller)
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 1500), // زيادة وقت حركة الظهور لتصبح أهدأ
+      duration: const Duration(milliseconds: 2000), // مدة الحركة أصبحت أسرع وأكثر حيوية
     );
-    
+
+    // 2. حركة ارتداد (Elastic Bounce) للشعار
+    _logoScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
+      ),
+    );
+
+    // 3. حركة انزلاق (Slide Up) للنصوص للأعلى
+    _textSlideAnimation = Tween<Offset>(
+      begin: const Offset(0, 0.3),
+      end: Offset.zero,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
+
+    // 4. ظهور تدريجي عام (Fade)
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.2, 1.0, curve: Curves.easeIn),
+      ),
     );
 
     _animationController.forward();
 
-    // 2. زيادة التأخير الزمني إلى ثانيتين ونصف (2500ms) لضمان رؤية المستخدم للشاشة بالكامل
-    Future.delayed(const Duration(milliseconds: 5000), () {
+    // تقليل وقت الانتظار إلى 3 ثوانٍ لتحسين الـ UX
+    Future.delayed(const Duration(milliseconds: 3000), () {
       if (mounted) {
         context.read<SettingsBloc>().add(CheckSettingsEvent());
       }
@@ -44,11 +70,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   void dispose() {
-    // 3. تم إزالة كود (setEnabledSystemUIMode) من هنا لكي يظل التطبيق 
-    // بالكامل في وضع الشاشة الكاملة (بدون شريط سفلي) كما طلبت.
-    
     _animationController.dispose();
     super.dispose();
+  }
+
+  // استعادة أشرطة النظام (الساعة والبطارية) قبل مغادرة شاشة البداية
+  void _restoreSystemUI() {
+    SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
   }
 
   @override
@@ -56,84 +84,192 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
         if (state is SettingsInitial) {
+          _restoreSystemUI();
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const MainNavigationScreen()),
           );
         } else if (state is SettingsNotFound) {
+          _restoreSystemUI();
           Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (_) => const SettingsScreen(isFirstTime: true)),
+            MaterialPageRoute(
+              builder: (_) => const SettingsScreen(isFirstTime: true),
+            ),
           );
         }
       },
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: FadeTransition(
-          opacity: _fadeAnimation,
-          child: Stack(
-            children: [
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(24),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).colorScheme.primaryContainer,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Theme.of(context).colorScheme.primary.withAlpha(50),
-                            blurRadius: 20,
-                            spreadRadius: 5,
-                            offset: const Offset(0, 5),
+        body: Stack(
+          children: [
+            // ديكور خلفية (دوائر شفافة هادئة)
+            Positioned(
+              top: -100,
+              right: -50,
+              child: Container(
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.primary.withAlpha(15),
+                ),
+              ),
+            ),
+            Positioned(
+              bottom: -80,
+              left: -80,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: Theme.of(context).colorScheme.secondary.withAlpha(15),
+                ),
+              ),
+            ),
+
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  // الشعار المخصص مع حركة التكبير والارتداد
+                  ScaleTransition(
+                    scale: _logoScaleAnimation,
+                    child: _buildAppLogo(context),
+                  ),
+                  const SizedBox(height: 32),
+                  
+                  // النصوص مع حركة الانزلاق والظهور
+                  SlideTransition(
+                    position: _textSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Column(
+                        children: [
+                          Text(
+                            'مُتتبع الإجازات',
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                                  fontWeight: FontWeight.w900,
+                                  color: Theme.of(context).colorScheme.primary,
+                                  letterSpacing: 1.2,
+                                ),
+                          ),
+                          const SizedBox(height: 12),
+                          // استخدام شارة (Chip) للنص الفرعي ليكون أكثر عصرية
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).colorScheme.primaryContainer.withAlpha(150),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              'نظم إجازاتك بسهولة وذكاء',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.primary,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                            ),
                           ),
                         ],
                       ),
-                      child: Icon(
-                        Icons.event_available,
-                        size: 80,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
                     ),
-                    const SizedBox(height: 24),
-                    Text(
-                      'مُتتبع الإجازات',
-                      style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: Theme.of(context).colorScheme.primary,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      'نظم إجازاتك بسهولة وذكاء',
-                      style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withAlpha(20),
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
-              Positioned(
-                bottom: 48,
-                left: 0,
-                right: 0,
+            ),
+            
+            // مؤشر التحميل والإصدار في الأسفل
+            Positioned(
+              bottom: 48,
+              left: 0,
+              right: 0,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
                 child: Column(
                   children: [
-                    const CircularProgressIndicator(),
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3.5,
+                        color: Theme.of(context).colorScheme.primary.withAlpha(150),
+                        strokeCap: StrokeCap.round,
+                      ),
+                    ),
                     const SizedBox(height: 16),
                     Text(
                       'الإصدار 1.0.0',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withAlpha(20),
-                        letterSpacing: 1.2,
-                      ),
+                            color: Theme.of(context).colorScheme.onSurface.withAlpha(100),
+                            letterSpacing: 1.5,
+                            fontWeight: FontWeight.bold,
+                          ),
                     ),
                   ],
                 ),
               ),
-            ],
-          ),
+            ),
+          ],
         ),
+      ),
+    );
+  }
+
+  // تصميم شعار (Logo) مخصص واحترافي باستخدام الـ Widgets فقط
+  Widget _buildAppLogo(BuildContext context) {
+    return Container(
+      width: 120,
+      height: 120,
+      decoration: BoxDecoration(
+        gradient: LinearGradient(
+          colors: [
+            Theme.of(context).colorScheme.primary,
+            Theme.of(context).colorScheme.primary.withAlpha(150), 
+          ],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(32),
+        boxShadow: [
+          BoxShadow(
+            color: Theme.of(context).colorScheme.primary.withAlpha(80),
+            blurRadius: 30,
+            offset: const Offset(0, 15),
+          ),
+        ],
+      ),
+      child: Stack(
+        alignment: Alignment.center,
+        children: [
+          // أيقونة التقويم الرئيسية
+          Icon(
+            Icons.calendar_month_rounded,
+            size: 60,
+            color: Theme.of(context).colorScheme.onPrimary,
+          ),
+          // دائرة وعلامة صح متداخلة (Layered Icon)
+          Positioned(
+            bottom: 25,
+            right: 22,
+            child: Container(
+              padding: const EdgeInsets.all(4),
+              decoration: BoxDecoration(
+                color: Theme.of(context).colorScheme.surface,
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withAlpha(25),
+                    blurRadius: 4,
+                  )
+                ]
+              ),
+              child: Icon(
+                Icons.check_circle_rounded,
+                size: 20,
+                color: Theme.of(context).colorScheme.primary,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
