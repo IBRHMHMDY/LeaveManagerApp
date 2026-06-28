@@ -1,15 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_localizations/flutter_localizations.dart';
-import 'package:vacation_tracker/presentation/screens/splash_screen.dart';
-import 'core/di/injection_container.dart' as di;
-import 'presentation/blocs/settings/settings_bloc.dart';
-import 'presentation/blocs/leaves/leaves_bloc.dart';
+import 'package:easy_localization/easy_localization.dart';
+import 'package:vacation_tracker/core/di/injection_container.dart' as di;
+import 'package:vacation_tracker/core/router/app_router.dart';
+import 'package:vacation_tracker/core/themes/app_theme.dart';
+import 'package:vacation_tracker/core/themes/theme_cubit.dart';
+import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
+import 'package:vacation_tracker/features/settings/presentstion/bloc/settings_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  await EasyLocalization.ensureInitialized();
   await di.init();
-  runApp(const VacationsTrackerApp());
+  
+  runApp(
+    EasyLocalization(
+      supportedLocales: const [
+        Locale('ar', 'EG'),
+        Locale('en', 'US'),
+      ],
+      path: 'assets/translations',
+      fallbackLocale: const Locale('ar', 'EG'),
+      startLocale: const Locale('ar', 'EG'),
+      child: const VacationsTrackerApp(),
+    ),
+  );
 }
 
 class VacationsTrackerApp extends StatelessWidget {
@@ -19,45 +34,28 @@ class VacationsTrackerApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MultiBlocProvider(
       providers: [
-        BlocProvider(
-          create: (_) => di.sl<SettingsBloc>(),
-        ),
+        BlocProvider(create: (_) => di.sl<SettingsBloc>()),
         BlocProvider(create: (_) => di.sl<LeavesBloc>()),
+        BlocProvider(create: (_) => ThemeCubit()),
       ],
-      child: MaterialApp(
-        debugShowCheckedModeBanner: false,
-        title: 'Vacation Tracker',
-        
-        // --- إعدادات اللغة والاتجاه (RTL) ---
-        locale: const Locale('ar', 'EG'),
-        supportedLocales: const [Locale('ar', 'EG')],
-        localizationsDelegates: const [
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
+      child: BlocBuilder<ThemeCubit, ThemeMode>(
+        builder: (context, themeMode) {
+          return MaterialApp.router(
+            debugShowCheckedModeBanner: false,
+            title: 'app_title'.tr(), 
+            
+            localizationsDelegates: context.localizationDelegates,
+            supportedLocales: context.supportedLocales,
+            locale: context.locale,
+            // ---------------------------------------------------
 
-        // --- إعدادات الوضع الليلي والنهاري ---
-        themeMode: ThemeMode.system, // يعتمد على إعدادات نظام المستخدم
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF008080),
-            brightness: Brightness.light,
-          ),
-          useMaterial3: true,
-          fontFamily: 'Cairo',
-        ),
-        darkTheme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(
-            seedColor: const Color(0xFF008080),
-            brightness: Brightness.dark,
-          ),
-          useMaterial3: true,
-          fontFamily: 'Cairo',
-        ),
-        home: const SplashScreen(),
+            themeMode: themeMode,
+            theme: AppTheme.lightTheme,
+            darkTheme: AppTheme.darkTheme,
+            routerConfig: AppRouter.router,
+          );
+        },
       ),
     );
   }
 }
-

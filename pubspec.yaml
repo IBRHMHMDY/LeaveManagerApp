@@ -28,6 +28,8 @@ dependencies:
   flutter_localizations:        # لدعم اللغة العربية والاتجاه من اليمين لليسار (RTL)
     sdk: flutter
   share_plus: ^10.0.0           # إضافة حزمة المشاركة الحديثة
+  go_router: ^17.3.0
+  easy_localization: ^3.0.8
 
 dev_dependencies:
   flutter_test:
@@ -44,6 +46,8 @@ flutter:
 
   # Material Icons font is
   uses-material-design: true
+  assets:
+    - assets/translations/
   
   fonts:
     - family: Cairo
@@ -51,7 +55,6 @@ flutter:
         - asset: assets/fonts/Cairo-Regular.ttf
         - asset: assets/fonts/Cairo-Bold.ttf
           weight: 700
-
 flutter_native_splash:
   color: "#F8F9FA" # لون الخلفية للوضع النهاري (Light Background)
   color_dark: "#121212" # لون الخلفية للوضع الليلي (Dark Background)

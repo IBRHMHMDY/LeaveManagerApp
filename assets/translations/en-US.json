@@ -1,0 +1,14 @@
+{
+  "app_title": "Vacation Tracker",
+  "app_subtitle": "Manage your leaves smartly",
+  "dashboard": "Dashboard",
+  "history": "My History",
+  "settings": "Settings",
+  "add_new_leave": "New Leave",
+  "regular_leave": "Regular",
+  "casual_leave": "Casual",
+  "financial_year": "Current Financial Year: {}",
+  "days": "Days",
+  "welcome_msg": "Welcome, {}",
+  "success_add": "A leave day has been deducted and recorded successfully."
+}

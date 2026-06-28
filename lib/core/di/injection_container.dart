@@ -1,53 +1,67 @@
 import 'package:get_it/get_it.dart';
-import 'package:vacation_tracker/data/repositories/leave_repository_impl.dart';
-import 'package:vacation_tracker/data/repositories/settings_repository_impl.dart';
-import 'package:vacation_tracker/domain/usecases/reset_leaves_usecase.dart';
-import '../database/app_database.dart';
-import '../../data/datasources/local_data_source.dart';
-
-import '../../domain/repositories/leave_repository.dart';
-import '../../domain/repositories/settings_repository.dart';
-import '../../domain/usecases/add_leave_usecase.dart';
-import '../../domain/usecases/calculate_balances_usecase.dart';
-import '../../domain/usecases/get_current_year_leaves_usecase.dart';
-import '../../domain/usecases/settings_usecases.dart';
-import '../../presentation/blocs/leaves/leaves_bloc.dart';
-import '../../presentation/blocs/settings/settings_bloc.dart';
+import 'package:vacation_tracker/core/database/app_database.dart';
+import 'package:vacation_tracker/features/settings/data/datasources/settings_local_data_source.dart';
+import 'package:vacation_tracker/features/leaves/data/datasources/leaves_local_data_source.dart';
+import 'package:vacation_tracker/features/leaves/data/repositories/leave_repository_impl.dart';
+import 'package:vacation_tracker/features/leaves/domain/repositories/leave_repository.dart';
+import 'package:vacation_tracker/features/leaves/domain/usecases/add_leave_usecase.dart';
+import 'package:vacation_tracker/features/leaves/domain/usecases/calculate_balances_usecase.dart';
+import 'package:vacation_tracker/features/leaves/domain/usecases/get_current_year_leaves_usecase.dart';
+import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
+import 'package:vacation_tracker/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:vacation_tracker/features/settings/domain/repositories/settings_repository.dart';
+import 'package:vacation_tracker/features/settings/domain/usecases/settings_usecase.dart';
+import 'package:vacation_tracker/features/settings/presentstion/bloc/settings_bloc.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
   // --- BLoCs ---
-  sl.registerFactory(() => SettingsBloc(
-        checkSettingsExist: sl(),
-        getSettings: sl(),
-        saveSettings: sl(),
-      ));
-  sl.registerFactory(() => LeavesBloc(
-        calculateBalances: sl(),
-        getCurrentYearLeaves: sl(),
-        addLeave: sl(),
-        resetLeaves: sl(), // أضف هذا السطر
-      ));
+  sl.registerFactory(
+    () => SettingsBloc(
+      checkSettingsExist: sl(),
+      getSettings: sl(),
+      saveSettings: sl(),
+    ),
+  );
+  sl.registerFactory(
+    () => LeavesBloc(
+      calculateBalances: sl(),
+      getCurrentYearLeaves: sl(),
+      addLeave: sl(),
+      resetLeaves: sl(),
+    ),
+  );
 
   // --- Use Cases ---
   sl.registerLazySingleton(() => CheckSettingsExistUseCase(sl()));
   sl.registerLazySingleton(() => GetSettingsUseCase(sl()));
   sl.registerLazySingleton(() => SaveSettingsUseCase(sl()));
-  sl.registerLazySingleton(() => AddLeaveUseCase(sl()));
+  sl.registerLazySingleton(() => ResetBalancesUseCase(sl()));
+  sl.registerLazySingleton(
+    () => AddLeaveUseCase(calculateBalances: sl(), repository: sl()),
+  );
   sl.registerLazySingleton(() => GetCurrentYearLeavesUseCase(sl()));
-  sl.registerLazySingleton(() => CalculateBalancesUseCase(
-        getSettingsUseCase: sl(),
-        getCurrentYearLeavesUseCase: sl(),
-      ));
-  sl.registerLazySingleton(() => ResetLeavesUseCase(sl()));
+  sl.registerLazySingleton(
+    () => CalculateBalancesUseCase(
+      getSettingsUseCase: sl(),
+      getCurrentYearLeavesUseCase: sl(),
+    ),
+  );
 
   // --- Repositories ---
-  sl.registerLazySingleton<SettingsRepository>(() => SettingsRepositoryImpl(sl()));
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(sl()),
+  );
   sl.registerLazySingleton<LeaveRepository>(() => LeaveRepositoryImpl(sl()));
 
   // --- Data Sources ---
-  sl.registerLazySingleton<LocalDataSource>(() => LocalDataSourceImpl(sl()));
+  sl.registerLazySingleton<LeavesLocalDataSource>(
+    () => LeavesLocalDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<SettingsLocalDataSource>(
+    () => SettingsLocalDataSourceImpl(sl()),
+  );
 
   // --- Database ---
   sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
