@@ -135,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Column(
                         children: [
                           Text(
-                            'مُتتبع الإجازات',
+                            'دفتر أجازاتى',
                             style: Theme.of(context).textTheme.headlineMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w900,

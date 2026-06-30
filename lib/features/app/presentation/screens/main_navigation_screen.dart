@@ -2,13 +2,14 @@ import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation_tracker/core/constants/app_colors.dart';
+import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:vacation_tracker/features/leaves/presentation/shared_widgets/show_add_leave_bottomsheet.dart';
+import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:vacation_tracker/shared/widgets/theme_toggle_button.dart';
 import 'package:vacation_tracker/features/leaves/presentation/history/screens/history_screen.dart';
 import 'package:vacation_tracker/features/leaves/presentation/home/screens/home_screen.dart';
 import 'package:vacation_tracker/features/settings/presentation/screens/settings_screen.dart';
-import '../../../leaves/presentation/blocs/leaves_bloc.dart';
-import '../../../settings/presentation/bloc/settings_bloc.dart';
+
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -52,7 +53,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           ? FloatingActionButton.extended(
               onPressed: () => showAddLeaveBottomSheet(context),
               icon: const Icon(Icons.add),
-              label: const Text('إجازة جديدة'),
+              label: Text('new_leave'.tr()),
               backgroundColor: AppColors.accentCoral,
               foregroundColor: Colors.white,
             )
@@ -60,13 +61,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
-        destinations: const [
-          NavigationDestination(icon: Icon(Icons.home), label: 'الرئيسية'),
+        destinations: [
+          NavigationDestination(icon: const Icon(Icons.dashboard), label: 'dashboard'.tr()),
           NavigationDestination(
-            icon: Icon(Icons.history),
-            label: 'دفتر إجازاتي',
+            icon: const Icon(Icons.checklist),
+            label: 'history'.tr(),
           ),
-          NavigationDestination(icon: Icon(Icons.settings), label: 'الإعدادات'),
+          NavigationDestination(icon: const Icon(Icons.settings), label: 'settings'.tr()),
         ],
       ),
     );

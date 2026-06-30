@@ -1,7 +1,6 @@
 // lib/features/leaves/presentation/widgets/add_leave_form.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vacation_tracker/core/utils/app_notifications.dart';
 import 'package:vacation_tracker/core/utils/extenstions/date_extension.dart';
 import 'package:vacation_tracker/core/utils/financial_year_calculator.dart';
 import 'package:vacation_tracker/features/leaves/domain/entities/leave_record_entity.dart';
@@ -26,44 +25,27 @@ class AddLeaveFormState extends State<AddLeaveForm> {
   void _selectLeaveDate() async {
     final startFinYear = FinancialYearCalculator.currentFinancialYearStart;
     final endFinYear = FinancialYearCalculator.currentFinancialYearEnd;
-    final now = DateTime.now();
 
-    if (_selectedType == LeaveType.casual) {
-      final DateTime? picked = await showDatePicker(
-        context: context,
-        initialDate: now.isBefore(startFinYear) ? startFinYear : (now.isAfter(endFinYear) ? endFinYear : now),
-        firstDate: startFinYear,
-        lastDate: endFinYear,
-        helpText: 'اختر يوم الإجازة العارضة',
-        builder: (context, child) => Theme(data: Theme.of(context), child: child!),
-      );
+    final DateTimeRange? picked = await showDateRangePicker(
+      context: context,
+      firstDate: startFinYear,
+      lastDate: endFinYear,
+      initialDateRange:
+          _startDate != null && _endDate != null && _startDate != _endDate
+          ? DateTimeRange(start: _startDate!, end: _endDate!)
+          : null,
+      saveText: 'تأكيد',
+      cancelText: 'إلغاء',
+      helpText: 'اختر فترة الإجازة الاعتيادية (من - إلى)',
+      builder: (context, child) =>
+          Theme(data: Theme.of(context), child: child!),
+    );
 
-      if (picked != null) {
-        setState(() {
-          _startDate = picked;
-          _endDate = picked;
-        });
-      }
-    } else {
-      final DateTimeRange? picked = await showDateRangePicker(
-        context: context,
-        firstDate: startFinYear,
-        lastDate: endFinYear,
-        initialDateRange: _startDate != null && _endDate != null && _startDate != _endDate
-            ? DateTimeRange(start: _startDate!, end: _endDate!)
-            : null,
-        saveText: 'تأكيد',
-        cancelText: 'إلغاء',
-        helpText: 'اختر فترة الإجازة الاعتيادية (من - إلى)',
-        builder: (context, child) => Theme(data: Theme.of(context), child: child!),
-      );
-
-      if (picked != null) {
-        setState(() {
-          _startDate = picked.start;
-          _endDate = picked.end;
-        });
-      }
+    if (picked != null) {
+      setState(() {
+        _startDate = picked.start;
+        _endDate = picked.end;
+      });
     }
   }
 
@@ -99,7 +81,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               ),
             ),
             const SizedBox(height: 24),
-            
+
             // 2. عنوان النافذة بشكل أنيق
             Row(
               children: [
@@ -108,7 +90,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                 Text(
                   'تسجيل إجازة جديدة',
                   style: TextStyle(
-                    fontSize: 18, 
+                    fontSize: 18,
                     fontWeight: FontWeight.bold,
                     color: colorScheme.onSurface,
                   ),
@@ -121,14 +103,25 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             DropdownButtonFormField<LeaveType>(
               initialValue: _selectedType,
               dropdownColor: colorScheme.surface,
-              style: TextStyle(color: colorScheme.onSurface, fontSize: 16, fontFamily: 'Cairo'),
+              style: TextStyle(
+                color: colorScheme.onSurface,
+                fontSize: 16,
+                fontFamily: 'Cairo',
+              ),
               decoration: InputDecoration(
                 labelText: 'نوع الإجازة',
-                labelStyle: TextStyle(color: colorScheme.onSurface.withAlpha(150)),
-                prefixIcon: Icon(Icons.category_rounded, color: colorScheme.primary),
+                labelStyle: TextStyle(
+                  color: colorScheme.onSurface.withAlpha(150),
+                ),
+                prefixIcon: Icon(
+                  Icons.category_rounded,
+                  color: colorScheme.primary,
+                ),
                 filled: true,
                 fillColor: fillColor,
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: borderColor),
@@ -137,10 +130,16 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                   borderRadius: BorderRadius.circular(12),
                   borderSide: BorderSide(color: colorScheme.primary, width: 2),
                 ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                contentPadding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 16,
+                ),
               ),
               items: const [
-                DropdownMenuItem(value: LeaveType.regular, child: Text('اعتيادية')),
+                DropdownMenuItem(
+                  value: LeaveType.regular,
+                  child: Text('اعتيادية'),
+                ),
                 DropdownMenuItem(value: LeaveType.casual, child: Text('عارضة')),
               ],
               onChanged: (val) {
@@ -158,12 +157,17 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               onTap: _selectLeaveDate,
               borderRadius: BorderRadius.circular(12),
               child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+                padding: const EdgeInsets.symmetric(
+                  vertical: 16,
+                  horizontal: 16,
+                ),
                 decoration: BoxDecoration(
                   color: fillColor,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: _startDate != null ? colorScheme.primary : borderColor,
+                    color: _startDate != null
+                        ? colorScheme.primary
+                        : borderColor,
                     width: _startDate != null ? 1.5 : 1,
                   ),
                 ),
@@ -171,20 +175,26 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                   children: [
                     Icon(
                       Icons.date_range_rounded,
-                      color: _startDate != null ? colorScheme.primary : colorScheme.primary,
+                      color: _startDate != null
+                          ? colorScheme.primary
+                          : colorScheme.primary,
                     ),
                     const SizedBox(width: 12),
                     Expanded(
                       child: Text(
                         _startDate == null
-                            ? (_selectedType == LeaveType.casual ? 'اضغط لاختيار يوم الإجازة' : 'اضغط لاختيار فترة الإجازة')
-                            : (_selectedType == LeaveType.casual
-                                  ? _startDate!.toFormattedDate()
-                                  : '${_startDate!.toFormattedDate()}   إلى   ${_endDate!.toFormattedDate()}'),
+                            ? 'اضغط لاختيار فترة الإجازة'
+                            : '${_startDate!.toFormattedDate()}   إلى   ${_endDate!.toFormattedDate()}',
+                        textDirection: TextDirection.rtl,
+                        textAlign: TextAlign.center,
                         style: TextStyle(
                           fontSize: 15,
-                          fontWeight: _startDate != null ? FontWeight.bold : FontWeight.normal,
-                          color: _startDate != null ? colorScheme.primary : colorScheme.onSurface.withAlpha(150),
+                          fontWeight: _startDate != null
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: _startDate != null
+                              ? colorScheme.primary
+                              : colorScheme.onSurface.withAlpha(150),
                         ),
                       ),
                     ),
@@ -221,7 +231,8 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                       ? null
                       : () {
                           if (_startDate != null && _endDate != null) {
-                            final daysCount = _endDate!.difference(_startDate!).inDays + 1;
+                            final daysCount =
+                                _endDate!.difference(_startDate!).inDays + 1;
                             final record = LeaveRecord(
                               id: 0,
                               leaveType: _selectedType,
@@ -230,18 +241,27 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                               daysCount: daysCount,
                               notes: _notesController.text,
                             );
-                            widget.parentContext.read<LeavesBloc>().add(AddNewLeaveEvent(record));
-                          } else {
-                            AppNotifications.showWarning(context, 'الرجاء اختيار التاريخ أولاً');
+                            widget.parentContext.read<LeavesBloc>().add(
+                              AddNewLeaveEvent(record),
+                            );
                           }
                         },
                   child: isLoading
                       ? SizedBox(
                           height: 24,
                           width: 24,
-                          child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2.5),
+                          child: CircularProgressIndicator(
+                            color: colorScheme.onPrimary,
+                            strokeWidth: 2.5,
+                          ),
                         )
-                      : const Text('حفظ الإجازة', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                      : const Text(
+                          'حفظ الإجازة',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                 );
               },
             ),

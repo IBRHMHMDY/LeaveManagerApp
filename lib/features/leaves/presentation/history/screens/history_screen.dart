@@ -35,7 +35,6 @@ class _HistoryScreenState extends State<HistoryScreen> {
               builder: (context, state) {
                 if (state is LeavesLoaded) {
                   final filteredLeaves = state.currentYearLeaves.where((leave) {
-                    // الفلترة النظيفة باستخدام Enum
                     if (_selectedFilter == LeaveFilter.all) {
                       return true;
                     }

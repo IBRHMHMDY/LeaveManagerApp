@@ -38,26 +38,7 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
               ),
               const SizedBox(height: 12),
               ...monthLeaves.map((leave) {
-                // final isRegular = leave.leaveType == LeaveType.regular;
-                // final color = isRegular
-                //     ? AppColors.regularLeaveColor
-                //     : AppColors.casualLeaveColor;
                 return CustomLeaveCard(leave: leave);
-                // return Card(
-                //   margin: const EdgeInsets.only(bottom: 8),
-                //   child: ListTile(
-                //     leading: Container(
-                //       width: 4,
-                //       color: color,
-                //     ),
-                //     title: Text(isRegular ? 'اعتيادية' : 'عارضة', style: TextStyle(fontWeight: FontWeight.bold, color: color)),
-                //     subtitle: Text('${leave.startDate.toFormattedDate()} إلى ${leave.endDate.toFormattedDate()}'),
-                //     trailing: Text(
-                //       '${leave.daysCount} أيام',
-                //       style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
-                //     ),
-                //   ),
-                // );
               }),
             ],
           );
