@@ -8,4 +8,5 @@ abstract class LeaveRepository {
   
   /// جلب جميع الإجازات ضمن نطاق زمني معين (للسنة المالية)
   Future<Either<Failure, List<LeaveRecord>>> getLeavesBetweenDates(DateTime start, DateTime end);
+  Future<Either<Failure, Unit>> deleteLeave(int id);
 }

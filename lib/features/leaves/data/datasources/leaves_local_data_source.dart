@@ -6,7 +6,7 @@ abstract class LeavesLocalDataSource {
 
   Future<void> addLeaveRecord(LeaveRecordsTableCompanion companion);
   Future<List<LeaveRecordModel>> getLeavesBetween(DateTime start, DateTime end);
-  
+  Future<void> deleteLeaveRecord(int id);
 
 }
 
@@ -37,5 +37,13 @@ class LeavesLocalDataSourceImpl implements LeavesLocalDataSource {
     }
   }
 
+  @override
+  Future<void> deleteLeaveRecord(int id) async {
+    try {
+      await (db.delete(db.leaveRecordsTable)..where((tbl) => tbl.id.equals(id))).go();
+    } catch (e) {
+      throw DatabaseException('فشل في حذف الإجازة');
+    }
+  }
   
 }

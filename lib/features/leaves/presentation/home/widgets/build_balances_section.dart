@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation_tracker/core/constants/app_colors.dart';
 import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/features/settings/presentstion/bloc/settings_bloc.dart';
+import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
 
 class BuildBalancesSection extends StatelessWidget {
   const BuildBalancesSection(BuildContext context, {super.key});

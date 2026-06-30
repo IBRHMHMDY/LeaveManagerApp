@@ -9,7 +9,6 @@ import 'package:vacation_tracker/features/leaves/data/models/leave_record_mapper
 import 'package:vacation_tracker/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:vacation_tracker/features/leaves/domain/repositories/leave_repository.dart';
 
-
 class LeaveRepositoryImpl implements LeaveRepository {
   final LeavesLocalDataSource localDataSource;
 
@@ -34,11 +33,24 @@ class LeaveRepositoryImpl implements LeaveRepository {
   }
 
   @override
-  Future<Either<Failure, List<LeaveRecord>>> getLeavesBetweenDates(DateTime start, DateTime end) async {
+  Future<Either<Failure, List<LeaveRecord>>> getLeavesBetweenDates(
+    DateTime start,
+    DateTime end,
+  ) async {
     try {
       final models = await localDataSource.getLeavesBetween(start, end);
       final domainRecords = models.map((model) => model.toDomain()).toList();
       return Right(domainRecords);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteLeave(int id) async {
+    try {
+      await localDataSource.deleteLeaveRecord(id);
+      return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
     }

@@ -7,7 +7,7 @@ import 'package:vacation_tracker/core/utils/financial_year_calculator.dart';
 import 'package:vacation_tracker/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:vacation_tracker/core/utils/enums/leave_type.dart';
 import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/core/widgets/custom_text_field.dart'; // استدعاء حقل الإدخال الموحد
+import 'package:vacation_tracker/shared/widgets/custom_text_field.dart'; // استدعاء حقل الإدخال الموحد
 
 class AddLeaveForm extends StatefulWidget {
   final BuildContext parentContext;

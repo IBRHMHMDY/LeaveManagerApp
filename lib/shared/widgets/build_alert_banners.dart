@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/core/widgets/custom_alert_banner.dart';
+import 'package:vacation_tracker/shared/widgets/custom_alert_banner.dart';
 
 class BuildAlertBanners extends StatelessWidget {
   const BuildAlertBanners({super.key});

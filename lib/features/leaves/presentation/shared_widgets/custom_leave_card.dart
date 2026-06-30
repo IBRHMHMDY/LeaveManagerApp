@@ -1,9 +1,12 @@
 // lib/core/widgets/custom_leave_card.dart
 import 'package:flutter/material.dart';
-import '../../features/leaves/domain/entities/leave_record_entity.dart';
-import '../utils/enums/leave_type.dart';
-import '../constants/app_colors.dart';
-import '../utils/extenstions/date_extension.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:vacation_tracker/core/constants/app_colors.dart';
+import 'package:vacation_tracker/core/utils/enums/leave_type.dart';
+import 'package:vacation_tracker/core/utils/extenstions/date_extension.dart';
+import 'package:vacation_tracker/features/leaves/domain/entities/leave_record_entity.dart';
+import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
+
 
 class CustomLeaveCard extends StatelessWidget {
   final LeaveRecord leave;
@@ -154,6 +157,44 @@ class CustomLeaveCard extends StatelessWidget {
                   ),
                 ),
               ],
+            ),
+          ),
+          PositionedDirectional(
+            end: 4,
+            top: 4,
+            child: IconButton(
+              tooltip: 'حذف الإجازة',
+              icon: Icon(Icons.delete_outline_rounded, color: Colors.red.shade400, size: 22),
+              onPressed: () {
+                // إظهار نافذة تأكيد قبل الحذف
+                showDialog(
+                  context: context,
+                  builder: (ctx) => AlertDialog(
+                    title: const Text('تأكيد الحذف'),
+                    content: const Text('هل أنت متأكد من رغبتك في حذف هذه الإجازة واسترداد أيامها لرصيدك؟'),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.pop(ctx),
+                        child: Text('إلغاء', style: TextStyle(color: colorScheme.onSurface)),
+                      ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red.shade600,
+                          foregroundColor: Colors.white,
+                          elevation: 0,
+                        ),
+                        onPressed: () {
+                          Navigator.pop(ctx);
+                          // إطلاق حدث الحذف
+                          context.read<LeavesBloc>().add(DeleteLeaveEvent(leave.id));
+                        },
+                        child: const Text('نعم، حذف'),
+                      ),
+                    ],
+                  ),
+                );
+              },
             ),
           ),
         ],

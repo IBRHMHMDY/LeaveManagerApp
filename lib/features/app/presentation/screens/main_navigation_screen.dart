@@ -1,13 +1,14 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation_tracker/core/constants/app_colors.dart';
-import 'package:vacation_tracker/core/utils/helpers/show_add_leave_bottomsheet.dart';
-import 'package:vacation_tracker/core/widgets/theme_toggle_button.dart';
-import 'package:vacation_tracker/features/leaves/presentation/screens/history_screen.dart';
-import 'package:vacation_tracker/features/leaves/presentation/screens/home_screen.dart';
-import 'package:vacation_tracker/features/settings/presentstion/screens/settings_screen.dart';
-import '../blocs/leaves_bloc.dart';
-import '../../../settings/presentstion/bloc/settings_bloc.dart';
+import 'package:vacation_tracker/features/leaves/presentation/shared_widgets/show_add_leave_bottomsheet.dart';
+import 'package:vacation_tracker/shared/widgets/theme_toggle_button.dart';
+import 'package:vacation_tracker/features/leaves/presentation/history/screens/history_screen.dart';
+import 'package:vacation_tracker/features/leaves/presentation/home/screens/home_screen.dart';
+import 'package:vacation_tracker/features/settings/presentation/screens/settings_screen.dart';
+import '../../../leaves/presentation/blocs/leaves_bloc.dart';
+import '../../../settings/presentation/bloc/settings_bloc.dart';
 
 class MainNavigationScreen extends StatefulWidget {
   const MainNavigationScreen({super.key});
@@ -37,7 +38,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('أجازاتى'),
+          title: Text('app_title'.tr()),
           centerTitle: false,
           actions: const [
           // LanguageToggleButton(),

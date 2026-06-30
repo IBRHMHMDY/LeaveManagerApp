@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:vacation_tracker/core/utils/enums/leave_type.dart';
 import 'package:vacation_tracker/core/utils/extenstions/leave_filter_extension.dart';
-import 'package:vacation_tracker/core/widgets/custom_empty_state.dart';
-import 'package:vacation_tracker/core/widgets/custom_leave_card.dart';
+import 'package:vacation_tracker/features/leaves/presentation/history/widgets/custom_empty_state.dart';
+import 'package:vacation_tracker/features/leaves/presentation/shared_widgets/custom_leave_card.dart';
 import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/features/leaves/presentation/widgets/build_filter_chips.dart';
+import 'package:vacation_tracker/features/leaves/presentation/history/widgets/build_filter_chips.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});

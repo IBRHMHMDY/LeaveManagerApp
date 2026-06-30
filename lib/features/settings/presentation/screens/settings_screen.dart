@@ -4,10 +4,11 @@ import 'package:go_router/go_router.dart';
 import 'package:vacation_tracker/core/router/app_router.dart';
 import 'package:vacation_tracker/core/utils/app_notifications.dart';
 import 'package:vacation_tracker/core/utils/extenstions/string_extension.dart';
+import 'package:vacation_tracker/features/settings/presentation/widgets/show_about_developer.dart';
 import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/core/widgets/custom_text_field.dart';
+import 'package:vacation_tracker/shared/widgets/custom_text_field.dart';
 import 'package:vacation_tracker/features/settings/domain/entities/settings_entity.dart';
-import 'package:vacation_tracker/features/settings/presentstion/bloc/settings_bloc.dart';
+import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isFirstTime;
@@ -27,7 +28,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   void initState() {
     super.initState();
-    // 1. استدعاء البيانات مبكراً إذا لم تكن هذه المرة الأولى لضمان ملء الحقول
     _loadInitialData();
   }
 
@@ -84,22 +84,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
           }
         } else if (state is SettingsSavedSuccess) {
           AppNotifications.showSuccess(context, 'تم حفظ الإعدادات بنجاح');
-
-          // تحديث بيانات الإعدادات في الـ Bloc
           context.read<SettingsBloc>().add(LoadSettingsEvent());
-          // 2. تحديث أرصدة الإجازات فوراً لكي تنعكس الأرصدة الجديدة على الشاشة الرئيسية
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
-
-          // 3. التوجيه يتم **فقط** إذا كانت هذه الشاشة الأولى
           if (widget.isFirstTime) {
             context.go(AppRouter.home);
           }
-          // إذا لم تكن المرة الأولى سيبقى المستخدم بداخل التبويب بهدوء وسلاسة
         } else if (state is SettingsError) {
           AppNotifications.showError(context, state.message);
         }
       },
       child: Scaffold(
+        appBar: widget.isFirstTime
+            ? AppBar(
+                title: const Text('إعدادات الحساب'),
+              )
+            : AppBar(
+                title: const Text('إعدادات التطبيق'),
+              ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Form(
@@ -159,8 +160,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   ],
                 ),
                 const SizedBox(height: 32),
-
-                // 4. تحسين زر الحفظ (إظهار مؤشر تحميل ومنع الضغط المتكرر)
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
                     final isLoading = state is SettingsLoading;
@@ -190,7 +189,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
 
-                // 5. إخفاء زر مسح السجلات تماماً إذا كان المستخدم يفتح التطبيق لأول مرة
                 if (!widget.isFirstTime) ...[
                   const SizedBox(height: 16),
                   const Divider(),
@@ -241,7 +239,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       );
                     },
                   ),
+                  const SizedBox(height: 16),
+                  
+                  // الزر الجديد: عن التطبيق
+                  TextButton.icon(
+                    style: TextButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      foregroundColor: Theme.of(context).colorScheme.onSurface.withAlpha(200),
+                    ),
+                    icon: const Icon(Icons.info_outline_rounded),
+                    label: const Text(
+                      'عن التطبيق',
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    ),
+                    onPressed: () => showAboutDeveloperBottomSheet(context),
+                  ),
                 ],
+                const SizedBox(height: 32),
               ],
             ),
           ),

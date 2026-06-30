@@ -1,5 +1,8 @@
 import 'package:get_it/get_it.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:vacation_tracker/core/database/app_database.dart';
+import 'package:vacation_tracker/features/leaves/domain/usecases/delete_leave_usecase.dart';
+import 'package:vacation_tracker/shared/themes/theme_cubit.dart';
 import 'package:vacation_tracker/features/settings/data/datasources/settings_local_data_source.dart';
 import 'package:vacation_tracker/features/leaves/data/datasources/leaves_local_data_source.dart';
 import 'package:vacation_tracker/features/leaves/data/repositories/leave_repository_impl.dart';
@@ -11,12 +14,28 @@ import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.
 import 'package:vacation_tracker/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:vacation_tracker/features/settings/domain/repositories/settings_repository.dart';
 import 'package:vacation_tracker/features/settings/domain/usecases/settings_usecase.dart';
-import 'package:vacation_tracker/features/settings/presentstion/bloc/settings_bloc.dart';
+import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
 
 final sl = GetIt.instance;
 
 Future<void> init() async {
+  // --- Core Services (أضف هذا القسم) ---
+  final sharedPreferences = await SharedPreferences.getInstance();
+  sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
+  
+  // --- Database ---
+  sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
+
+  // --- Data Sources ---
+  sl.registerLazySingleton<LeavesLocalDataSource>(
+    () => LeavesLocalDataSourceImpl(sl()),
+  );
+  sl.registerLazySingleton<SettingsLocalDataSource>(
+    () => SettingsLocalDataSourceImpl(sl()),
+  );
+  
   // --- BLoCs ---
+  sl.registerFactory(() => ThemeCubit(sharedPreferences: sl()));
   sl.registerFactory(
     () => SettingsBloc(
       checkSettingsExist: sl(),
@@ -30,8 +49,14 @@ Future<void> init() async {
       getCurrentYearLeaves: sl(),
       addLeave: sl(),
       resetLeaves: sl(),
+      deleteLeave: sl(),
     ),
   );
+  // --- Repositories ---
+  sl.registerLazySingleton<SettingsRepository>(
+    () => SettingsRepositoryImpl(sl()),
+  );
+  sl.registerLazySingleton<LeaveRepository>(() => LeaveRepositoryImpl(sl()));
 
   // --- Use Cases ---
   sl.registerLazySingleton(() => CheckSettingsExistUseCase(sl()));
@@ -48,21 +73,7 @@ Future<void> init() async {
       getCurrentYearLeavesUseCase: sl(),
     ),
   );
+  sl.registerLazySingleton(() => DeleteLeaveUseCase(sl()));
 
-  // --- Repositories ---
-  sl.registerLazySingleton<SettingsRepository>(
-    () => SettingsRepositoryImpl(sl()),
-  );
-  sl.registerLazySingleton<LeaveRepository>(() => LeaveRepositoryImpl(sl()));
 
-  // --- Data Sources ---
-  sl.registerLazySingleton<LeavesLocalDataSource>(
-    () => LeavesLocalDataSourceImpl(sl()),
-  );
-  sl.registerLazySingleton<SettingsLocalDataSource>(
-    () => SettingsLocalDataSourceImpl(sl()),
-  );
-
-  // --- Database ---
-  sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
 }

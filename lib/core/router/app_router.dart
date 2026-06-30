@@ -1,7 +1,7 @@
 import 'package:go_router/go_router.dart';
-import '../../features/leaves/presentation/screens/splash_screen.dart';
-import '../../features/leaves/presentation/screens/main_navigation_screen.dart';
-import '../../features/settings/presentstion/screens/settings_screen.dart';
+import '../../features/app/presentation/screens/splash_screen.dart';
+import '../../features/app/presentation/screens/main_navigation_screen.dart';
+import '../../features/settings/presentation/screens/settings_screen.dart';
 
 class AppRouter {
   static const String splash = '/';

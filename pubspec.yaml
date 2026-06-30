@@ -16,6 +16,9 @@ dependencies:
   dartz: ^0.10.1                # للبرمجة الوظيفية ومعالجة الأخطاء (Either و Unit)
   get_it: ^7.6.4                # لحقن الاعتماديات (Dependency Injection)
 
+  # --- Storages Data ---
+  shared_preferences: ^2.3.0  # لحفظ تفضيلات المستخدم (مثل الثيم واللغة)
+
   # --- Database (Drift - SQLite) ---
   drift: ^2.14.1                # مكتبة قاعدة البيانات الرئيسية
   sqlite3_flutter_libs: ^0.5.18 # مكتبات التشغيل الأصلية لـ SQLite
@@ -29,8 +32,11 @@ dependencies:
     sdk: flutter
   share_plus: ^10.0.0           # إضافة حزمة المشاركة الحديثة
   go_router: ^17.3.0
-  easy_localization: ^3.0.8
 
+  easy_localization: ^3.0.8
+  package_info_plus: ^8.0.0  # لقراءة رقم إصدار التطبيق برمجياً
+  url_launcher: ^6.3.0       # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter

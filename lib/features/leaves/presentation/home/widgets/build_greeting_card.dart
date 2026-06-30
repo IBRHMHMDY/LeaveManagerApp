@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vacation_tracker/features/settings/presentstion/bloc/settings_bloc.dart';
+import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
 
 class BuildGreetingCard extends StatelessWidget {
   const BuildGreetingCard({super.key});

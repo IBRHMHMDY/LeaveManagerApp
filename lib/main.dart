@@ -3,10 +3,10 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:easy_localization/easy_localization.dart';
 import 'package:vacation_tracker/core/di/injection_container.dart' as di;
 import 'package:vacation_tracker/core/router/app_router.dart';
-import 'package:vacation_tracker/core/themes/app_theme.dart';
-import 'package:vacation_tracker/core/themes/theme_cubit.dart';
+import 'package:vacation_tracker/shared/themes/app_theme.dart';
+import 'package:vacation_tracker/shared/themes/theme_cubit.dart';
 import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/features/settings/presentstion/bloc/settings_bloc.dart';
+import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,14 +36,13 @@ class VacationsTrackerApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => di.sl<SettingsBloc>()),
         BlocProvider(create: (_) => di.sl<LeavesBloc>()),
-        BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider(create: (_) => di.sl<ThemeCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            title: 'app_title'.tr(), 
-            
+            title: 'app_title'.tr(),
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,

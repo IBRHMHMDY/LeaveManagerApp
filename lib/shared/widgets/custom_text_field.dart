@@ -6,7 +6,7 @@ class CustomTextField extends StatelessWidget {
   final IconData icon;
   final TextInputType keyboardType;
   final String? Function(String?)? validator;
-  final TextEditingController? controller; // أضفنا الكنترولر هنا
+  final TextEditingController? controller;
 
   const CustomTextField({
     super.key,
@@ -14,7 +14,7 @@ class CustomTextField extends StatelessWidget {
     required this.icon,
     this.keyboardType = TextInputType.text,
     this.validator,
-    this.controller, // تمرير الكنترولر
+    this.controller,
   });
 
   @override
@@ -26,11 +26,11 @@ class CustomTextField extends StatelessWidget {
         controller: controller,
         keyboardType: keyboardType,
         validator: validator,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface), // لون النص المكتوب
+        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           labelText: label,
           labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withAlpha(150)),
-          prefixIcon: Icon(icon, color: AppColors.primaryTeal), // توحيد الهوية البصرية
+          prefixIcon: Icon(icon, color: AppColors.primaryTeal),
           filled: true,
           fillColor: isDark ? Colors.black12 : Colors.grey.shade50,
           border: OutlineInputBorder(
