@@ -1,4 +1,4 @@
-package com.eg.coresoft.vacation_tracker
+package com.ibrahimhamdy.leavemanager
 
 import io.flutter.embedding.android.FlutterActivity
 

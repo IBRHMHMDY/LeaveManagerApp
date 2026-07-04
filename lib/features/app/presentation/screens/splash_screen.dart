@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vacation_tracker/core/router/app_router.dart';
-import 'package:vacation_tracker/features/app/presentation/widgets/custom_app_logo.dart';
+import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/features/app/presentation/widgets/custom_app_logo.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -135,7 +135,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Column(
                         children: [
                           Text(
-                            'دفتر أجازاتى',
+                            'دفتر اجازاتى',
                             style: Theme.of(context).textTheme.headlineMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w900,
@@ -197,7 +197,7 @@ class _SplashScreenState extends State<SplashScreen>
                     ),
                     const SizedBox(height: 16),
                     Text(
-                      'الإصدار 1.0.0',
+                      'Version 1.0.0',
                       style: Theme.of(context).textTheme.labelMedium?.copyWith(
                         color: Theme.of(
                           context,

@@ -1,13 +1,14 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
-import 'package:vacation_tracker/features/leaves/domain/usecases/delete_leave_usecase.dart';
-import 'package:vacation_tracker/features/settings/domain/usecases/settings_usecase.dart';
-import '../../domain/entities/leave_balance_entity.dart';
-import '../../domain/entities/leave_record_entity.dart';
-import '../../domain/usecases/add_leave_usecase.dart';
-import '../../domain/usecases/calculate_balances_usecase.dart';
-import '../../domain/usecases/get_current_year_leaves_usecase.dart';
-import '../../../../core/usecases/base_usecase.dart';
+import 'package:leave_manager/core/usecases/base_usecase.dart';
+import 'package:leave_manager/features/leaves/domain/entities/leave_balance_entity.dart';
+import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/add_leave_usecase.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/delete_leave_usecase.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/get_current_year_leaves_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/settings_usecase.dart';
+
 
 // --- Events ---
 abstract class LeavesEvent extends Equatable {

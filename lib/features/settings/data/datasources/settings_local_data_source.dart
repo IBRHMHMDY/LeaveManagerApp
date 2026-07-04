@@ -1,7 +1,7 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart' show debugPrint;
-import 'package:vacation_tracker/core/database/app_database.dart';
-import 'package:vacation_tracker/core/errors/exceptions.dart';
+import 'package:leave_manager/core/database/app_database.dart';
+import 'package:leave_manager/core/errors/exceptions.dart';
 
 abstract class SettingsLocalDataSource {
   Future<bool> hasSettings();

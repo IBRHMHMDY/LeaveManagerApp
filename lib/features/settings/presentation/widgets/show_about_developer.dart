@@ -1,7 +1,7 @@
-// lib/core/utils/helpers/show_about_developer.dart
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:leave_manager/features/app/presentation/widgets/custom_app_logo_icon.dart';
 
 void showAboutDeveloperBottomSheet(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;
@@ -34,7 +34,6 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
     _loadPackageInfo();
   }
 
-  // دالة لجلب رقم الإصدار من ملف pubspec.yaml تلقائياً
   Future<void> _loadPackageInfo() async {
     final info = await PackageInfo.fromPlatform();
     setState(() {
@@ -42,7 +41,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
     });
   }
 
-  // دالة لفتح البريد الإلكتروني المطور
+  // دالة فتح البريد الإلكتروني
   Future<void> _launchEmail() async {
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
@@ -53,6 +52,22 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
     );
     if (!await launchUrl(emailLaunchUri)) {
       debugPrint('لا يمكن فتح البريد الإلكتروني');
+    }
+  }
+
+  // دالة فتح الواتساب (WhatsApp) المضافة حديثاً
+  Future<void> _launchWhatsApp() async {
+    // ضع رقم هاتفك هنا مع مفتاح الدولة بدون أصفار أو علامة + (مثال لمصر: 201000000000)
+    const String phoneNumber = '2001007576297'; 
+    // الرسالة الافتراضية التي ستظهر في المحادثة
+    final String message = Uri.encodeComponent('مرحباً، لدي استفسار بخصوص تطبيق دفتر أجازاتى.');
+    
+    // استخدام الرابط العالمي wa.me لضمان التوافقية
+    final Uri whatsappUri = Uri.parse('https://wa.me/$phoneNumber?text=$message');
+
+    // LaunchMode.externalApplication يضمن الخروج من التطبيق وفتح الواتساب بشكل نظيف
+    if (!await launchUrl(whatsappUri, mode: LaunchMode.externalApplication)) {
+      debugPrint('لا يمكن فتح الواتساب');
     }
   }
 
@@ -76,39 +91,20 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
           ),
           const SizedBox(height: 32),
 
-          // 2. شعار التطبيق (نفس الشعار المستخدم في شاشة البداية)
-          Container(
-            width: 80,
-            height: 80,
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [colorScheme.primary, colorScheme.primary.withAlpha(150)],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(24),
-              boxShadow: [
-                BoxShadow(
-                  color: colorScheme.primary.withAlpha(50),
-                  blurRadius: 20,
-                  offset: const Offset(0, 10),
-                ),
-              ],
-            ),
-            child: Icon(Icons.calendar_month_rounded, size: 40, color: colorScheme.onPrimary),
-          ),
+          // 2. شعار التطبيق
+          CustomAppLogoIcon(context),
           const SizedBox(height: 16),
 
           // 3. اسم التطبيق وإصداره
           Text(
-            'مُتتبع الإجازات',
+            'دفتر اجازاتى',
             style: TextStyle(
               fontSize: 22,
               fontWeight: FontWeight.w900,
               color: colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 12),
           Text(
             'الإصدار $_version',
             style: TextStyle(
@@ -159,24 +155,41 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
           ),
           const SizedBox(height: 24),
 
-          // 5. زر التواصل
+          // 5. زر التواصل عبر واتساب (الجديد)
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 54),
-              backgroundColor: colorScheme.primary,
-              foregroundColor: colorScheme.onPrimary,
+              minimumSize: const Size(double.infinity, 50),
+              backgroundColor: const Color(0xFF25D366), // لون الواتساب الرسمي
+              foregroundColor: Colors.white,
               elevation: 0,
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(12),
               ),
             ),
-            icon: const Icon(Icons.mail_rounded),
-            label: const Text('تواصل مع المطور', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.chat_bubble_outline_rounded), // أيقونة المحادثة
+            label: const Text('تواصل عبر واتساب', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            onPressed: _launchWhatsApp,
+          ),
+          const SizedBox(height: 12),
+
+          // 6. زر التواصل عبر البريد الإلكتروني (تصميم مختلف لتمييزه)
+          OutlinedButton.icon(
+            style: OutlinedButton.styleFrom(
+              minimumSize: const Size(double.infinity, 50),
+              foregroundColor: colorScheme.primary,
+              side: BorderSide(color: colorScheme.primary.withAlpha(100), width: 1.5),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+            ),
+            icon: const Icon(Icons.mail_outline_rounded),
+            label: const Text('إرسال بريد إلكتروني', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             onPressed: _launchEmail,
           ),
-          const SizedBox(height: 16),
           
-          // 6. حقوق الملكية
+          const SizedBox(height: 24),
+          
+          // 7. حقوق الملكية
           Text(
             '© ${DateTime.now().year} جميع الحقوق محفوظة',
             style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withAlpha(100)),

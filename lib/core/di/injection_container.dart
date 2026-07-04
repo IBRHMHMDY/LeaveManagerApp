@@ -1,20 +1,20 @@
 import 'package:get_it/get_it.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:vacation_tracker/core/database/app_database.dart';
-import 'package:vacation_tracker/features/leaves/domain/usecases/delete_leave_usecase.dart';
-import 'package:vacation_tracker/shared/themes/theme_cubit.dart';
-import 'package:vacation_tracker/features/settings/data/datasources/settings_local_data_source.dart';
-import 'package:vacation_tracker/features/leaves/data/datasources/leaves_local_data_source.dart';
-import 'package:vacation_tracker/features/leaves/data/repositories/leave_repository_impl.dart';
-import 'package:vacation_tracker/features/leaves/domain/repositories/leave_repository.dart';
-import 'package:vacation_tracker/features/leaves/domain/usecases/add_leave_usecase.dart';
-import 'package:vacation_tracker/features/leaves/domain/usecases/calculate_balances_usecase.dart';
-import 'package:vacation_tracker/features/leaves/domain/usecases/get_current_year_leaves_usecase.dart';
-import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/features/settings/data/repositories/settings_repository_impl.dart';
-import 'package:vacation_tracker/features/settings/domain/repositories/settings_repository.dart';
-import 'package:vacation_tracker/features/settings/domain/usecases/settings_usecase.dart';
-import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/core/database/app_database.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/delete_leave_usecase.dart';
+import 'package:leave_manager/shared/themes/theme_cubit.dart';
+import 'package:leave_manager/features/settings/data/datasources/settings_local_data_source.dart';
+import 'package:leave_manager/features/leaves/data/datasources/leaves_local_data_source.dart';
+import 'package:leave_manager/features/leaves/data/repositories/leave_repository_impl.dart';
+import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/add_leave_usecase.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/get_current_year_leaves_usecase.dart';
+import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
+import 'package:leave_manager/features/settings/data/repositories/settings_repository_impl.dart';
+import 'package:leave_manager/features/settings/domain/repositories/settings_repository.dart';
+import 'package:leave_manager/features/settings/domain/usecases/settings_usecase.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 
 final sl = GetIt.instance;
 

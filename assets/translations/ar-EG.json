@@ -1,15 +1,108 @@
 {
-  "app_title": "دفتر إجازاتي",
-  "app_subtitle": "نظم إجازاتك بسهولة وذكاء",
-  "dashboard": "لوحة المعلومات",
-  "history": "دفتر إجازاتي",
-  "settings": "اعدادات التطبيق",
-  "new_leave": "إجازة جديدة",
-  "regular_leave": "اعتيادية",
-  "casual_leave": "عارضة",
-  "financial_year": "السنة المالية الحالية: {}",
-  "days": "أيام",
-  "welcome_msg": "مرحباً، {}",
-  "success_add": "تم خصم يوم إجازة من رصيدك وتسجيله بنجاح.",
-  "About App": "عن التطبيق"
+  "core": {
+    "app_name": "دفتر أجازاتى",
+    "app_slogan": "نظم إجازاتك بسهولة وذكاء",
+    "buttons": {
+      "save": "حفظ",
+      "cancel": "إلغاء",
+      "confirm": "تأكيد",
+      "yes_delete": "نعم، حذف",
+      "yes_clear": "نعم، مسح"
+    },
+    "navigation": {
+      "home": "الرئيسية",
+      "history": "دفتر إجازاتي",
+      "settings": "الإعدادات"
+    },
+    "alerts": {
+      "success": "تمت العملية بنجاح",
+      "error": "حدث خطأ غير متوقع",
+      "warning": "تحذير"
+    },
+    "validation": {
+      "required": "مطلوب",
+      "numbers_only": "أرقام فقط"
+    }
+  },
+  "features": {
+    "leaves": {
+      "dashboard": {
+        "greeting": "مرحباً، {name}",
+        "financial_year": "السنة المالية الحالية: {fin_year}",
+        "end_of_year_alert": "تنبيه: اقترب موعد نهاية السنة المالية، يرجى تسوية رصيد إجازاتك.",
+        "regular_balance": "اعتيادي",
+        "casual_balance": "عارضة",
+        "current_month_leaves": "إجازات الشهر الحالي",
+        "leave_added_success": "تم خصم أيام الإجازة من رصيدك وتسجيلها بدفتر إجازاتك."
+      },
+      "history": {
+        "empty_state": "لا توجد إجازات مسجلة في هذا التصنيف.",
+        "filter_all": "الكل",
+        "filter_regular": "اعتيادي",
+        "filter_casual": "عارضة",
+        "delete_success": "تم حذف الإجازة واسترداد الرصيد بنجاح."
+      },
+      "add_leave": {
+        "title": "تسجيل إجازة جديدة",
+        "fab_button": "إجازة جديدة",
+        "leave_type": "نوع الإجازة",
+        "type_regular": "اعتيادية",
+        "type_casual": "عارضة",
+        "select_casual_date": "اضغط لاختيار يوم الإجازة",
+        "select_regular_date": "اضغط لاختيار فترة الإجازة",
+        "notes": "ملاحظات (اختياري)",
+        "save_button": "حفظ الإجازة",
+        "date_required_warning": "الرجاء اختيار التاريخ أولاً"
+      },
+      "leave_card": {
+        "regular": "إجازة اعتيادية",
+        "casual": "إجازة عارضة",
+        "days": "أيام",
+        "delete_title": "تأكيد الحذف",
+        "delete_body": "هل أنت متأكد من رغبتك في حذف هذه الإجازة واسترداد أيامها لرصيدك؟"
+      }
+    },
+    "settings": {
+      "title_account": "إعدادات الحساب",
+      "title_app": "إعدادات التطبيق",
+      "sections": {
+        "personal_info": "البيانات الشخصية",
+        "annual_balances": "الأرصدة السنوية المستحقة",
+        "system_preferences": "إعدادات النظام والتفضيلات"
+      },
+      "fields": {
+        "employee_name": "اسم الموظف",
+        "job_title": "المسمى الوظيفي",
+        "total_regular": "إجمالي الاعتيادي",
+        "total_casual": "إجمالي العارضة"
+      },
+      "preferences": {
+        "dark_mode": "الوضع الليلي",
+        "dark_mode_desc": "تفعيل المظهر الداكن للراحة البصرية",
+        "light_mode_desc": "تفعيل المظهر الفاتح لسطوع أوضح",
+        "app_language": "لغة التطبيق",
+        "current_language": "اللغة الحالية: العربية",
+        "lang_ar": "العربية",
+        "lang_en": "English"
+      },
+      "actions": {
+        "save_settings": "حفظ الإعدادات",
+        "settings_saved": "تم حفظ الإعدادات بنجاح",
+        "reset_balances": "تصفير الأرصدة (مسح سجلات الإجازات)",
+        "reset_confirm_title": "تأكيد التصفير",
+        "reset_confirm_body": "هل أنت متأكد من أنك تريد مسح جميع سجلات الإجازات؟ هذا الإجراء لا يمكن التراجع عنه.",
+        "balances_reset_success": "تم تصفير الأرصدة بنجاح",
+        "about_app": "عن التطبيق"
+      },
+      "about": {
+        "version": "الإصدار",
+        "slogan": "نظم إجازاتك بسهولة وذكاء",
+        "description": "تم التطوير بكل حب لخدمة الموظفين وتنظيم أوقاتهم بطريقة احترافية وذكية.",
+        "developed_by": "تطوير وتصميم",
+        "contact_whatsapp": "تواصل عبر واتساب",
+        "contact_email": "إرسال بريد إلكتروني",
+        "copyright": "جميع الحقوق محفوظة"
+      }
+    }
+  }
 }

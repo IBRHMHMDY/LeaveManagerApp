@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:vacation_tracker/core/errors/failures.dart';
-import 'package:vacation_tracker/core/usecases/base_usecase.dart';
-import 'package:vacation_tracker/features/settings/domain/entities/settings_entity.dart';
-import 'package:vacation_tracker/features/settings/domain/repositories/settings_repository.dart';
+import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/core/usecases/base_usecase.dart';
+import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
+import 'package:leave_manager/features/settings/domain/repositories/settings_repository.dart';
 
 
 class CheckSettingsExistUseCase implements BaseUseCase<bool, NoParams> {

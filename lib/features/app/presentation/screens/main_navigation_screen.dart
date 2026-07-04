@@ -1,14 +1,12 @@
-import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vacation_tracker/core/constants/app_colors.dart';
-import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/features/leaves/presentation/shared_widgets/show_add_leave_bottomsheet.dart';
-import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:vacation_tracker/shared/widgets/theme_toggle_button.dart';
-import 'package:vacation_tracker/features/leaves/presentation/history/screens/history_screen.dart';
-import 'package:vacation_tracker/features/leaves/presentation/home/screens/home_screen.dart';
-import 'package:vacation_tracker/features/settings/presentation/screens/settings_screen.dart';
+import 'package:leave_manager/core/constants/app_colors.dart';
+import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
+import 'package:leave_manager/features/leaves/presentation/shared_widgets/show_add_leave_bottomsheet.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/features/leaves/presentation/history/screens/history_screen.dart';
+import 'package:leave_manager/features/leaves/presentation/home/screens/home_screen.dart';
+import 'package:leave_manager/features/settings/presentation/screens/settings_screen.dart';
 
 
 class MainNavigationScreen extends StatefulWidget {
@@ -30,7 +28,6 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   @override
   void initState() {
     super.initState();
-    // تحميل البيانات الأساسية للتطبيق فور الدخول للشاشة الرئيسية
     context.read<SettingsBloc>().add(LoadSettingsEvent());
     context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
   }
@@ -39,21 +36,16 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: Text('app_title'.tr()),
+          title: const Text('دفتر أجازاتى'),
           centerTitle: false,
-          actions: const [
-          // LanguageToggleButton(),
-          // SizedBox(width: 1),
-          ThemeToggleButton(),
-          SizedBox(width: 15),
-        ],
+
         ),
       body: IndexedStack(index: _currentIndex, children: _screens),
       floatingActionButton: _currentIndex != 2
           ? FloatingActionButton.extended(
               onPressed: () => showAddLeaveBottomSheet(context),
               icon: const Icon(Icons.add),
-              label: Text('new_leave'.tr()),
+              label: const Text('اجازه جديده'),
               backgroundColor: AppColors.accentCoral,
               foregroundColor: Colors.white,
             )
@@ -61,13 +53,13 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
         onDestinationSelected: (index) => setState(() => _currentIndex = index),
-        destinations: [
-          NavigationDestination(icon: const Icon(Icons.dashboard), label: 'dashboard'.tr()),
+        destinations: const [
+          NavigationDestination(icon: Icon(Icons.dashboard), label: 'الرئيسية'),
           NavigationDestination(
-            icon: const Icon(Icons.checklist),
-            label: 'history'.tr(),
+            icon:  Icon(Icons.checklist),
+            label: 'الأجازات',
           ),
-          NavigationDestination(icon: const Icon(Icons.settings), label: 'settings'.tr()),
+          NavigationDestination(icon: Icon(Icons.settings), label: 'الإعدادات'),
         ],
       ),
     );

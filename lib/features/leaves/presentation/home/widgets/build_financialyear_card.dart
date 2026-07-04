@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vacation_tracker/core/utils/financial_year_calculator.dart';
+import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 
 class BuildFinancialYearCard extends StatelessWidget {
   const BuildFinancialYearCard(BuildContext context,{super.key});

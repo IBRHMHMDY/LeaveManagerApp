@@ -22,7 +22,6 @@ class AppRouter {
       GoRoute(
         path: settings,
         builder: (context, state) {
-          // استقبال المتغير isFirstTime بأمان
           final isFirstTime = state.extra as bool? ?? false;
           return SettingsScreen(isFirstTime: isFirstTime);
         },

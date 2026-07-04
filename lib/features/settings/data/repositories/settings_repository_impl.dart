@@ -1,12 +1,12 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import 'package:vacation_tracker/core/database/app_database.dart';
-import 'package:vacation_tracker/core/errors/exceptions.dart';
-import 'package:vacation_tracker/core/errors/failures.dart';
-import 'package:vacation_tracker/features/settings/data/datasources/settings_local_data_source.dart';
-import 'package:vacation_tracker/features/settings/data/models/settings_mapper.dart';
-import 'package:vacation_tracker/features/settings/domain/entities/settings_entity.dart';
-import 'package:vacation_tracker/features/settings/domain/repositories/settings_repository.dart';
+import 'package:leave_manager/core/database/app_database.dart';
+import 'package:leave_manager/core/errors/exceptions.dart';
+import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/features/settings/data/datasources/settings_local_data_source.dart';
+import 'package:leave_manager/features/settings/data/models/settings_mapper.dart';
+import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
+import 'package:leave_manager/features/settings/domain/repositories/settings_repository.dart';
 
 
 class SettingsRepositoryImpl implements SettingsRepository {

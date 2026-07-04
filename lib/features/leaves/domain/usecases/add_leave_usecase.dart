@@ -1,11 +1,11 @@
 import 'package:dartz/dartz.dart';
-import 'package:vacation_tracker/core/errors/failures.dart';
-import 'package:vacation_tracker/core/usecases/base_usecase.dart';
-import 'package:vacation_tracker/core/utils/financial_year_calculator.dart';
-import 'package:vacation_tracker/features/leaves/domain/entities/leave_record_entity.dart';
-import 'package:vacation_tracker/core/utils/enums/leave_type.dart';
-import 'package:vacation_tracker/features/leaves/domain/repositories/leave_repository.dart';
-import 'package:vacation_tracker/features/leaves/domain/usecases/calculate_balances_usecase.dart';
+import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/core/usecases/base_usecase.dart';
+import 'package:leave_manager/core/utils/financial_year_calculator.dart';
+import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
+import 'package:leave_manager/core/utils/enums/leave_type.dart';
+import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
+import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
 
 class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
   final LeaveRepository repository;

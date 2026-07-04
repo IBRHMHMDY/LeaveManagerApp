@@ -1,8 +1,8 @@
 import 'package:dartz/dartz.dart';
-import 'package:vacation_tracker/core/errors/failures.dart';
-import 'package:vacation_tracker/core/usecases/base_usecase.dart';
-import 'package:vacation_tracker/features/leaves/domain/entities/leave_balance_entity.dart';
-import 'package:vacation_tracker/core/utils/enums/leave_type.dart';
+import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/core/usecases/base_usecase.dart';
+import 'package:leave_manager/features/leaves/domain/entities/leave_balance_entity.dart';
+import 'package:leave_manager/core/utils/enums/leave_type.dart';
 
 import 'get_current_year_leaves_usecase.dart';
 import '../../../settings/domain/usecases/settings_usecase.dart';

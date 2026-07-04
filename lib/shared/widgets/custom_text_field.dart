@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vacation_tracker/core/constants/app_colors.dart';
+import 'package:leave_manager/core/constants/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;

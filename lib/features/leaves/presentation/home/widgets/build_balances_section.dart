@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vacation_tracker/core/constants/app_colors.dart';
-import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/core/constants/app_colors.dart';
+import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 
 class BuildBalancesSection extends StatelessWidget {
   const BuildBalancesSection(BuildContext context, {super.key});
@@ -20,7 +20,7 @@ class BuildBalancesSection extends StatelessWidget {
                   Expanded(
                     child: _buildCircularIndicator(
                       context,
-                      'اعتيادي',
+                      'اعتيادى',
                       leavesState.balance.remainingRegular,
                       settingsState.settings.totalRegularLeaves,
                       AppColors.regularLeaveColor,
@@ -30,7 +30,7 @@ class BuildBalancesSection extends StatelessWidget {
                   Expanded(
                     child: _buildCircularIndicator(
                       context,
-                      'عارضة',
+                      'عارضه',
                       leavesState.balance.remainingCasual,
                       settingsState.settings.totalCasualLeaves,
                       AppColors.casualLeaveColor,

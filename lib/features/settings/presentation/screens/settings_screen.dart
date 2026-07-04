@@ -1,14 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:vacation_tracker/core/router/app_router.dart';
-import 'package:vacation_tracker/core/utils/app_notifications.dart';
-import 'package:vacation_tracker/core/utils/extenstions/string_extension.dart';
-import 'package:vacation_tracker/features/settings/presentation/widgets/show_about_developer.dart';
-import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/shared/widgets/custom_text_field.dart';
-import 'package:vacation_tracker/features/settings/domain/entities/settings_entity.dart';
-import 'package:vacation_tracker/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:easy_localization/easy_localization.dart'; 
+import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/core/utils/app_notifications.dart';
+import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
+import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
+import 'package:leave_manager/shared/widgets/custom_text_field.dart';
+import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/show_about_developer.dart';
+import 'package:leave_manager/shared/themes/theme_cubit.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isFirstTime;
@@ -49,7 +51,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _saveSettings() {
     if (_formKey.currentState!.validate()) {
-      // إخفاء لوحة المفاتيح عند الضغط على حفظ
       FocusScope.of(context).unfocus();
 
       final settings = Settings(
@@ -76,6 +77,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isCurrentDark = Theme.of(context).brightness == Brightness.dark;
+    
+    // جلب اللغة الحالية من easy_localization
+    final currentLocale = context.locale; 
+
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
         if (state is SettingsLoaded && !widget.isFirstTime) {
@@ -94,13 +101,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
       },
       child: Scaffold(
-        appBar: widget.isFirstTime
-            ? AppBar(
-                title: const Text('إعدادات الحساب'),
-              )
-            : AppBar(
-                title: const Text('إعدادات التطبيق'),
-              ),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(16.0),
           child: Form(
@@ -120,7 +120,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   validator: (val) =>
                       val == null || val.trim().isEmpty ? 'مطلوب' : null,
                 ),
-
                 CustomTextField(
                   label: 'المسمى الوظيفي',
                   icon: Icons.work_outline,
@@ -128,14 +127,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   validator: (val) =>
                       val == null || val.trim().isEmpty ? 'مطلوب' : null,
                 ),
-
                 const SizedBox(height: 16),
                 const Text(
                   'الأرصدة السنوية المستحقة',
                   style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 16),
-
                 Row(
                   children: [
                     Expanded(
@@ -159,6 +156,102 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ],
                 ),
+                
+                // --- قسم إعدادات النظام والتفضيلات ---
+                const SizedBox(height: 24),
+                const Text(
+                  'إعدادات النظام والتفضيلات',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 12),
+                
+                // الحاوية الموحدة للمظهر واللغة
+                Container(
+                  decoration: BoxDecoration(
+                    color: colorScheme.surfaceContainerHighest.withAlpha(50),
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(color: colorScheme.outline.withAlpha(40)),
+                  ),
+                  child: Column(
+                    children: [
+                      // 1. مفتاح تحويل الوضع الليلي
+                      BlocBuilder<ThemeCubit, ThemeMode>(
+                        builder: (context, themeMode) {
+                          return SwitchListTile(
+                            title: const Text(
+                              'الوضع الليلي',
+                              style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                            ),
+                            subtitle: Text(
+                              isCurrentDark ? 'تفعيل المظهر الداكن للراحة البصرية' : 'تفعيل المظهر الفاتح لسطوع أوضح',
+                              style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withAlpha(140)),
+                            ),
+                            secondary: Icon(
+                              isCurrentDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+                              color: colorScheme.primary,
+                            ),
+                            value: isCurrentDark,
+                            activeThumbColor: colorScheme.primary,
+                            onChanged: (bool value) {
+                              context.read<ThemeCubit>().toggleTheme(context);
+                            },
+                          );
+                        },
+                      ),
+                      
+                      const Divider(height: 1, indent: 16, endIndent: 16),
+                      
+                      // 2. قائمة اختيار لغة التطبيق
+                      ListTile(
+                        leading: Icon(Icons.language_rounded, color: colorScheme.primary),
+                        title: const Text(
+                          'لغة التطبيق',
+                          style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(
+                          currentLocale.languageCode == 'ar' ? 'اللغة الحالية: العربية' : 'Current Language: English',
+                          style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withAlpha(140)),
+                        ),
+                        // وضع الـ Dropdown داخل حاوية (Container) منسقة
+                        trailing: Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: colorScheme.surface,
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: colorScheme.outline.withAlpha(50)),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<Locale>(
+                              value: currentLocale,
+                              icon: Icon(Icons.arrow_drop_down_rounded, color: colorScheme.primary, size: 24),
+                              dropdownColor: colorScheme.surface,
+                              borderRadius: BorderRadius.circular(12),
+                              // منطق التبديل والحفظ التلقائي
+                              onChanged: (Locale? newLocale) async {
+                                if (newLocale != null && newLocale != currentLocale) {
+                                  // تقوم هذه الدالة بتغيير اللغة، إعادة البناء، وحفظ الاختيار تلقائياً
+                                  await context.setLocale(newLocale);
+                                }
+                              },
+                              items: const [
+                                DropdownMenuItem(
+                                  value: Locale('ar', 'EG'),
+                                  child: Text('العربية', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                ),
+                                // DropdownMenuItem(
+                                //   value: Locale('en', 'US'),
+                                //   child: Text('English', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14)),
+                                // ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                // --------------------------------------------------------
+
                 const SizedBox(height: 32),
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
@@ -166,10 +259,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 16),
-                        backgroundColor: Theme.of(context).colorScheme.primary,
-                        foregroundColor: Theme.of(
-                          context,
-                        ).colorScheme.onPrimary,
+                        backgroundColor: colorScheme.primary,
+                        foregroundColor: colorScheme.onPrimary,
+                        elevation: 0,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
                       onPressed: isLoading ? null : _saveSettings,
                       child: isLoading
@@ -183,12 +276,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             )
                           : const Text(
                               'حفظ الإعدادات',
-                              style: TextStyle(fontSize: 16),
+                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                             ),
                     );
                   },
                 ),
-
                 if (!widget.isFirstTime) ...[
                   const SizedBox(height: 16),
                   const Divider(),
@@ -198,11 +290,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       foregroundColor: Colors.red.shade700,
                       side: BorderSide(color: Colors.red.shade700),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
                     icon: const Icon(Icons.delete_forever),
                     label: const Text(
                       'تصفير الأرصدة (مسح سجلات الإجازات)',
-                      style: TextStyle(fontSize: 16),
+                      style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     ),
                     onPressed: () {
                       showDialog(
@@ -221,11 +314,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: Colors.red,
                                 foregroundColor: Colors.white,
+                                elevation: 0,
                               ),
                               onPressed: () {
-                                context.read<LeavesBloc>().add(
-                                  ResetAllLeavesEvent(),
-                                );
+                                context.read<LeavesBloc>().add(ResetAllLeavesEvent());
                                 Navigator.pop(ctx);
                                 AppNotifications.showSuccess(
                                   context,
@@ -240,12 +332,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                   ),
                   const SizedBox(height: 16),
-                  
-                  // الزر الجديد: عن التطبيق
                   TextButton.icon(
                     style: TextButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      foregroundColor: Theme.of(context).colorScheme.onSurface.withAlpha(200),
+                      foregroundColor: colorScheme.onSurface.withAlpha(200),
                     ),
                     icon: const Icon(Icons.info_outline_rounded),
                     label: const Text(

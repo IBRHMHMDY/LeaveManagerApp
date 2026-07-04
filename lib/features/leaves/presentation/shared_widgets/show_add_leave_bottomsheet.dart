@@ -1,6 +1,6 @@
 // lib/core/utils/helpers/show_add_leave_bottomsheet.dart
 import 'package:flutter/material.dart';
-import 'package:vacation_tracker/features/leaves/presentation/shared_widgets/add_leave_form.dart';
+import 'package:leave_manager/features/leaves/presentation/shared_widgets/add_leave_form.dart';
 
 void showAddLeaveBottomSheet(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:vacation_tracker/core/utils/extenstions/leave_filter_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart';
 
 class BuildFilterChips extends StatelessWidget {
   final LeaveFilter selectedFilter;

@@ -1,13 +1,13 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
-import 'package:vacation_tracker/core/database/app_database.dart';
-import 'package:vacation_tracker/core/errors/exceptions.dart';
-import 'package:vacation_tracker/core/errors/failures.dart';
-import 'package:vacation_tracker/core/utils/enums/leave_type.dart';
-import 'package:vacation_tracker/features/leaves/data/datasources/leaves_local_data_source.dart';
-import 'package:vacation_tracker/features/leaves/data/models/leave_record_mapper.dart';
-import 'package:vacation_tracker/features/leaves/domain/entities/leave_record_entity.dart';
-import 'package:vacation_tracker/features/leaves/domain/repositories/leave_repository.dart';
+import 'package:leave_manager/core/database/app_database.dart';
+import 'package:leave_manager/core/errors/exceptions.dart';
+import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/core/utils/enums/leave_type.dart';
+import 'package:leave_manager/features/leaves/data/datasources/leaves_local_data_source.dart';
+import 'package:leave_manager/features/leaves/data/models/leave_record_mapper.dart';
+import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
+import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
 
 class LeaveRepositoryImpl implements LeaveRepository {
   final LeavesLocalDataSource localDataSource;

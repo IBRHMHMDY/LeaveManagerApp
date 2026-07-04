@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:vacation_tracker/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:vacation_tracker/features/leaves/presentation/shared_widgets/custom_leave_card.dart';
+import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
+import 'package:leave_manager/features/leaves/presentation/shared_widgets/custom_leave_card.dart';
 
 class BuildCurrentMonthLeaves extends StatelessWidget {
   const BuildCurrentMonthLeaves(BuildContext context, {super.key});

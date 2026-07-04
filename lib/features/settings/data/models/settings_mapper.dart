@@ -1,5 +1,5 @@
-import 'package:vacation_tracker/core/database/app_database.dart';
-import 'package:vacation_tracker/features/settings/domain/entities/settings_entity.dart';
+import 'package:leave_manager/core/database/app_database.dart';
+import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
 
 extension SettingsMapper on SettingModel {
   Settings toDomain() {
