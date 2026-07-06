@@ -46,3 +46,7 @@ app.*.map.json
 # حماية مفاتيح التوقيع الرقمي
 android/key.properties
 *.jks
+*.docx
+*.csv
+/bundle
+upload-keystore.jks

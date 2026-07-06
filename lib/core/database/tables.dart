@@ -2,11 +2,12 @@ import 'package:drift/drift.dart';
 
 @DataClassName('SettingModel')
 class SettingsTable extends Table {
-  IntColumn get id => integer()(); // لن نستخدم autoIncrement لأننا نحتاج سجلاً واحداً فقط يحمل ID ثابت
+  IntColumn get id => integer()(); // المُعرف
   TextColumn get employeeName => text()();
   TextColumn get jobTitle => text()();
   IntColumn get totalRegularLeaves => integer()();
   IntColumn get totalCasualLeaves => integer()();
+  TextColumn get selectedCountry => text().withDefault(const Constant('مصر'))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -20,4 +21,13 @@ class LeaveRecordsTable extends Table {
   DateTimeColumn get endDate => dateTime()();
   IntColumn get daysCount => integer()();
   TextColumn get notes => text().nullable()();
+}
+
+@DataClassName('HolidayModel')
+class HolidaysTable extends Table {
+  IntColumn get id => integer().autoIncrement()(); // المُعرف
+  TextColumn get name => text()(); // اسم الإجازة
+  DateTimeColumn get startDate => dateTime()(); // تاريخ البداية
+  DateTimeColumn get endDate => dateTime()(); // تاريخ النهاية
+  TextColumn get country => text().withDefault(const Constant('مصر'))(); 
 }

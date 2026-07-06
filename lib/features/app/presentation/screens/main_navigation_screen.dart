@@ -6,6 +6,7 @@ import 'package:leave_manager/features/leaves/presentation/shared_widgets/show_a
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/history/screens/history_screen.dart';
 import 'package:leave_manager/features/leaves/presentation/home/screens/home_screen.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_events.dart';
 import 'package:leave_manager/features/settings/presentation/screens/settings_screen.dart';
 
 
@@ -36,7 +37,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('دفتر أجازاتى'),
+          title: const Text('مدير أجازاتى'),
           centerTitle: false,
 
         ),
@@ -57,7 +58,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
           NavigationDestination(icon: Icon(Icons.dashboard), label: 'الرئيسية'),
           NavigationDestination(
             icon:  Icon(Icons.checklist),
-            label: 'الأجازات',
+            label: 'دفتر أجازاتى',
           ),
           NavigationDestination(icon: Icon(Icons.settings), label: 'الإعدادات'),
         ],

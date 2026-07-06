@@ -3,9 +3,9 @@ import 'package:leave_manager/core/errors/failures.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_balance_entity.dart';
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
+import 'package:leave_manager/features/settings/domain/usecases/get_settings_usecase.dart';
 
 import 'get_current_year_leaves_usecase.dart';
-import '../../../settings/domain/usecases/settings_usecase.dart';
 
 class CalculateBalancesUseCase implements BaseUseCase<LeaveBalance, NoParams> {
   final GetSettingsUseCase getSettingsUseCase;

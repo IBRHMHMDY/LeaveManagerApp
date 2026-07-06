@@ -1,4 +1,4 @@
-// lib/features/leaves/presentation/widgets/add_leave_form.dart
+// lib/features/leaves/presentation/shared_widgets/add_leave_form.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
@@ -6,7 +6,17 @@ import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:leave_manager/shared/widgets/custom_text_field.dart'; // استدعاء حقل الإدخال الموحد
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
+import 'package:leave_manager/shared/widgets/custom_text_field.dart';
+
+// --- الواردات الجديدة لدمج الحاسبة الذكية والإجازات الرسمية ---
+import 'package:leave_manager/core/utils/leave_calculator.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_event.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_state.dart';
+import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
+import 'package:leave_manager/core/di/injection_container.dart' as di;
 
 class AddLeaveForm extends StatefulWidget {
   final BuildContext parentContext;
@@ -22,6 +32,42 @@ class AddLeaveFormState extends State<AddLeaveForm> {
   DateTime? _endDate;
   final TextEditingController _notesController = TextEditingController();
 
+  // --- متغيرات الحاسبة الذكية ---
+  int _actualDaysCount = 0; 
+  List<Holiday> _officialHolidays = []; 
+  late HolidaysBloc _holidaysBloc; 
+
+  @override
+  void initState() {
+    super.initState();
+    // قراءة إعدادات المستخدم للحصول على البلد، وتمريره لجلب إجازات هذا البلد فقط
+    final settingsState = widget.parentContext.read<SettingsBloc>().state;
+    final String country = settingsState is SettingsLoaded ? settingsState.settings.selectedCountry : 'مصر';
+    
+    _holidaysBloc = di.sl<HolidaysBloc>()..add(LoadHolidaysEvent(country));
+  }
+
+  @override
+  void dispose() {
+    _holidaysBloc.close(); // إغلاق الـ BLoC لمنع تسرب الذاكرة (Memory Leak)
+    _notesController.dispose();
+    super.dispose();
+  }
+
+  // --- دالة الحساب الذكية ---
+  void _calculateActualDays() {
+    if (_startDate != null && _endDate != null) {
+      final days = LeaveCalculator.calculateActualLeaveDays(
+        startDate: _startDate!,
+        endDate: _endDate!,
+        officialHolidays: _officialHolidays,
+      );
+      setState(() {
+        _actualDaysCount = days;
+      });
+    }
+  }
+
   void _selectLeaveDate() async {
     final startFinYear = FinancialYearCalculator.currentFinancialYearStart;
     final endFinYear = FinancialYearCalculator.currentFinancialYearEnd;
@@ -36,7 +82,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
           : null,
       saveText: 'تأكيد',
       cancelText: 'إلغاء',
-      helpText: 'اختر فترة الإجازة الاعتيادية (من - إلى)',
+      helpText: 'اختر فترة الإجازة (من - إلى)',
       builder: (context, child) =>
           Theme(data: Theme.of(context), child: child!),
     );
@@ -46,6 +92,8 @@ class AddLeaveFormState extends State<AddLeaveForm> {
         _startDate = picked.start;
         _endDate = picked.end;
       });
+      // استدعاء الحساب بعد اختيار التواريخ
+      _calculateActualDays();
     }
   }
 
@@ -56,13 +104,27 @@ class AddLeaveFormState extends State<AddLeaveForm> {
     final borderColor = isDark ? Colors.white24 : Colors.grey.shade300;
     final fillColor = isDark ? Colors.black12 : Colors.grey.shade50;
 
-    return BlocListener<LeavesBloc, LeavesState>(
-      bloc: widget.parentContext.read<LeavesBloc>(),
-      listener: (context, state) {
-        if (state is LeaveAddedSuccess) {
-          Navigator.pop(context);
-        }
-      },
+    return MultiBlocListener(
+      listeners: [
+        BlocListener<LeavesBloc, LeavesState>(
+          bloc: widget.parentContext.read<LeavesBloc>(),
+          listener: (context, state) {
+            if (state is LeaveAddedSuccess) {
+              Navigator.pop(context);
+            }
+          },
+        ),
+        // الاستماع لجلب قائمة الإجازات الرسمية من قاعدة البيانات
+        BlocListener<HolidaysBloc, HolidaysState>(
+          bloc: _holidaysBloc,
+          listener: (context, state) {
+            if (state is HolidaysLoaded) {
+              _officialHolidays = state.holidays;
+              _calculateActualDays(); // إعادة الحساب التلقائي إذا كانت التواريخ مختارة مسبقاً
+            }
+          },
+        ),
+      ],
       child: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
         child: Column(
@@ -99,7 +161,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             ),
             const SizedBox(height: 24),
 
-            // 3. حقل نوع الإجازة (مصمم ليتطابق مع CustomTextField)
+            // 3. حقل نوع الإجازة
             DropdownButtonFormField<LeaveType>(
               initialValue: _selectedType,
               dropdownColor: colorScheme.surface,
@@ -147,12 +209,13 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                   _selectedType = val!;
                   _startDate = null;
                   _endDate = null;
+                  _actualDaysCount = 0; // تصفير الأيام عند التغيير
                 });
               },
             ),
             const SizedBox(height: 16),
 
-            // 4. زر اختيار التاريخ (تحول لشكله كحقل إدخال عصري)
+            // 4. زر اختيار التاريخ
             InkWell(
               onTap: _selectLeaveDate,
               borderRadius: BorderRadius.circular(12),
@@ -204,7 +267,38 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             ),
             const SizedBox(height: 16),
 
-            // 5. حقل الملاحظات باستخدام المكون المخصص الموحد
+            // --- 5. عرض عدد الأيام المخصومة بذكاء للموظف (ميزة جديدة للواجهة) ---
+            if (_startDate != null && _endDate != null)
+              Padding(
+                padding: const EdgeInsets.only(bottom: 16.0),
+                child: Container(
+                  padding: const EdgeInsets.all(12),
+                  decoration: BoxDecoration(
+                    color: colorScheme.primaryContainer.withAlpha(100),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: colorScheme.primary.withAlpha(50)),
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.info_outline_rounded, color: colorScheme.primary, size: 20),
+                      const SizedBox(width: 8),
+                      Text(
+                        _actualDaysCount > 0 
+                          ? 'سيتم خصم ( $_actualDaysCount ) أيام فعلية من رصيدك'
+                          : 'لا يوجد خصم للأيام (التاريخ ضمن الإجازات الرسمية)',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: _actualDaysCount > 0 ? colorScheme.primary : Colors.red,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+
+            // 6. حقل الملاحظات
             CustomTextField(
               label: 'ملاحظات (اختياري)',
               icon: Icons.notes_rounded,
@@ -212,33 +306,36 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             ),
             const SizedBox(height: 8),
 
-            // 6. زر الحفظ (بتصميم أنيق بدون ظل وحواف دائرية)
+            // 7. زر الحفظ
             BlocBuilder<LeavesBloc, LeavesState>(
               bloc: widget.parentContext.read<LeavesBloc>(),
               builder: (context, state) {
                 final isLoading = state is LeavesLoading;
+                
+                // يتم تعطيل زر الحفظ إذا كان التطبيق يحمل البيانات أو إذا كانت الأيام الفعلية صفر!
+                final disableButton = isLoading || (_startDate != null && _actualDaysCount == 0);
+
                 return ElevatedButton(
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colorScheme.primary,
                     foregroundColor: colorScheme.onPrimary,
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    elevation: 0, // إزالة الظل لمظهر Flat عصري
+                    elevation: 0,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: isLoading
+                  onPressed: disableButton
                       ? null
                       : () {
                           if (_startDate != null && _endDate != null) {
-                            final daysCount =
-                                _endDate!.difference(_startDate!).inDays + 1;
                             final record = LeaveRecord(
                               id: 0,
                               leaveType: _selectedType,
                               startDate: _startDate!,
                               endDate: _endDate!,
-                              daysCount: daysCount,
+                              // هنا السحر: نمرر الأيام المفلترة بدلاً من الطرح المباشر!
+                              daysCount: _actualDaysCount, 
                               notes: _notesController.text,
                             );
                             widget.parentContext.read<LeavesBloc>().add(

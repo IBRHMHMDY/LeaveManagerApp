@@ -61,6 +61,18 @@ class $SettingsTableTable extends SettingsTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _selectedCountryMeta = const VerificationMeta(
+    'selectedCountry',
+  );
+  @override
+  late final GeneratedColumn<String> selectedCountry = GeneratedColumn<String>(
+    'selected_country',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('مصر'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -68,6 +80,7 @@ class $SettingsTableTable extends SettingsTable
     jobTitle,
     totalRegularLeaves,
     totalCasualLeaves,
+    selectedCountry,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -125,6 +138,15 @@ class $SettingsTableTable extends SettingsTable
     } else if (isInserting) {
       context.missing(_totalCasualLeavesMeta);
     }
+    if (data.containsKey('selected_country')) {
+      context.handle(
+        _selectedCountryMeta,
+        selectedCountry.isAcceptableOrUnknown(
+          data['selected_country']!,
+          _selectedCountryMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -154,6 +176,10 @@ class $SettingsTableTable extends SettingsTable
         DriftSqlType.int,
         data['${effectivePrefix}total_casual_leaves'],
       )!,
+      selectedCountry: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}selected_country'],
+      )!,
     );
   }
 
@@ -169,12 +195,14 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
   final String jobTitle;
   final int totalRegularLeaves;
   final int totalCasualLeaves;
+  final String selectedCountry;
   const SettingModel({
     required this.id,
     required this.employeeName,
     required this.jobTitle,
     required this.totalRegularLeaves,
     required this.totalCasualLeaves,
+    required this.selectedCountry,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -184,6 +212,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     map['job_title'] = Variable<String>(jobTitle);
     map['total_regular_leaves'] = Variable<int>(totalRegularLeaves);
     map['total_casual_leaves'] = Variable<int>(totalCasualLeaves);
+    map['selected_country'] = Variable<String>(selectedCountry);
     return map;
   }
 
@@ -194,6 +223,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       jobTitle: Value(jobTitle),
       totalRegularLeaves: Value(totalRegularLeaves),
       totalCasualLeaves: Value(totalCasualLeaves),
+      selectedCountry: Value(selectedCountry),
     );
   }
 
@@ -208,6 +238,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       jobTitle: serializer.fromJson<String>(json['jobTitle']),
       totalRegularLeaves: serializer.fromJson<int>(json['totalRegularLeaves']),
       totalCasualLeaves: serializer.fromJson<int>(json['totalCasualLeaves']),
+      selectedCountry: serializer.fromJson<String>(json['selectedCountry']),
     );
   }
   @override
@@ -219,6 +250,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       'jobTitle': serializer.toJson<String>(jobTitle),
       'totalRegularLeaves': serializer.toJson<int>(totalRegularLeaves),
       'totalCasualLeaves': serializer.toJson<int>(totalCasualLeaves),
+      'selectedCountry': serializer.toJson<String>(selectedCountry),
     };
   }
 
@@ -228,12 +260,14 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     String? jobTitle,
     int? totalRegularLeaves,
     int? totalCasualLeaves,
+    String? selectedCountry,
   }) => SettingModel(
     id: id ?? this.id,
     employeeName: employeeName ?? this.employeeName,
     jobTitle: jobTitle ?? this.jobTitle,
     totalRegularLeaves: totalRegularLeaves ?? this.totalRegularLeaves,
     totalCasualLeaves: totalCasualLeaves ?? this.totalCasualLeaves,
+    selectedCountry: selectedCountry ?? this.selectedCountry,
   );
   SettingModel copyWithCompanion(SettingsTableCompanion data) {
     return SettingModel(
@@ -248,6 +282,9 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       totalCasualLeaves: data.totalCasualLeaves.present
           ? data.totalCasualLeaves.value
           : this.totalCasualLeaves,
+      selectedCountry: data.selectedCountry.present
+          ? data.selectedCountry.value
+          : this.selectedCountry,
     );
   }
 
@@ -258,7 +295,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
           ..write('employeeName: $employeeName, ')
           ..write('jobTitle: $jobTitle, ')
           ..write('totalRegularLeaves: $totalRegularLeaves, ')
-          ..write('totalCasualLeaves: $totalCasualLeaves')
+          ..write('totalCasualLeaves: $totalCasualLeaves, ')
+          ..write('selectedCountry: $selectedCountry')
           ..write(')'))
         .toString();
   }
@@ -270,6 +308,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     jobTitle,
     totalRegularLeaves,
     totalCasualLeaves,
+    selectedCountry,
   );
   @override
   bool operator ==(Object other) =>
@@ -279,7 +318,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
           other.employeeName == this.employeeName &&
           other.jobTitle == this.jobTitle &&
           other.totalRegularLeaves == this.totalRegularLeaves &&
-          other.totalCasualLeaves == this.totalCasualLeaves);
+          other.totalCasualLeaves == this.totalCasualLeaves &&
+          other.selectedCountry == this.selectedCountry);
 }
 
 class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
@@ -288,12 +328,14 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
   final Value<String> jobTitle;
   final Value<int> totalRegularLeaves;
   final Value<int> totalCasualLeaves;
+  final Value<String> selectedCountry;
   const SettingsTableCompanion({
     this.id = const Value.absent(),
     this.employeeName = const Value.absent(),
     this.jobTitle = const Value.absent(),
     this.totalRegularLeaves = const Value.absent(),
     this.totalCasualLeaves = const Value.absent(),
+    this.selectedCountry = const Value.absent(),
   });
   SettingsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -301,6 +343,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     required String jobTitle,
     required int totalRegularLeaves,
     required int totalCasualLeaves,
+    this.selectedCountry = const Value.absent(),
   }) : employeeName = Value(employeeName),
        jobTitle = Value(jobTitle),
        totalRegularLeaves = Value(totalRegularLeaves),
@@ -311,6 +354,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     Expression<String>? jobTitle,
     Expression<int>? totalRegularLeaves,
     Expression<int>? totalCasualLeaves,
+    Expression<String>? selectedCountry,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -319,6 +363,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
       if (totalRegularLeaves != null)
         'total_regular_leaves': totalRegularLeaves,
       if (totalCasualLeaves != null) 'total_casual_leaves': totalCasualLeaves,
+      if (selectedCountry != null) 'selected_country': selectedCountry,
     });
   }
 
@@ -328,6 +373,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     Value<String>? jobTitle,
     Value<int>? totalRegularLeaves,
     Value<int>? totalCasualLeaves,
+    Value<String>? selectedCountry,
   }) {
     return SettingsTableCompanion(
       id: id ?? this.id,
@@ -335,6 +381,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
       jobTitle: jobTitle ?? this.jobTitle,
       totalRegularLeaves: totalRegularLeaves ?? this.totalRegularLeaves,
       totalCasualLeaves: totalCasualLeaves ?? this.totalCasualLeaves,
+      selectedCountry: selectedCountry ?? this.selectedCountry,
     );
   }
 
@@ -356,6 +403,9 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     if (totalCasualLeaves.present) {
       map['total_casual_leaves'] = Variable<int>(totalCasualLeaves.value);
     }
+    if (selectedCountry.present) {
+      map['selected_country'] = Variable<String>(selectedCountry.value);
+    }
     return map;
   }
 
@@ -366,7 +416,8 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
           ..write('employeeName: $employeeName, ')
           ..write('jobTitle: $jobTitle, ')
           ..write('totalRegularLeaves: $totalRegularLeaves, ')
-          ..write('totalCasualLeaves: $totalCasualLeaves')
+          ..write('totalCasualLeaves: $totalCasualLeaves, ')
+          ..write('selectedCountry: $selectedCountry')
           ..write(')'))
         .toString();
   }
@@ -772,12 +823,355 @@ class LeaveRecordsTableCompanion extends UpdateCompanion<LeaveRecordModel> {
   }
 }
 
+class $HolidaysTableTable extends HolidaysTable
+    with TableInfo<$HolidaysTableTable, HolidayModel> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $HolidaysTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _nameMeta = const VerificationMeta('name');
+  @override
+  late final GeneratedColumn<String> name = GeneratedColumn<String>(
+    'name',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
+    'start_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _endDateMeta = const VerificationMeta(
+    'endDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
+    'end_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _countryMeta = const VerificationMeta(
+    'country',
+  );
+  @override
+  late final GeneratedColumn<String> country = GeneratedColumn<String>(
+    'country',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('مصر'),
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, name, startDate, endDate, country];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'holidays_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<HolidayModel> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('name')) {
+      context.handle(
+        _nameMeta,
+        name.isAcceptableOrUnknown(data['name']!, _nameMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_nameMeta);
+    }
+    if (data.containsKey('start_date')) {
+      context.handle(
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(
+        _endDateMeta,
+        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endDateMeta);
+    }
+    if (data.containsKey('country')) {
+      context.handle(
+        _countryMeta,
+        country.isAcceptableOrUnknown(data['country']!, _countryMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  HolidayModel map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return HolidayModel(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      name: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}name'],
+      )!,
+      startDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}start_date'],
+      )!,
+      endDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}end_date'],
+      )!,
+      country: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}country'],
+      )!,
+    );
+  }
+
+  @override
+  $HolidaysTableTable createAlias(String alias) {
+    return $HolidaysTableTable(attachedDatabase, alias);
+  }
+}
+
+class HolidayModel extends DataClass implements Insertable<HolidayModel> {
+  final int id;
+  final String name;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String country;
+  const HolidayModel({
+    required this.id,
+    required this.name,
+    required this.startDate,
+    required this.endDate,
+    required this.country,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['name'] = Variable<String>(name);
+    map['start_date'] = Variable<DateTime>(startDate);
+    map['end_date'] = Variable<DateTime>(endDate);
+    map['country'] = Variable<String>(country);
+    return map;
+  }
+
+  HolidaysTableCompanion toCompanion(bool nullToAbsent) {
+    return HolidaysTableCompanion(
+      id: Value(id),
+      name: Value(name),
+      startDate: Value(startDate),
+      endDate: Value(endDate),
+      country: Value(country),
+    );
+  }
+
+  factory HolidayModel.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return HolidayModel(
+      id: serializer.fromJson<int>(json['id']),
+      name: serializer.fromJson<String>(json['name']),
+      startDate: serializer.fromJson<DateTime>(json['startDate']),
+      endDate: serializer.fromJson<DateTime>(json['endDate']),
+      country: serializer.fromJson<String>(json['country']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'name': serializer.toJson<String>(name),
+      'startDate': serializer.toJson<DateTime>(startDate),
+      'endDate': serializer.toJson<DateTime>(endDate),
+      'country': serializer.toJson<String>(country),
+    };
+  }
+
+  HolidayModel copyWith({
+    int? id,
+    String? name,
+    DateTime? startDate,
+    DateTime? endDate,
+    String? country,
+  }) => HolidayModel(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate ?? this.endDate,
+    country: country ?? this.country,
+  );
+  HolidayModel copyWithCompanion(HolidaysTableCompanion data) {
+    return HolidayModel(
+      id: data.id.present ? data.id.value : this.id,
+      name: data.name.present ? data.name.value : this.name,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      country: data.country.present ? data.country.value : this.country,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HolidayModel(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('country: $country')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, startDate, endDate, country);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is HolidayModel &&
+          other.id == this.id &&
+          other.name == this.name &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.country == this.country);
+}
+
+class HolidaysTableCompanion extends UpdateCompanion<HolidayModel> {
+  final Value<int> id;
+  final Value<String> name;
+  final Value<DateTime> startDate;
+  final Value<DateTime> endDate;
+  final Value<String> country;
+  const HolidaysTableCompanion({
+    this.id = const Value.absent(),
+    this.name = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.country = const Value.absent(),
+  });
+  HolidaysTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String name,
+    required DateTime startDate,
+    required DateTime endDate,
+    this.country = const Value.absent(),
+  }) : name = Value(name),
+       startDate = Value(startDate),
+       endDate = Value(endDate);
+  static Insertable<HolidayModel> custom({
+    Expression<int>? id,
+    Expression<String>? name,
+    Expression<DateTime>? startDate,
+    Expression<DateTime>? endDate,
+    Expression<String>? country,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (name != null) 'name': name,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (country != null) 'country': country,
+    });
+  }
+
+  HolidaysTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? name,
+    Value<DateTime>? startDate,
+    Value<DateTime>? endDate,
+    Value<String>? country,
+  }) {
+    return HolidaysTableCompanion(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      country: country ?? this.country,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (name.present) {
+      map['name'] = Variable<String>(name.value);
+    }
+    if (startDate.present) {
+      map['start_date'] = Variable<DateTime>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<DateTime>(endDate.value);
+    }
+    if (country.present) {
+      map['country'] = Variable<String>(country.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('HolidaysTableCompanion(')
+          ..write('id: $id, ')
+          ..write('name: $name, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('country: $country')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
   late final $SettingsTableTable settingsTable = $SettingsTableTable(this);
   late final $LeaveRecordsTableTable leaveRecordsTable =
       $LeaveRecordsTableTable(this);
+  late final $HolidaysTableTable holidaysTable = $HolidaysTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -785,6 +1179,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   List<DatabaseSchemaEntity> get allSchemaEntities => [
     settingsTable,
     leaveRecordsTable,
+    holidaysTable,
   ];
 }
 
@@ -795,6 +1190,7 @@ typedef $$SettingsTableTableCreateCompanionBuilder =
       required String jobTitle,
       required int totalRegularLeaves,
       required int totalCasualLeaves,
+      Value<String> selectedCountry,
     });
 typedef $$SettingsTableTableUpdateCompanionBuilder =
     SettingsTableCompanion Function({
@@ -803,6 +1199,7 @@ typedef $$SettingsTableTableUpdateCompanionBuilder =
       Value<String> jobTitle,
       Value<int> totalRegularLeaves,
       Value<int> totalCasualLeaves,
+      Value<String> selectedCountry,
     });
 
 class $$SettingsTableTableFilterComposer
@@ -836,6 +1233,11 @@ class $$SettingsTableTableFilterComposer
 
   ColumnFilters<int> get totalCasualLeaves => $composableBuilder(
     column: $table.totalCasualLeaves,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get selectedCountry => $composableBuilder(
+    column: $table.selectedCountry,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -873,6 +1275,11 @@ class $$SettingsTableTableOrderingComposer
     column: $table.totalCasualLeaves,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get selectedCountry => $composableBuilder(
+    column: $table.selectedCountry,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableTableAnnotationComposer
@@ -902,6 +1309,11 @@ class $$SettingsTableTableAnnotationComposer
 
   GeneratedColumn<int> get totalCasualLeaves => $composableBuilder(
     column: $table.totalCasualLeaves,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get selectedCountry => $composableBuilder(
+    column: $table.selectedCountry,
     builder: (column) => column,
   );
 }
@@ -942,12 +1354,14 @@ class $$SettingsTableTableTableManager
                 Value<String> jobTitle = const Value.absent(),
                 Value<int> totalRegularLeaves = const Value.absent(),
                 Value<int> totalCasualLeaves = const Value.absent(),
+                Value<String> selectedCountry = const Value.absent(),
               }) => SettingsTableCompanion(
                 id: id,
                 employeeName: employeeName,
                 jobTitle: jobTitle,
                 totalRegularLeaves: totalRegularLeaves,
                 totalCasualLeaves: totalCasualLeaves,
+                selectedCountry: selectedCountry,
               ),
           createCompanionCallback:
               ({
@@ -956,12 +1370,14 @@ class $$SettingsTableTableTableManager
                 required String jobTitle,
                 required int totalRegularLeaves,
                 required int totalCasualLeaves,
+                Value<String> selectedCountry = const Value.absent(),
               }) => SettingsTableCompanion.insert(
                 id: id,
                 employeeName: employeeName,
                 jobTitle: jobTitle,
                 totalRegularLeaves: totalRegularLeaves,
                 totalCasualLeaves: totalCasualLeaves,
+                selectedCountry: selectedCountry,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -1214,6 +1630,200 @@ typedef $$LeaveRecordsTableTableProcessedTableManager =
       LeaveRecordModel,
       PrefetchHooks Function()
     >;
+typedef $$HolidaysTableTableCreateCompanionBuilder =
+    HolidaysTableCompanion Function({
+      Value<int> id,
+      required String name,
+      required DateTime startDate,
+      required DateTime endDate,
+      Value<String> country,
+    });
+typedef $$HolidaysTableTableUpdateCompanionBuilder =
+    HolidaysTableCompanion Function({
+      Value<int> id,
+      Value<String> name,
+      Value<DateTime> startDate,
+      Value<DateTime> endDate,
+      Value<String> country,
+    });
+
+class $$HolidaysTableTableFilterComposer
+    extends Composer<_$AppDatabase, $HolidaysTableTable> {
+  $$HolidaysTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get country => $composableBuilder(
+    column: $table.country,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$HolidaysTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $HolidaysTableTable> {
+  $$HolidaysTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get name => $composableBuilder(
+    column: $table.name,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get country => $composableBuilder(
+    column: $table.country,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$HolidaysTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $HolidaysTableTable> {
+  $$HolidaysTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get name =>
+      $composableBuilder(column: $table.name, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<String> get country =>
+      $composableBuilder(column: $table.country, builder: (column) => column);
+}
+
+class $$HolidaysTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $HolidaysTableTable,
+          HolidayModel,
+          $$HolidaysTableTableFilterComposer,
+          $$HolidaysTableTableOrderingComposer,
+          $$HolidaysTableTableAnnotationComposer,
+          $$HolidaysTableTableCreateCompanionBuilder,
+          $$HolidaysTableTableUpdateCompanionBuilder,
+          (
+            HolidayModel,
+            BaseReferences<_$AppDatabase, $HolidaysTableTable, HolidayModel>,
+          ),
+          HolidayModel,
+          PrefetchHooks Function()
+        > {
+  $$HolidaysTableTableTableManager(_$AppDatabase db, $HolidaysTableTable table)
+    : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$HolidaysTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$HolidaysTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$HolidaysTableTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> name = const Value.absent(),
+                Value<DateTime> startDate = const Value.absent(),
+                Value<DateTime> endDate = const Value.absent(),
+                Value<String> country = const Value.absent(),
+              }) => HolidaysTableCompanion(
+                id: id,
+                name: name,
+                startDate: startDate,
+                endDate: endDate,
+                country: country,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String name,
+                required DateTime startDate,
+                required DateTime endDate,
+                Value<String> country = const Value.absent(),
+              }) => HolidaysTableCompanion.insert(
+                id: id,
+                name: name,
+                startDate: startDate,
+                endDate: endDate,
+                country: country,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$HolidaysTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $HolidaysTableTable,
+      HolidayModel,
+      $$HolidaysTableTableFilterComposer,
+      $$HolidaysTableTableOrderingComposer,
+      $$HolidaysTableTableAnnotationComposer,
+      $$HolidaysTableTableCreateCompanionBuilder,
+      $$HolidaysTableTableUpdateCompanionBuilder,
+      (
+        HolidayModel,
+        BaseReferences<_$AppDatabase, $HolidaysTableTable, HolidayModel>,
+      ),
+      HolidayModel,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1222,4 +1832,6 @@ class $AppDatabaseManager {
       $$SettingsTableTableTableManager(_db, _db.settingsTable);
   $$LeaveRecordsTableTableTableManager get leaveRecordsTable =>
       $$LeaveRecordsTableTableTableManager(_db, _db.leaveRecordsTable);
+  $$HolidaysTableTableTableManager get holidaysTable =>
+      $$HolidaysTableTableTableManager(_db, _db.holidaysTable);
 }

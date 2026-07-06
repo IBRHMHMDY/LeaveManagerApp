@@ -47,7 +47,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
       scheme: 'mailto',
       path: 'ibrhmhmdy@example.com', // ضع بريدك الإلكتروني هنا
       queryParameters: {
-        'subject': 'تطبيق متتبع الإجازات - تواصل',
+        'subject': 'تطبيق مدير الإجازات - تواصل',
       },
     );
     if (!await launchUrl(emailLaunchUri)) {
@@ -60,7 +60,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
     // ضع رقم هاتفك هنا مع مفتاح الدولة بدون أصفار أو علامة + (مثال لمصر: 201000000000)
     const String phoneNumber = '2001007576297'; 
     // الرسالة الافتراضية التي ستظهر في المحادثة
-    final String message = Uri.encodeComponent('مرحباً، لدي استفسار بخصوص تطبيق دفتر أجازاتى.');
+    final String message = Uri.encodeComponent('مرحباً، لدي استفسار بخصوص تطبيق مدير أجازاتى.');
     
     // استخدام الرابط العالمي wa.me لضمان التوافقية
     final Uri whatsappUri = Uri.parse('https://wa.me/$phoneNumber?text=$message');

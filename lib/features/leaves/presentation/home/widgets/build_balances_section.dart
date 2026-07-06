@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 
 class BuildBalancesSection extends StatelessWidget {
   const BuildBalancesSection(BuildContext context, {super.key});

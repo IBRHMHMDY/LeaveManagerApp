@@ -22,13 +22,13 @@ void main() async {
       path: 'assets/translations',
       fallbackLocale: const Locale('ar', 'EG'),
       startLocale: const Locale('ar', 'EG'),
-      child: const VacationsTrackerApp(),
+      child: const LeaveManagerAPP(),
     ),
   );
 }
 
-class VacationsTrackerApp extends StatelessWidget {
-  const VacationsTrackerApp({super.key});
+class LeaveManagerAPP extends StatelessWidget {
+  const LeaveManagerAPP({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,12 +42,11 @@ class VacationsTrackerApp extends StatelessWidget {
         builder: (context, themeMode) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            title: 'دفتر أجازاتى',
+            title: 'مدير أجازاتى',
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,
-            // ---------------------------------------------------
-
+            // -------------------------------------------------------//
             themeMode: themeMode,
             theme: AppTheme.lightTheme,
             darkTheme: AppTheme.darkTheme,

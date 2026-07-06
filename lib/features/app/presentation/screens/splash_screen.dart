@@ -4,6 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/features/app/presentation/widgets/custom_app_logo.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_events.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -135,7 +137,7 @@ class _SplashScreenState extends State<SplashScreen>
                       child: Column(
                         children: [
                           Text(
-                            'دفتر اجازاتى',
+                            'مدير اجازاتى',
                             style: Theme.of(context).textTheme.headlineMedium
                                 ?.copyWith(
                                   fontWeight: FontWeight.w900,

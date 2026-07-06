@@ -1,6 +1,6 @@
 {
   "core": {
-    "app_name": "Vacations Tracker",
+    "app_name": "Leave Manager",
     "app_slogan": "Track your leaves smartly and easily",
     "buttons": {
       "save": "Save",

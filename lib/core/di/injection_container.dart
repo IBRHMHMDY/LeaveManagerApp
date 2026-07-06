@@ -1,4 +1,16 @@
 import 'package:get_it/get_it.dart';
+import 'package:leave_manager/features/holidays/data/datasources/holidays_local_data_source.dart';
+import 'package:leave_manager/features/holidays/data/repositories/holiday_repository_impl.dart';
+import 'package:leave_manager/features/holidays/domain/repositories/holiday_repository.dart';
+import 'package:leave_manager/features/holidays/domain/usecases/add_holiday_use_case.dart';
+import 'package:leave_manager/features/holidays/domain/usecases/delete_holiday_use_case.dart';
+import 'package:leave_manager/features/holidays/domain/usecases/get_holidays_use_case.dart';
+import 'package:leave_manager/features/holidays/domain/usecases/seed_holidays_by_country_use_case.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
+import 'package:leave_manager/features/settings/domain/usecases/check_settings_exist_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/get_settings_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/reset_balance_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/save_settings_usecase.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/delete_leave_usecase.dart';
@@ -13,7 +25,6 @@ import 'package:leave_manager/features/leaves/domain/usecases/get_current_year_l
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/settings/data/repositories/settings_repository_impl.dart';
 import 'package:leave_manager/features/settings/domain/repositories/settings_repository.dart';
-import 'package:leave_manager/features/settings/domain/usecases/settings_usecase.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 
 final sl = GetIt.instance;
@@ -33,7 +44,7 @@ Future<void> init() async {
   sl.registerLazySingleton<SettingsLocalDataSource>(
     () => SettingsLocalDataSourceImpl(sl()),
   );
-  
+  sl.registerLazySingleton<HolidaysLocalDataSource>(() => HolidaysLocalDataSourceImpl(sl()));
   // --- BLoCs ---
   sl.registerFactory(() => ThemeCubit(sharedPreferences: sl()));
   sl.registerFactory(
@@ -41,6 +52,8 @@ Future<void> init() async {
       checkSettingsExist: sl(),
       getSettings: sl(),
       saveSettings: sl(),
+      resetBalances: sl(),
+      seedHolidays: sl(),
     ),
   );
   sl.registerFactory(
@@ -52,12 +65,19 @@ Future<void> init() async {
       deleteLeave: sl(),
     ),
   );
+  sl.registerFactory(
+    () => HolidaysBloc(
+      getHolidays: sl(),
+      addHoliday: sl(),
+      deleteHoliday: sl(),
+    ),
+  );
   // --- Repositories ---
   sl.registerLazySingleton<SettingsRepository>(
     () => SettingsRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<LeaveRepository>(() => LeaveRepositoryImpl(sl()));
-
+  sl.registerLazySingleton<HolidayRepository>(() => HolidayRepositoryImpl(sl()));
   // --- Use Cases ---
   sl.registerLazySingleton(() => CheckSettingsExistUseCase(sl()));
   sl.registerLazySingleton(() => GetSettingsUseCase(sl()));
@@ -74,6 +94,9 @@ Future<void> init() async {
     ),
   );
   sl.registerLazySingleton(() => DeleteLeaveUseCase(sl()));
-
+  sl.registerLazySingleton(() => GetHolidaysUseCase(sl()));
+  sl.registerLazySingleton(() => AddHolidayUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteHolidayUseCase(sl()));
+  sl.registerLazySingleton(() => SeedHolidaysByCountryUseCase(sl()));
 
 }

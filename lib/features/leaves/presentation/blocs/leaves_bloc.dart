@@ -7,7 +7,7 @@ import 'package:leave_manager/features/leaves/domain/usecases/add_leave_usecase.
 import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/delete_leave_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/get_current_year_leaves_usecase.dart';
-import 'package:leave_manager/features/settings/domain/usecases/settings_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/reset_balance_usecase.dart';
 
 
 // --- Events ---

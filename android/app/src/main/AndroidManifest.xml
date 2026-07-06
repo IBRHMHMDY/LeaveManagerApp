@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="vacation_tracker"
+        android:label="leave_manager"
         android:name="${applicationName}"
         android:icon="@mipmap/launcher_icon"
         android:allowBackup="false"
