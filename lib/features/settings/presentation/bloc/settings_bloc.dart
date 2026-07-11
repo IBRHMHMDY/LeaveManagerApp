@@ -6,7 +6,7 @@ import 'package:leave_manager/features/settings/domain/usecases/reset_balance_us
 import 'package:leave_manager/features/settings/domain/usecases/save_settings_usecase.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_events.dart';
 import '../../../../core/utils/financial_year_calculator.dart';
-import '../../../holidays/domain/usecases/seed_holidays_by_country_use_case.dart';
+import '../../../holidays/domain/usecases/seed_holidays_use_case.dart';
 import 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
@@ -14,7 +14,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final GetSettingsUseCase getSettings;
   final ResetBalancesUseCase resetBalances;
   final SaveSettingsUseCase saveSettings;
-  final SeedHolidaysByCountryUseCase seedHolidays;
+  final SeedHolidaysUseCase seedHolidays;
 
   SettingsBloc({
     required this.checkSettingsExist,
@@ -57,7 +57,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       (_) async {
         // 2. تحديث وتفريغ الإجازات الرسمية لتتطابق مع البلد الجديد المختار
         final currentYear = FinancialYearCalculator.currentFinancialYearStart.year;
-        final seedResult = await seedHolidays(event.settings.selectedCountry, currentYear);
+        final seedResult = await seedHolidays(currentYear);
         
         seedResult.fold(
           (failure) => emit(SettingsError('تم الحفظ لكن فشل تحديث الإجازات: ${failure.message}')),

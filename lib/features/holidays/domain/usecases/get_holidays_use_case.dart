@@ -8,8 +8,7 @@ class GetHolidaysUseCase {
 
   const GetHolidaysUseCase(this.repository);
 
-  // تمت إضافة مُعامل country
-  Future<Either<Failure, List<Holiday>>> call(DateTime start, DateTime end, String country) async {
-    return await repository.getHolidaysBetweenDates(start, end, country);
+  Future<Either<Failure, List<Holiday>>> call(DateTime start, DateTime end) async {
+    return await repository.getHolidaysBetweenDates(start, end);
   }
 }

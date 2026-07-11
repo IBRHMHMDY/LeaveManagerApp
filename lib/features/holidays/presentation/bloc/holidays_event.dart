@@ -8,13 +8,7 @@ abstract class HolidaysEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadHolidaysEvent extends HolidaysEvent {
-  final String country;
-  const LoadHolidaysEvent(this.country);
-
-  @override
-  List<Object> get props => [country];
-}
+class LoadHolidaysEvent extends HolidaysEvent {}
 class AddHolidayEvent extends HolidaysEvent {
   final Holiday holiday;
 

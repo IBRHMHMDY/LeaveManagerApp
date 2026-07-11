@@ -12,15 +12,14 @@ class HolidayRepositoryImpl implements HolidayRepository {
   const HolidayRepositoryImpl(this._localDataSource);
 
   @override
-  Future<Either<Failure, List<Holiday>>> getHolidaysBetweenDates(DateTime start, DateTime end, String country) async {
+  Future<Either<Failure, List<Holiday>>> getHolidaysBetweenDates(DateTime start, DateTime end) async {
     try {
-      final models = await _localDataSource.getHolidaysBetweenDates(start, end, country);
+      final models = await _localDataSource.getHolidaysBetweenDates(start, end);
       final holidays = models.map((m) => Holiday(
             id: m.id,
             name: m.name,
             startDate: m.startDate,
             endDate: m.endDate,
-            country: m.country,
           )).toList();
       return Right(holidays);
     } catch (e) {
@@ -35,7 +34,6 @@ class HolidayRepositoryImpl implements HolidayRepository {
         name: Value(holiday.name),
         startDate: Value(holiday.startDate),
         endDate: Value(holiday.endDate),
-        country: Value(holiday.country), // إضافة البلد
       );
       await _localDataSource.addHoliday(companion);
       return const Right(unit);
@@ -55,9 +53,9 @@ class HolidayRepositoryImpl implements HolidayRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> clearHolidaysByCountry(String country) async {
+  Future<Either<Failure, Unit>> clearHolidays() async {
     try {
-      await _localDataSource.clearHolidaysByCountry(country);
+      await _localDataSource.clearHolidays();
       return const Right(unit);
     } catch (e) {
       return Left(CacheFailure('فشل في مسح الإجازات القديمة: $e'));

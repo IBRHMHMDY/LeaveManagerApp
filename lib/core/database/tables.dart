@@ -7,7 +7,6 @@ class SettingsTable extends Table {
   TextColumn get jobTitle => text()();
   IntColumn get totalRegularLeaves => integer()();
   IntColumn get totalCasualLeaves => integer()();
-  TextColumn get selectedCountry => text().withDefault(const Constant('مصر'))();
 
   @override
   Set<Column> get primaryKey => {id};
@@ -29,5 +28,4 @@ class HolidaysTable extends Table {
   TextColumn get name => text()(); // اسم الإجازة
   DateTimeColumn get startDate => dateTime()(); // تاريخ البداية
   DateTimeColumn get endDate => dateTime()(); // تاريخ النهاية
-  TextColumn get country => text().withDefault(const Constant('مصر'))(); 
 }

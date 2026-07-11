@@ -2,10 +2,10 @@ import 'package:drift/drift.dart';
 import '../../../../core/database/app_database.dart';
 
 abstract class HolidaysLocalDataSource {
-  Future<List<HolidayModel>> getHolidaysBetweenDates(DateTime start, DateTime end, String country);
+  Future<List<HolidayModel>> getHolidaysBetweenDates(DateTime start, DateTime end);
   Future<void> addHoliday(HolidaysTableCompanion holiday);
   Future<void> deleteHoliday(int id);
-  Future<void> clearHolidaysByCountry(String country); // إضافة دالة المسح
+  Future<void> clearHolidays(); // إضافة دالة المسح
 }
 
 class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
@@ -14,9 +14,8 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
   const HolidaysLocalDataSourceImpl(this._database);
 
   @override
-  Future<List<HolidayModel>> getHolidaysBetweenDates(DateTime start, DateTime end, String country) async {
+  Future<List<HolidayModel>> getHolidaysBetweenDates(DateTime start, DateTime end) async {
     return await (_database.select(_database.holidaysTable)
-          ..where((t) => t.country.equals(country)) // فلترة بالبلد
           ..where((t) => t.startDate.isSmallerOrEqualValue(end) & t.endDate.isBiggerOrEqualValue(start)))
         .get();
   }
@@ -32,8 +31,8 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
   }
 
   @override
-  Future<void> clearHolidaysByCountry(String country) async {
+  Future<void> clearHolidays() async {
     // مسح جميع إجازات هذا البلد من الجدول
-    await (_database.delete(_database.holidaysTable)..where((t) => t.country.equals(country))).go();
+    await (_database.delete(_database.holidaysTable)).go();
   }
 }

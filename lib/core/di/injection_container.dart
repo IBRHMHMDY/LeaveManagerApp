@@ -5,7 +5,7 @@ import 'package:leave_manager/features/holidays/domain/repositories/holiday_repo
 import 'package:leave_manager/features/holidays/domain/usecases/add_holiday_use_case.dart';
 import 'package:leave_manager/features/holidays/domain/usecases/delete_holiday_use_case.dart';
 import 'package:leave_manager/features/holidays/domain/usecases/get_holidays_use_case.dart';
-import 'package:leave_manager/features/holidays/domain/usecases/seed_holidays_by_country_use_case.dart';
+import 'package:leave_manager/features/holidays/domain/usecases/seed_holidays_use_case.dart';
 import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
 import 'package:leave_manager/features/settings/domain/usecases/check_settings_exist_usecase.dart';
 import 'package:leave_manager/features/settings/domain/usecases/get_settings_usecase.dart';
@@ -97,6 +97,6 @@ Future<void> init() async {
   sl.registerLazySingleton(() => GetHolidaysUseCase(sl()));
   sl.registerLazySingleton(() => AddHolidayUseCase(sl()));
   sl.registerLazySingleton(() => DeleteHolidayUseCase(sl()));
-  sl.registerLazySingleton(() => SeedHolidaysByCountryUseCase(sl()));
+  sl.registerLazySingleton(() => SeedHolidaysUseCase(sl()));
 
 }

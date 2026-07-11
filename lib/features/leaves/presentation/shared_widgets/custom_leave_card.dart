@@ -5,7 +5,7 @@ import '../../domain/entities/leave_record_entity.dart';
 import '../../../../core/utils/enums/leave_type.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/utils/extenstions/date_extension.dart';
-import '../blocs/leaves_bloc.dart'; // استدعاء الـ BLoC لإطلاق الحدث
+import '../blocs/leaves_bloc.dart';
 
 class CustomLeaveCard extends StatelessWidget {
   final LeaveRecord leave;
@@ -16,37 +16,28 @@ class CustomLeaveCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final isRegular = leave.leaveType == LeaveType.regular;
     final color = isRegular ? AppColors.regularLeaveColor : AppColors.casualLeaveColor;
-    
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
 
     return Dismissible(
-      // 1. يجب إعطاء مفتاح فريد لكل كارت لكي لا يحدث تداخل عند إعادة بناء القائمة
       key: ValueKey(leave.id),
-      
-      // 2. اتجاه السحب (من البداية للنهاية - أي من اليمين لليسار في الواجهة العربية)
       direction: DismissDirection.endToStart,
-      
-      // 3. الخلفية التي تظهر خلف الكارت أثناء السحب
       background: Container(
         margin: const EdgeInsets.only(bottom: 14),
         decoration: BoxDecoration(
-          color: Colors.red.shade600,
-          borderRadius: BorderRadius.circular(16),
+          color: colorScheme.error,
+          borderRadius: BorderRadius.circular(20), // ليتماشى مع حواف الثيم الجديد
         ),
-        alignment: AlignmentDirectional.centerEnd, // محاذاة الأيقونة لليمين
+        alignment: AlignmentDirectional.centerEnd,
         padding: const EdgeInsets.symmetric(horizontal: 24),
         child: const Icon(Icons.delete_outline_rounded, color: Colors.white, size: 32),
       ),
-      
-      // 4. دالة تأكيد الحذف (تمنع اختفاء الكارت إذا تراجع المستخدم)
       confirmDismiss: (direction) async {
         return await showDialog<bool>(
           context: context,
           builder: (ctx) => AlertDialog(
             title: const Text('تأكيد الحذف'),
             content: const Text('هل أنت متأكد من رغبتك في حذف هذه الإجازة واسترداد أيامها لرصيدك؟'),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
             actions: [
               TextButton(
                 onPressed: () => Navigator.pop(ctx, false),
@@ -54,9 +45,8 @@ class CustomLeaveCard extends StatelessWidget {
               ),
               ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.red.shade600,
-                  foregroundColor: Colors.white,
-                  elevation: 0,
+                  backgroundColor: colorScheme.error,
+                  foregroundColor: colorScheme.onError,
                 ),
                 onPressed: () => Navigator.pop(ctx, true),
                 child: const Text('نعم، حذف'),
@@ -65,43 +55,21 @@ class CustomLeaveCard extends StatelessWidget {
           ),
         );
       },
-      
-      // 5. الإجراء الفعلي الذي يحدث بعد اختفاء الكارت
       onDismissed: (direction) {
         context.read<LeavesBloc>().add(DeleteLeaveEvent(leave.id));
       },
-      
-      // 6. الكارت الأصلي الخاص بك (بدون زر الـ IconButton الذي أضفناه سابقاً)
-      child: Container(
+      // استخدام Card بدلاً من Container ليرث تصميم AppTheme تلقائياً
+      child: Card(
         margin: const EdgeInsets.only(bottom: 14),
-        clipBehavior: Clip.antiAlias, 
-        decoration: BoxDecoration(
-          color: colorScheme.surface, 
-          borderRadius: BorderRadius.circular(16),
-          boxShadow: [
-            BoxShadow(
-              color: isDark ? Colors.transparent : Colors.black.withAlpha(8), 
-              blurRadius: 12,
-              offset: const Offset(0, 4),
-            ),
-          ],
-          border: Border.all(
-            color: isDark ? Colors.white12 : Colors.transparent,
-            width: 1,
-          ),
-        ),
+        clipBehavior: Clip.antiAlias,
         child: Stack(
           children: [
             PositionedDirectional(
-              start: 0, 
+              start: 0,
               top: 0,
               bottom: 0,
-              child: Container(
-                width: 5,
-                color: color,
-              ),
+              child: Container(width: 5, color: color),
             ),
-            
             Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -114,7 +82,7 @@ class CustomLeaveCard extends StatelessWidget {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: color.withAlpha(20),
+                            color: color.withAlpha(25),
                             borderRadius: BorderRadius.circular(20),
                           ),
                           child: Text(
@@ -136,7 +104,7 @@ class CustomLeaveCard extends StatelessWidget {
                               style: TextStyle(
                                 fontSize: 13.5,
                                 color: colorScheme.onSurface,
-                                fontWeight: FontWeight.w500,
+                                fontWeight: FontWeight.w600,
                               ),
                             ),
                           ],
@@ -146,8 +114,9 @@ class CustomLeaveCard extends StatelessWidget {
                           Container(
                             padding: const EdgeInsets.all(10),
                             decoration: BoxDecoration(
-                              color: isDark ? Colors.black26 : Colors.grey.shade50,
-                              borderRadius: BorderRadius.circular(10),
+                              // استخدام ألوان السطح المتدرجة من الثيم
+                              color: colorScheme.surfaceContainerHighest.withAlpha(100),
+                              borderRadius: BorderRadius.circular(12),
                             ),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
@@ -175,8 +144,8 @@ class CustomLeaveCard extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                     decoration: BoxDecoration(
-                      color: isDark ? Colors.black26 : Colors.grey.shade50,
-                      borderRadius: BorderRadius.circular(12),
+                      color: color.withAlpha(15), // خلفية ناعمة من نفس لون الإجازة
+                      borderRadius: BorderRadius.circular(16),
                     ),
                     child: Column(
                       mainAxisSize: MainAxisSize.min,

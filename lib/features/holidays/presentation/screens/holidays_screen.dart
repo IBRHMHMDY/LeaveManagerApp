@@ -1,36 +1,72 @@
+// lib/features/holidays/presentation/screens/holidays_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:intl/intl.dart';
-import '../../../../core/di/injection_container.dart';
-import '../../../settings/presentation/bloc/settings_bloc.dart';
-import '../../../settings/presentation/bloc/settings_state.dart';
-import '../../domain/entities/holiday_entity.dart';
-import '../bloc/holidays_bloc.dart';
-import '../bloc/holidays_event.dart';
-import '../bloc/holidays_state.dart';
+import 'package:leave_manager/core/di/injection_container.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_event.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_state.dart';
+import 'package:leave_manager/features/holidays/presentation/widgets/add_holiday_bottom_sheet.dart';
+import 'package:leave_manager/features/holidays/presentation/widgets/custom_holiday_card.dart';
+import 'package:leave_manager/core/utils/app_notifications.dart';
+import 'package:leave_manager/features/holidays/presentation/widgets/next_holiday_card.dart';
+import 'package:leave_manager/features/leaves/presentation/history/widgets/custom_empty_state.dart';
+
 
 class HolidaysScreen extends StatelessWidget {
   const HolidaysScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    // جلب البلد المحفوظ من SettingsBloc
-    final settingsState = context.read<SettingsBloc>().state;
-    final String country = settingsState is SettingsLoaded ? settingsState.settings.selectedCountry : 'مصر';
 
     return BlocProvider(
-      create: (context) => sl<HolidaysBloc>()..add(LoadHolidaysEvent(country)),
-      child: _HolidaysView(country: country),
+      create: (context) => sl<HolidaysBloc>()..add(LoadHolidaysEvent()),
+      child:  const _HolidaysView(),
     );
   }
 }
 
-class _HolidaysView extends StatelessWidget {
-  final String country;
-  const _HolidaysView({required this.country});
+class _HolidaysView extends StatefulWidget {
+
+
+  const _HolidaysView();
+
+  @override
+  State<_HolidaysView> createState() => _HolidaysViewState();
+}
+
+// 1. إضافة with WidgetsBindingObserver
+class _HolidaysViewState extends State<_HolidaysView> with WidgetsBindingObserver {
+  
+  @override
+  void initState() {
+    super.initState();
+    // 2. تسجيل المراقب (Observer) عند بدء الشاشة
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    // 3. إزالة المراقب عند إغلاق الشاشة لتجنب الـ Memory Leaks
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  // 4. الاستماع لتغيرات حالة التطبيق (App Lifecycle)
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    
+    // إذا عاد التطبيق إلى الواجهة (العمل من الخلفية)
+    if (state == AppLifecycleState.resumed) {
+      // قم بإعادة جلب البيانات لتحديث تواريخ الإجازات وحالة "الإجازة القادمة"
+      context.read<HolidaysBloc>().add(LoadHolidaysEvent());
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
       appBar: AppBar(
         title: const Text('الإجازات الرسمية'),
@@ -38,170 +74,63 @@ class _HolidaysView extends StatelessWidget {
       body: BlocConsumer<HolidaysBloc, HolidaysState>(
         listener: (context, state) {
           if (state is HolidayOperationSuccess) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.green),
-            );
+            AppNotifications.showSuccess(context, state.message);
           } else if (state is HolidaysError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text(state.message), backgroundColor: Colors.red),
-            );
+            AppNotifications.showError(context, state.message);
           }
         },
         builder: (context, state) {
           if (state is HolidaysLoading) {
             return const Center(child: CircularProgressIndicator());
           } else if (state is HolidaysLoaded) {
+            
             if (state.holidays.isEmpty) {
-              return const Center(child: Text('لا توجد إجازات رسمية مسجلة لهذه السنة المالية.'));
+              return const CustomEmptyState();
             }
-            return ListView.builder(
-              itemCount: state.holidays.length,
-              itemBuilder: (context, index) {
-                final holiday = state.holidays[index];
-                return _HolidayTile(holiday: holiday);
-              },
+
+            return Column(
+              children: [
+                // إضافة كارت الإجازة القادمة في أعلى الشاشة
+                const NextHolidayCard(),
+                
+                // قائمة الإجازات
+                Expanded(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                    itemCount: state.holidays.length,
+                    itemBuilder: (context, index) {
+                      final holiday = state.holidays[index];
+                      return CustomHolidayCard(holiday: holiday);
+                    },
+                  ),
+                ),
+              ],
             );
           }
           return const SizedBox.shrink();
         },
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _showAddHolidayDialog(context, country),
-        child: const Icon(Icons.add),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => _showAddHolidayDialog(context),
+        icon: const Icon(Icons.add),
+        label: const Text('إضافة إجازة'),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
       ),
     );
   }
 
-  void _showAddHolidayDialog(BuildContext context, String currentCountry) {
+  void _showAddHolidayDialog(BuildContext context) {
     final bloc = context.read<HolidaysBloc>();
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      builder: (_) => _AddHolidayBottomSheet(bloc: bloc, country: currentCountry),
-    );
-  }
-}
-
-class _HolidayTile extends StatelessWidget {
-  final Holiday holiday;
-  const _HolidayTile({required this.holiday});
-
-  @override
-  Widget build(BuildContext context) {
-    final dateFormat = DateFormat('yyyy/MM/dd');
-    final startStr = dateFormat.format(holiday.startDate);
-    final endStr = dateFormat.format(holiday.endDate);
-    final daysCount = holiday.endDate.difference(holiday.startDate).inDays + 1;
-
-    return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: ListTile(
-        title: Text(holiday.name, style: const TextStyle(fontWeight: FontWeight.bold)),
-        subtitle: Text('من: $startStr  إلى: $endStr\n($daysCount أيام)'),
-        trailing: IconButton(
-          icon: const Icon(Icons.delete, color: Colors.red),
-          onPressed: () {
-            context.read<HolidaysBloc>().add(DeleteHolidayEvent(holiday.id));
-          },
-        ),
+      backgroundColor: Theme.of(context).colorScheme.surface,
+      elevation: 0,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
       ),
-    );
-  }
-}
-
-class _AddHolidayBottomSheet extends StatefulWidget {
-  final HolidaysBloc bloc;
-  final String country;
-
-  const _AddHolidayBottomSheet({required this.bloc, required this.country});
-
-  @override
-  State<_AddHolidayBottomSheet> createState() => _AddHolidayBottomSheetState();
-}
-
-class _AddHolidayBottomSheetState extends State<_AddHolidayBottomSheet> {
-  final _nameController = TextEditingController();
-  DateTimeRange? _selectedDateRange;
-
-  Future<void> _pickDateRange() async {
-    final now = DateTime.now();
-    final picked = await showDateRangePicker(
-      context: context,
-      firstDate: DateTime(now.year - 1),
-      lastDate: DateTime(now.year + 2),
-      initialDateRange: _selectedDateRange,
-    );
-
-    if (picked != null) {
-      setState(() {
-        _selectedDateRange = picked;
-      });
-    }
-  }
-
-  void _submit() {
-    if (_nameController.text.trim().isEmpty || _selectedDateRange == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('الرجاء إدخال اسم الإجازة وتحديد التواريخ.')),
-      );
-      return;
-    }
-
-    final newHoliday = Holiday(
-      id: 0, 
-      name: _nameController.text.trim(),
-      startDate: _selectedDateRange!.start,
-      endDate: _selectedDateRange!.end,
-      country: widget.country, // تمرير البلد المختار للكيان الجديد
-    );
-
-    widget.bloc.add(AddHolidayEvent(newHoliday));
-    Navigator.pop(context);
-  }
-
-  @override
-  void dispose() {
-    _nameController.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.only(
-        bottom: MediaQuery.of(context).viewInsets.bottom,
-        left: 16, right: 16, top: 24,
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          const Text('إضافة إجازة رسمية', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 16),
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(
-              labelText: 'اسم الإجازة (مثل: عيد الفطر)',
-              border: OutlineInputBorder(),
-            ),
-          ),
-          const SizedBox(height: 16),
-          ElevatedButton.icon(
-            icon: const Icon(Icons.date_range),
-            label: Text(_selectedDateRange == null 
-              ? 'تحديد فترة الإجازة' 
-              : '${DateFormat('MM/dd').format(_selectedDateRange!.start)} - ${DateFormat('MM/dd').format(_selectedDateRange!.end)}'),
-            onPressed: _pickDateRange,
-          ),
-          const SizedBox(height: 24),
-          ElevatedButton(
-            style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(16)),
-            onPressed: _submit,
-            child: const Text('حفظ الإجازة'),
-          ),
-          const SizedBox(height: 24),
-        ],
-      ),
+      builder: (_) => AddHolidayBottomSheet(bloc: bloc),
     );
   }
 }

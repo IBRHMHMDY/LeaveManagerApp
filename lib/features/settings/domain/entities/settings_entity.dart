@@ -6,7 +6,6 @@ class Settings extends Equatable {
   final String jobTitle;
   final int totalRegularLeaves;
   final int totalCasualLeaves;
-  final String selectedCountry; // تمت إضافة حقل البلد المختار
 
   const Settings({
     required this.id,
@@ -14,7 +13,6 @@ class Settings extends Equatable {
     required this.jobTitle,
     required this.totalRegularLeaves,
     required this.totalCasualLeaves,
-    this.selectedCountry = 'مصر', // القيمة الافتراضية
   });
 
   @override
@@ -24,6 +22,5 @@ class Settings extends Equatable {
         jobTitle,
         totalRegularLeaves,
         totalCasualLeaves,
-        selectedCountry,
       ];
 }

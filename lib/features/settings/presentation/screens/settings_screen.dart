@@ -25,7 +25,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _jobController = TextEditingController(text: 'موظف');
-  final _regularLeavesController = TextEditingController(text: '21');
+  final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
 
   @override
@@ -79,7 +79,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isCurrentDark = Theme.of(context).brightness == Brightness.dark;
+    // final isCurrentDark = Theme.of(context).brightness == Brightness.dark;
 
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
@@ -169,16 +169,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // الحاوية الموحدة للمظهر واللغة
                 Container(
                   decoration: BoxDecoration(
-                    color: colorScheme.surfaceContainerHighest.withAlpha(50),
+                    color: colorScheme.onPrimaryContainer.withAlpha(50),
                     borderRadius: BorderRadius.circular(16),
                     border: Border.all(
-                      color: colorScheme.outline.withAlpha(40),
+                      color: colorScheme.outlineVariant,
                     ),
                   ),
-                  child: Column(
+                  child: const Column(
                     children: [
-                      // 1. مفتاح تحويل الوضع الليلي
-                      SettingThemeMode(colorScheme: colorScheme, isCurrentDark: isCurrentDark),
+                      // Settings App Theme Mode
+                      SettingThemeMode(),
 
                       // const Divider(height: 1, indent: 16, endIndent: 16),
 
@@ -284,7 +284,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   const SizedBox(height: 16),
                   TextButton.icon(
                     style: TextButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      padding: const EdgeInsets.symmetric(vertical: 32),
                       foregroundColor: colorScheme.onSurface.withAlpha(200),
                     ),
                     icon: const Icon(Icons.info_outline_rounded),
@@ -298,7 +298,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     onPressed: () => showAboutDeveloperBottomSheet(context),
                   ),
                 ],
-                const SizedBox(height: 32),
+                const SizedBox(height: 5),
               ],
             ),
           ),

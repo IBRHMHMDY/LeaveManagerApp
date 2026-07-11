@@ -6,11 +6,7 @@ import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/shared/widgets/custom_text_field.dart';
-
-// --- الواردات الجديدة لدمج الحاسبة الذكية والإجازات الرسمية ---
 import 'package:leave_manager/core/utils/leave_calculator.dart';
 import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
 import 'package:leave_manager/features/holidays/presentation/bloc/holidays_event.dart';
@@ -40,11 +36,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
   @override
   void initState() {
     super.initState();
-    // قراءة إعدادات المستخدم للحصول على البلد، وتمريره لجلب إجازات هذا البلد فقط
-    final settingsState = widget.parentContext.read<SettingsBloc>().state;
-    final String country = settingsState is SettingsLoaded ? settingsState.settings.selectedCountry : 'مصر';
-    
-    _holidaysBloc = di.sl<HolidaysBloc>()..add(LoadHolidaysEvent(country));
+    _holidaysBloc = di.sl<HolidaysBloc>()..add(LoadHolidaysEvent());
   }
 
   @override

@@ -1,3 +1,4 @@
+// lib/features/leaves/presentation/home/widgets/build_balances_section.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_colors.dart';
@@ -14,14 +15,13 @@ class BuildBalancesSection extends StatelessWidget {
       builder: (context, settingsState) {
         return BlocBuilder<LeavesBloc, LeavesState>(
           builder: (context, leavesState) {
-            if (settingsState is SettingsLoaded &&
-                leavesState is LeavesLoaded) {
+            if (settingsState is SettingsLoaded && leavesState is LeavesLoaded) {
               return Row(
                 children: [
                   Expanded(
                     child: _buildCircularIndicator(
                       context,
-                      'اعتيادى',
+                      'اعتيادي',
                       leavesState.balance.remainingRegular,
                       settingsState.settings.totalRegularLeaves,
                       AppColors.regularLeaveColor,
@@ -31,7 +31,7 @@ class BuildBalancesSection extends StatelessWidget {
                   Expanded(
                     child: _buildCircularIndicator(
                       context,
-                      'عارضه',
+                      'عارضة',
                       leavesState.balance.remainingCasual,
                       settingsState.settings.totalCasualLeaves,
                       AppColors.casualLeaveColor,
@@ -58,15 +58,14 @@ class BuildBalancesSection extends StatelessWidget {
     final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     
     return Card(
-      elevation: isDark ? 0 : 4, // تقليل الظل في الوضع الليلي
-      shadowColor: isDark ? Colors.transparent : color.withAlpha(50),
-      color: Theme.of(context).colorScheme.surface, // متغير حسب الثيم
+      // جميع خصائص اللون والظل يتم سحبها الآن تلقائياً من AppTheme
       shape: RoundedRectangleBorder(
-        side: BorderSide(
-          color: isDark ? color.withAlpha(100) : color, // حدود أهدأ في الوضع الليلي
-          width: 1,
-        ),
         borderRadius: BorderRadius.circular(20),
+        // إضافة لمسة خفيفة بلون الإجازة للإطار
+        side: BorderSide(
+          color: color.withAlpha(isDark ? 80 : 120),
+          width: 1.5,
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 24.0, horizontal: 16.0),
@@ -77,7 +76,7 @@ class BuildBalancesSection extends StatelessWidget {
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
-                color: Theme.of(context).colorScheme.onSurface
+                color: Theme.of(context).colorScheme.onSurface,
               ),
             ),
             const SizedBox(height: 20),
@@ -85,13 +84,12 @@ class BuildBalancesSection extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 SizedBox(
-                  width: 110, // Slightly larger
+                  width: 110,
                   height: 110,
                   child: CircularProgressIndicator(
                     value: progress,
                     strokeWidth: 10,
-                    // FIX: Changed withAlpha(2) to withAlpha(25)
-                    backgroundColor: color.withAlpha(50),
+                    backgroundColor: color.withAlpha(isDark ? 30 : 40),
                     color: color,
                     strokeCap: StrokeCap.round, // Modern rounded stroke
                   ),
@@ -111,7 +109,7 @@ class BuildBalancesSection extends StatelessWidget {
                       '/ $total',
                       style: TextStyle(
                         fontSize: 16,
-                        color: Colors.grey.shade600,
+                        color: Theme.of(context).colorScheme.onSurface.withAlpha(150),
                         fontWeight: FontWeight.w700,
                       ),
                     ),
