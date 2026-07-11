@@ -79,8 +79,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    // final isCurrentDark = Theme.of(context).brightness == Brightness.dark;
-
+    final isCurrentDark = Theme.of(context).brightness == Brightness.dark;
+    
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
         if (state is SettingsLoaded && !widget.isFirstTime) {
@@ -175,10 +175,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       color: colorScheme.outlineVariant,
                     ),
                   ),
-                  child: const Column(
+                  child: Column(
                     children: [
                       // Settings App Theme Mode
-                      SettingThemeMode(),
+                      SettingThemeMode(colorScheme: colorScheme, isCurrentDark: isCurrentDark),
 
                       // const Divider(height: 1, indent: 16, endIndent: 16),
 

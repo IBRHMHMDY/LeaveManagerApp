@@ -1,7 +1,6 @@
 // lib/features/holidays/presentation/widgets/next_holiday_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/holiday_extensions.dart';
 import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
 import 'package:leave_manager/features/holidays/presentation/bloc/holidays_state.dart';
@@ -87,24 +86,16 @@ class NextHolidayCard extends StatelessWidget {
                               color: colorScheme.onSurface,
                             ),
                           ),
+                          const SizedBox(height: 6),
+                          // Text(
+                          //   nextHoliday.startDate.toFormattedDate(),
+                          //   style: TextStyle(
+                          //     fontSize: 13,
+                          //     color: colorScheme.onSurfaceVariant,
+                          //   ),
+                          // ),
                           const SizedBox(height: 4),
-                          Text(
-                            nextHoliday.startDate.toFormattedDate(),
-                            style: TextStyle(
-                              fontSize: 13,
-                              color: colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    
-                    // القسم الأيسر: الأيام المتبقية
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Container(
+                          Container(
                           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                           decoration: BoxDecoration(
                             color: colorScheme.primary,
@@ -119,8 +110,20 @@ class NextHolidayCard extends StatelessWidget {
                             ),
                           ),
                         ),
-                      ],
+                        ],
+                      ),
                     ),
+                    
+                    // القسم الأيسر: الأيام المتبقية
+                   
+
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                           if(onTap != null) const Icon(Icons.arrow_forward_ios_rounded)
+                        ],
+                      ),
                   ],
                 ),
               ),

@@ -1,6 +1,6 @@
+import 'package:easy_localization/easy_localization.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:easy_localization/easy_localization.dart';
 import 'package:leave_manager/core/di/injection_container.dart' as di;
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/shared/themes/app_theme.dart';

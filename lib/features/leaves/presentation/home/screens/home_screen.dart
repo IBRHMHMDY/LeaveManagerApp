@@ -5,7 +5,7 @@ import 'package:leave_manager/core/di/injection_container.dart' as di;
 import 'package:leave_manager/core/utils/app_notifications.dart';
 import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
 import 'package:leave_manager/features/holidays/presentation/bloc/holidays_event.dart';
-import 'package:leave_manager/features/holidays/presentation/widgets/next_holiday_card.dart';
+import 'package:leave_manager/features/leaves/presentation/home/widgets/next_holiday_card.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/home/widgets/build_balances_section.dart';

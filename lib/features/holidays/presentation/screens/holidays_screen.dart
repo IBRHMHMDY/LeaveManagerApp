@@ -8,7 +8,6 @@ import 'package:leave_manager/features/holidays/presentation/bloc/holidays_state
 import 'package:leave_manager/features/holidays/presentation/widgets/add_holiday_bottom_sheet.dart';
 import 'package:leave_manager/features/holidays/presentation/widgets/custom_holiday_card.dart';
 import 'package:leave_manager/core/utils/app_notifications.dart';
-import 'package:leave_manager/features/holidays/presentation/widgets/next_holiday_card.dart';
 import 'package:leave_manager/features/leaves/presentation/history/widgets/custom_empty_state.dart';
 
 
@@ -90,9 +89,6 @@ class _HolidaysViewState extends State<_HolidaysView> with WidgetsBindingObserve
 
             return Column(
               children: [
-                // إضافة كارت الإجازة القادمة في أعلى الشاشة
-                const NextHolidayCard(),
-                
                 // قائمة الإجازات
                 Expanded(
                   child: ListView.builder(
