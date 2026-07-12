@@ -17,8 +17,18 @@ class LeaveRepositoryImpl implements LeaveRepository {
   @override
   Future<Either<Failure, Unit>> addLeave(LeaveRecord leave) async {
     try {
+      // تحديد القيمة الرقمية بناءً على نوع الإجازة
+      int typeIndex = 0;
+      if (leave.leaveType == LeaveType.regular) {
+        typeIndex = 0;
+      } else if (leave.leaveType == LeaveType.casual) {
+        typeIndex = 1;
+      } else {
+        typeIndex = 2; // بدل راحة
+      }
+
       final companion = LeaveRecordsTableCompanion(
-        leaveType: Value(leave.leaveType == LeaveType.regular ? 0 : 1),
+        leaveType: Value(typeIndex),
         startDate: Value(leave.startDate),
         endDate: Value(leave.endDate),
         daysCount: Value(leave.daysCount),

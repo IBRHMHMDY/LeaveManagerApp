@@ -3,6 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/di/injection_container.dart' as di;
 import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/features/extra_work_days/presentation/bloc/extra_work_bloc.dart';
+import 'package:leave_manager/features/extra_work_days/presentation/bloc/extra_work_events.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
+import 'package:leave_manager/features/holidays/presentation/bloc/holidays_event.dart';
 import 'package:leave_manager/shared/themes/app_theme.dart';
 import 'package:leave_manager/shared/themes/theme_cubit.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
@@ -12,13 +16,10 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await EasyLocalization.ensureInitialized();
   await di.init();
-  
+
   runApp(
     EasyLocalization(
-      supportedLocales: const [
-        Locale('ar', 'EG'),
-        Locale('en', 'US'),
-      ],
+      supportedLocales: const [Locale('ar', 'EG'), Locale('en', 'US')],
       path: 'assets/translations',
       fallbackLocale: const Locale('ar', 'EG'),
       startLocale: const Locale('ar', 'EG'),
@@ -36,13 +37,19 @@ class LeaveManagerAPP extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => di.sl<SettingsBloc>()),
         BlocProvider(create: (_) => di.sl<LeavesBloc>()),
+        BlocProvider(
+          create: (_) => di.sl<ExtraWorkBloc>()..add(GetExtraWorkDaysEvent()),
+        ),
+        BlocProvider(
+          create: (context) => di.sl<HolidaysBloc>()..add(LoadHolidaysEvent()),
+        ),
         BlocProvider(create: (_) => di.sl<ThemeCubit>()),
       ],
       child: BlocBuilder<ThemeCubit, ThemeMode>(
         builder: (context, themeMode) {
           return MaterialApp.router(
             debugShowCheckedModeBanner: false,
-            title: 'مدير أجازاتى',
+            title: 'مدير اجازاتى',
             localizationsDelegates: context.localizationDelegates,
             supportedLocales: context.supportedLocales,
             locale: context.locale,

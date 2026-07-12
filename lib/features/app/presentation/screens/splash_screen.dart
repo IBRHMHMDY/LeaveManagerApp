@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/core/utils/app_version.dart';
 import 'package:leave_manager/features/app/presentation/widgets/custom_app_logo.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_events.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
@@ -198,16 +199,7 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Version 1.0.0',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withAlpha(100),
-                        letterSpacing: 1.5,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const AppVersion(),
                   ],
                 ),
               ),

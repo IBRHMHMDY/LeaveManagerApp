@@ -1,4 +1,5 @@
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/features/extra_work_days/presentation/screens/extra_work_screen.dart';
 import 'package:leave_manager/features/holidays/presentation/screens/holidays_screen.dart';
 import '../../features/app/presentation/screens/splash_screen.dart';
 import '../../features/app/presentation/screens/main_navigation_screen.dart';
@@ -28,6 +29,10 @@ class AppRouter {
         path: '/holidays',
         name: 'holidays',
         builder: (context, state) => const HolidaysScreen(),
+      ),
+      GoRoute(
+        path: '/extra-work',
+        builder: (context, state) => const ExtraWorkScreen(),
       ),
     ],
   );

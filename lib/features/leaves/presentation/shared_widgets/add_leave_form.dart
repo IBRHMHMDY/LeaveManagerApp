@@ -195,6 +195,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                   child: Text('اعتيادية'),
                 ),
                 DropdownMenuItem(value: LeaveType.casual, child: Text('عارضة')),
+                DropdownMenuItem(value: LeaveType.restAllowance, child: Text('بدل راحة')),
               ],
               onChanged: (val) {
                 setState(() {

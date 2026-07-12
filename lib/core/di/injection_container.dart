@@ -1,4 +1,11 @@
 import 'package:get_it/get_it.dart';
+import 'package:leave_manager/features/extra_work_days/data/datasources/extra_work_local_data_source.dart';
+import 'package:leave_manager/features/extra_work_days/data/repositories/extra_work_repository_impl.dart';
+import 'package:leave_manager/features/extra_work_days/domain/repositories/extra_work_repository.dart';
+import 'package:leave_manager/features/extra_work_days/domain/usecases/add_extra_work_day_usecase.dart';
+import 'package:leave_manager/features/extra_work_days/domain/usecases/delete_extra_work_day_usecase.dart';
+import 'package:leave_manager/features/extra_work_days/domain/usecases/get_extra_work_days_usecase.dart';
+import 'package:leave_manager/features/extra_work_days/presentation/bloc/extra_work_bloc.dart';
 import 'package:leave_manager/features/holidays/data/datasources/holidays_local_data_source.dart';
 import 'package:leave_manager/features/holidays/data/repositories/holiday_repository_impl.dart';
 import 'package:leave_manager/features/holidays/domain/repositories/holiday_repository.dart';
@@ -84,13 +91,14 @@ Future<void> init() async {
   sl.registerLazySingleton(() => SaveSettingsUseCase(sl()));
   sl.registerLazySingleton(() => ResetBalancesUseCase(sl()));
   sl.registerLazySingleton(
-    () => AddLeaveUseCase(calculateBalances: sl(), repository: sl()),
+    () => AddLeaveUseCase(calculateBalances: sl(), repository: sl(), getExtraWorkDays: sl(),),
   );
   sl.registerLazySingleton(() => GetCurrentYearLeavesUseCase(sl()));
   sl.registerLazySingleton(
     () => CalculateBalancesUseCase(
       getSettingsUseCase: sl(),
       getCurrentYearLeavesUseCase: sl(),
+      getExtraWorkDaysUseCase: sl(),
     ),
   );
   sl.registerLazySingleton(() => DeleteLeaveUseCase(sl()));
@@ -99,4 +107,27 @@ Future<void> init() async {
   sl.registerLazySingleton(() => DeleteHolidayUseCase(sl()));
   sl.registerLazySingleton(() => SeedHolidaysUseCase(sl()));
 
+  // =========================================================================
+  // Extra Work Days Feature (بدلات الراحة المكتسبة)
+  // =========================================================================
+  
+  // Bloc
+  sl.registerFactory(() => ExtraWorkBloc(
+        getExtraWorkDays: sl(),
+        addExtraWorkDay: sl(),
+        deleteExtraWorkDay: sl(),
+      ));
+
+  // UseCases
+  sl.registerLazySingleton(() => GetExtraWorkDaysUseCase(sl()));
+  sl.registerLazySingleton(() => AddExtraWorkDayUseCase(sl()));
+  sl.registerLazySingleton(() => DeleteExtraWorkDayUseCase(sl()));
+
+  // Repository
+  sl.registerLazySingleton<ExtraWorkRepository>(
+      () => ExtraWorkRepositoryImpl(localDataSource: sl()));
+
+  // Data Source
+  sl.registerLazySingleton<ExtraWorkLocalDataSource>(
+      () => ExtraWorkLocalDataSourceImpl(database: sl()));
 }

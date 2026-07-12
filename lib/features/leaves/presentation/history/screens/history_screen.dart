@@ -56,7 +56,10 @@ class _HistoryScreenState extends State<HistoryScreen> {
                       if (_selectedFilter == LeaveFilter.regular) {
                         return leave.leaveType == LeaveType.regular;
                       }
-                      return leave.leaveType == LeaveType.casual;
+                      if (_selectedFilter == LeaveFilter.casual) {
+                        return leave.leaveType == LeaveType.casual;
+                      }
+                      return leave.leaveType == LeaveType.restAllowance;
                     }).toList();
 
                     if (filteredLeaves.isEmpty) {

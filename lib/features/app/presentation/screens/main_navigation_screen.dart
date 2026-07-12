@@ -37,7 +37,7 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-          title: const Text('مدير أجازاتى'),
+          title: const Text('مدير اجازاتى'),
           centerTitle: false,
 
         ),

@@ -2,7 +2,7 @@ import 'package:drift/drift.dart';
 
 @DataClassName('SettingModel')
 class SettingsTable extends Table {
-  IntColumn get id => integer()(); // المُعرف
+  IntColumn get id => integer()();
   TextColumn get employeeName => text()();
   TextColumn get jobTitle => text()();
   IntColumn get totalRegularLeaves => integer()();
@@ -28,4 +28,11 @@ class HolidaysTable extends Table {
   TextColumn get name => text()(); // اسم الإجازة
   DateTimeColumn get startDate => dateTime()(); // تاريخ البداية
   DateTimeColumn get endDate => dateTime()(); // تاريخ النهاية
+}
+
+@DataClassName('ExtraWorkDayModel')
+class ExtraWorkDaysTable extends Table {
+  IntColumn get id => integer().autoIncrement()();
+  DateTimeColumn get date => dateTime()();
+  TextColumn get notes => text().nullable()(); // ملاحظات اختيارية (سبب العمل الإضافي)
 }
