@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/utils/extenstions/holiday_extensions.dart';
-import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
-import 'package:leave_manager/features/holidays/presentation/bloc/holidays_state.dart';
+import 'package:leave_manager/features/app/presentation/bloc/navigation_cubit.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/presentation/bloc/holidays_bloc.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/presentation/bloc/holidays_state.dart';
 
 class NextHolidayCard extends StatelessWidget {
   final BuildContext? context;
 
-  const NextHolidayCard(this.context,{super.key});
+  const NextHolidayCard(this.context, {super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -50,7 +50,10 @@ class NextHolidayCard extends StatelessWidget {
             ),
             clipBehavior: Clip.antiAlias,
             child: InkWell(
-              onTap: () => context.push('/holidays'),
+              onTap: () => context.read<NavigationCubit>().changeTab(
+                selectedIndex: 2, // الانتقال لصفحة بدل الراحة في الشريط السفلي
+                restAllowanceTab: 2, // فتح تبويب العطلات الرسمية تلقائياً
+              ),
               child: Padding(
                 padding: const EdgeInsets.all(16),
                 child: Row(

@@ -6,7 +6,7 @@ import 'package:leave_manager/features/settings/domain/usecases/reset_balance_us
 import 'package:leave_manager/features/settings/domain/usecases/save_settings_usecase.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_events.dart';
 import '../../../../core/utils/financial_year_calculator.dart';
-import '../../../holidays/domain/usecases/seed_holidays_use_case.dart';
+import '../../../rest_allowance/holidays/domain/usecases/seed_holidays_use_case.dart';
 import 'settings_state.dart';
 
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {

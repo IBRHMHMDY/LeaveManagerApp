@@ -1,5 +1,5 @@
 // lib/features/holidays/domain/extensions/holiday_extensions.dart
-import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/domain/entities/holiday_entity.dart';
 
 
 extension HolidayListExtension on List<Holiday> {

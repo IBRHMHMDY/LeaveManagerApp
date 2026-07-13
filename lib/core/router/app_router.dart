@@ -1,22 +1,27 @@
 import 'package:go_router/go_router.dart';
-import 'package:leave_manager/features/extra_work_days/presentation/screens/extra_work_screen.dart';
-import 'package:leave_manager/features/holidays/presentation/screens/holidays_screen.dart';
-import '../../features/app/presentation/screens/splash_screen.dart';
-import '../../features/app/presentation/screens/main_navigation_screen.dart';
-import '../../features/settings/presentation/screens/settings_screen.dart';
+import 'package:leave_manager/features/app/presentation/screens/splash_screen.dart';
+import 'package:leave_manager/features/app/presentation/screens/main_navigation_bottom.dart';
+import 'package:leave_manager/features/settings/presentation/screens/settings_screen.dart';
+// استيراد الشاشة المجمعة الجديدة بدلاً من الشاشات القديمة المنفصلة
+import 'package:leave_manager/features/rest_allowance/presentation/screens/rest_allowance_screen.dart';
 
 class AppRouter {
   static const String splash = '/';
   static const String home = '/home';
   static const String settings = '/settings';
+  // إضافة اسم مسار ثابت للشاشة الجديدة
+  static const String restAllowance = '/rest-allowance';
 
   static final GoRouter router = GoRouter(
     initialLocation: splash,
     routes: [
-      GoRoute(path: splash, builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: splash, 
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: home,
-        builder: (context, state) => const MainNavigationScreen(),
+        builder: (context, state) => const MainNavigationBottom(),
       ),
       GoRoute(
         path: settings,
@@ -25,14 +30,11 @@ class AppRouter {
           return SettingsScreen(isFirstTime: isFirstTime);
         },
       ),
+      // المسار الجديد الموحد لإدارة بدل الراحة
       GoRoute(
-        path: '/holidays',
-        name: 'holidays',
-        builder: (context, state) => const HolidaysScreen(),
-      ),
-      GoRoute(
-        path: '/extra-work',
-        builder: (context, state) => const ExtraWorkScreen(),
+        path: restAllowance,
+        name: 'restAllowance',
+        builder: (context, state) => const RestAllowanceScreen(),
       ),
     ],
   );

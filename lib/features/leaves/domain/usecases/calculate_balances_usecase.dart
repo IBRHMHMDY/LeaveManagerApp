@@ -5,7 +5,7 @@ import '../../../../core/utils/enums/leave_type.dart';
 import '../entities/leave_balance_entity.dart';
 import 'get_current_year_leaves_usecase.dart';
 import '../../../settings/domain/usecases/get_settings_usecase.dart';
-import '../../../extra_work_days/domain/usecases/get_extra_work_days_usecase.dart'; // استيراد الـ UseCase الجديد
+import '../../../rest_allowance/extra_work_days/domain/usecases/get_extra_work_days_usecase.dart'; // استيراد الـ UseCase الجديد
 
 class CalculateBalancesUseCase implements BaseUseCase<LeaveBalance, NoParams> {
   final GetSettingsUseCase getSettingsUseCase;

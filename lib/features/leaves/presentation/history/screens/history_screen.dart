@@ -7,6 +7,7 @@ import 'package:leave_manager/features/leaves/presentation/history/widgets/custo
 import 'package:leave_manager/features/leaves/presentation/shared_widgets/custom_leave_card.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/history/widgets/build_filter_chips.dart';
+import 'package:leave_manager/features/leaves/presentation/shared_widgets/show_add_leave_bottomsheet.dart';
 
 class HistoryScreen extends StatefulWidget {
   const HistoryScreen({super.key});
@@ -20,6 +21,7 @@ class _HistoryScreenState extends State<HistoryScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: BlocListener<LeavesBloc, LeavesState>(
         listener: (context, state) {
@@ -50,16 +52,21 @@ class _HistoryScreenState extends State<HistoryScreen> {
                     final filteredLeaves = state.currentYearLeaves.where((
                       leave,
                     ) {
-                      if (_selectedFilter == LeaveFilter.all) {
-                        return true;
+                      // 1. استبعاد بدلات الراحة بشكل كامل من هذه الشاشة
+                      if (leave.leaveType == LeaveType.restAllowance){
+                        return false;
                       }
+
+                      // 2. تطبيق الفلتر على باقي الأنواع
+                      if (_selectedFilter == LeaveFilter.all) return true;
                       if (_selectedFilter == LeaveFilter.regular) {
                         return leave.leaveType == LeaveType.regular;
                       }
                       if (_selectedFilter == LeaveFilter.casual) {
                         return leave.leaveType == LeaveType.casual;
+                      } else {
+                        return false;
                       }
-                      return leave.leaveType == LeaveType.restAllowance;
                     }).toList();
 
                     if (filteredLeaves.isEmpty) {
@@ -83,6 +90,16 @@ class _HistoryScreenState extends State<HistoryScreen> {
               ),
             ),
           ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton.extended(
+        onPressed: () => showAddLeaveBottomSheet(context),
+        backgroundColor: colorScheme.primary,
+        foregroundColor: colorScheme.onPrimary,
+        icon: const Icon(Icons.add_rounded),
+        label: const Text(
+          'تسجيل إجازة',
+          style: TextStyle(fontWeight: FontWeight.bold),
         ),
       ),
     );

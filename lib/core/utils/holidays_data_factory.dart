@@ -1,5 +1,5 @@
 // lib/core/utils/holidays_data_factory.dart
-import '../../features/holidays/domain/entities/holiday_entity.dart';
+import '../../features/rest_allowance/holidays/domain/entities/holiday_entity.dart';
 
 class HolidaysDataFactory {
   /// الحصول على قائمة الإجازات الرسمية بناءً على الدولة.

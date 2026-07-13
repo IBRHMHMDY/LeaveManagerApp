@@ -8,10 +8,10 @@ import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 import 'package:leave_manager/core/utils/leave_calculator.dart';
-import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
-import 'package:leave_manager/features/holidays/presentation/bloc/holidays_event.dart';
-import 'package:leave_manager/features/holidays/presentation/bloc/holidays_state.dart';
-import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/presentation/bloc/holidays_bloc.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/presentation/bloc/holidays_event.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/presentation/bloc/holidays_state.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/core/di/injection_container.dart' as di;
 
 class AddLeaveForm extends StatefulWidget {
@@ -195,7 +195,6 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                   child: Text('اعتيادية'),
                 ),
                 DropdownMenuItem(value: LeaveType.casual, child: Text('عارضة')),
-                DropdownMenuItem(value: LeaveType.restAllowance, child: Text('بدل راحة')),
               ],
               onChanged: (val) {
                 setState(() {

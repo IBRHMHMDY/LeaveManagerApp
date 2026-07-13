@@ -13,33 +13,44 @@ class BuildFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+      child: Row(
+        children: [
+          _buildChip(context, LeaveFilter.all, 'الكل'),
+          const SizedBox(width: 8),
+          _buildChip(context, LeaveFilter.regular, 'اعتيادي'),
+          const SizedBox(width: 8),
+          _buildChip(context, LeaveFilter.casual, 'عارضة'),
+          // تم إزالة فلتر "بدل راحة" من هنا
+        ],
+      ),
+    );
+  }
+
+  Widget _buildChip(BuildContext context, LeaveFilter filter, String label) {
+    final isSelected = selectedFilter == filter;
     final colorScheme = Theme.of(context).colorScheme;
 
-    return Padding(
-      padding: const EdgeInsets.all(16.0),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: LeaveFilter.values.map((filter) {
-          final isSelected = selectedFilter == filter;
-          return ChoiceChip(
-            label: Text(
-              filter.label,
-              style: TextStyle(
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
-              ),
-            ),
-            selected: isSelected,
-            selectedColor: colorScheme.primary,
-            backgroundColor: colorScheme.surfaceContainerHighest,
-            onSelected: (selected) {
-              if (selected) {
-                // استدعاء الدالة لتحديث الحالة في الشاشة الأب
-                onFilterChanged(filter);
-              }
-            },
-          );
-        }).toList(),
+    return FilterChip(
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isSelected ? colorScheme.onPrimary : colorScheme.onSurface,
+          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
+      selected: isSelected,
+      onSelected: (_) => onFilterChanged(filter),
+      backgroundColor: colorScheme.surface,
+      selectedColor: colorScheme.primary,
+      checkmarkColor: colorScheme.onPrimary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(
+          color: isSelected ? colorScheme.primary : colorScheme.outline,
+        ),
       ),
     );
   }

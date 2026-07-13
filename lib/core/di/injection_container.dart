@@ -1,19 +1,20 @@
 import 'package:get_it/get_it.dart';
-import 'package:leave_manager/features/extra_work_days/data/datasources/extra_work_local_data_source.dart';
-import 'package:leave_manager/features/extra_work_days/data/repositories/extra_work_repository_impl.dart';
-import 'package:leave_manager/features/extra_work_days/domain/repositories/extra_work_repository.dart';
-import 'package:leave_manager/features/extra_work_days/domain/usecases/add_extra_work_day_usecase.dart';
-import 'package:leave_manager/features/extra_work_days/domain/usecases/delete_extra_work_day_usecase.dart';
-import 'package:leave_manager/features/extra_work_days/domain/usecases/get_extra_work_days_usecase.dart';
-import 'package:leave_manager/features/extra_work_days/presentation/bloc/extra_work_bloc.dart';
-import 'package:leave_manager/features/holidays/data/datasources/holidays_local_data_source.dart';
-import 'package:leave_manager/features/holidays/data/repositories/holiday_repository_impl.dart';
-import 'package:leave_manager/features/holidays/domain/repositories/holiday_repository.dart';
-import 'package:leave_manager/features/holidays/domain/usecases/add_holiday_use_case.dart';
-import 'package:leave_manager/features/holidays/domain/usecases/delete_holiday_use_case.dart';
-import 'package:leave_manager/features/holidays/domain/usecases/get_holidays_use_case.dart';
-import 'package:leave_manager/features/holidays/domain/usecases/seed_holidays_use_case.dart';
-import 'package:leave_manager/features/holidays/presentation/bloc/holidays_bloc.dart';
+import 'package:leave_manager/features/app/presentation/bloc/navigation_cubit.dart';
+import 'package:leave_manager/features/rest_allowance/extra_work_days/data/datasources/extra_work_local_data_source.dart';
+import 'package:leave_manager/features/rest_allowance/extra_work_days/data/repositories/extra_work_repository_impl.dart';
+import 'package:leave_manager/features/rest_allowance/extra_work_days/domain/repositories/extra_work_repository.dart';
+import 'package:leave_manager/features/rest_allowance/extra_work_days/domain/usecases/add_extra_work_day_usecase.dart';
+import 'package:leave_manager/features/rest_allowance/extra_work_days/domain/usecases/delete_extra_work_day_usecase.dart';
+import 'package:leave_manager/features/rest_allowance/extra_work_days/domain/usecases/get_extra_work_days_usecase.dart';
+import 'package:leave_manager/features/rest_allowance/extra_work_days/presentation/bloc/extra_work_bloc.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/data/datasources/holidays_local_data_source.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/data/repositories/holiday_repository_impl.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/domain/repositories/holiday_repository.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/domain/usecases/add_holiday_use_case.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/domain/usecases/delete_holiday_use_case.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/domain/usecases/get_holidays_use_case.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/domain/usecases/seed_holidays_use_case.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/presentation/bloc/holidays_bloc.dart';
 import 'package:leave_manager/features/settings/domain/usecases/check_settings_exist_usecase.dart';
 import 'package:leave_manager/features/settings/domain/usecases/get_settings_usecase.dart';
 import 'package:leave_manager/features/settings/domain/usecases/reset_balance_usecase.dart';
@@ -40,10 +41,10 @@ Future<void> init() async {
   // --- Core Services (أضف هذا القسم) ---
   final sharedPreferences = await SharedPreferences.getInstance();
   sl.registerLazySingleton<SharedPreferences>(() => sharedPreferences);
-  
   // --- Database ---
   sl.registerLazySingleton<AppDatabase>(() => AppDatabase());
-
+  // --- Navigation ---
+  sl.registerLazySingleton<NavigationCubit>(() => NavigationCubit());
   // --- Data Sources ---
   sl.registerLazySingleton<LeavesLocalDataSource>(
     () => LeavesLocalDataSourceImpl(sl()),
@@ -51,7 +52,9 @@ Future<void> init() async {
   sl.registerLazySingleton<SettingsLocalDataSource>(
     () => SettingsLocalDataSourceImpl(sl()),
   );
-  sl.registerLazySingleton<HolidaysLocalDataSource>(() => HolidaysLocalDataSourceImpl(sl()));
+  sl.registerLazySingleton<HolidaysLocalDataSource>(
+    () => HolidaysLocalDataSourceImpl(sl()),
+  );
   // --- BLoCs ---
   sl.registerFactory(() => ThemeCubit(sharedPreferences: sl()));
   sl.registerFactory(
@@ -73,25 +76,28 @@ Future<void> init() async {
     ),
   );
   sl.registerFactory(
-    () => HolidaysBloc(
-      getHolidays: sl(),
-      addHoliday: sl(),
-      deleteHoliday: sl(),
-    ),
+    () =>
+        HolidaysBloc(getHolidays: sl(), addHoliday: sl(), deleteHoliday: sl()),
   );
   // --- Repositories ---
   sl.registerLazySingleton<SettingsRepository>(
     () => SettingsRepositoryImpl(sl()),
   );
   sl.registerLazySingleton<LeaveRepository>(() => LeaveRepositoryImpl(sl()));
-  sl.registerLazySingleton<HolidayRepository>(() => HolidayRepositoryImpl(sl()));
+  sl.registerLazySingleton<HolidayRepository>(
+    () => HolidayRepositoryImpl(sl()),
+  );
   // --- Use Cases ---
   sl.registerLazySingleton(() => CheckSettingsExistUseCase(sl()));
   sl.registerLazySingleton(() => GetSettingsUseCase(sl()));
   sl.registerLazySingleton(() => SaveSettingsUseCase(sl()));
   sl.registerLazySingleton(() => ResetBalancesUseCase(sl()));
   sl.registerLazySingleton(
-    () => AddLeaveUseCase(calculateBalances: sl(), repository: sl(), getExtraWorkDays: sl(),),
+    () => AddLeaveUseCase(
+      calculateBalances: sl(),
+      repository: sl(),
+      getExtraWorkDays: sl(),
+    ),
   );
   sl.registerLazySingleton(() => GetCurrentYearLeavesUseCase(sl()));
   sl.registerLazySingleton(
@@ -110,13 +116,15 @@ Future<void> init() async {
   // =========================================================================
   // Extra Work Days Feature (بدلات الراحة المكتسبة)
   // =========================================================================
-  
+
   // Bloc
-  sl.registerFactory(() => ExtraWorkBloc(
-        getExtraWorkDays: sl(),
-        addExtraWorkDay: sl(),
-        deleteExtraWorkDay: sl(),
-      ));
+  sl.registerFactory(
+    () => ExtraWorkBloc(
+      getExtraWorkDays: sl(),
+      addExtraWorkDay: sl(),
+      deleteExtraWorkDay: sl(),
+    ),
+  );
 
   // UseCases
   sl.registerLazySingleton(() => GetExtraWorkDaysUseCase(sl()));
@@ -125,9 +133,11 @@ Future<void> init() async {
 
   // Repository
   sl.registerLazySingleton<ExtraWorkRepository>(
-      () => ExtraWorkRepositoryImpl(localDataSource: sl()));
+    () => ExtraWorkRepositoryImpl(localDataSource: sl()),
+  );
 
   // Data Source
   sl.registerLazySingleton<ExtraWorkLocalDataSource>(
-      () => ExtraWorkLocalDataSourceImpl(database: sl()));
+    () => ExtraWorkLocalDataSourceImpl(database: sl()),
+  );
 }

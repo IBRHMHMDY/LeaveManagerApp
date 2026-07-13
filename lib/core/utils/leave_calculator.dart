@@ -1,5 +1,5 @@
 
-import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
+import 'package:leave_manager/features/rest_allowance/holidays/domain/entities/holiday_entity.dart';
 
 class LeaveCalculator {
   /// تحسب هذه الدالة عدد أيام الإجازة الفعلية

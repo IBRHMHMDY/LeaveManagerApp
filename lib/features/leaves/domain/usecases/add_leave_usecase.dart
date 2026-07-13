@@ -6,7 +6,7 @@ import 'package:leave_manager/features/leaves/domain/entities/leave_record_entit
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
-import 'package:leave_manager/features/extra_work_days/domain/usecases/get_extra_work_days_usecase.dart'; 
+import 'package:leave_manager/features/rest_allowance/extra_work_days/domain/usecases/get_extra_work_days_usecase.dart'; 
 
 class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
   final LeaveRepository repository;

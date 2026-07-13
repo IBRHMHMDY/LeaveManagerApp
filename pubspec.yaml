@@ -1,6 +1,6 @@
 name: leave_manager
 description: "Leave Manager App - إدارة إجازاتك بذكاء وسهولة."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+publish_to: 'none'
 version: 1.0.1+2
 
 environment:
@@ -8,6 +8,8 @@ environment:
 
 dependencies:
   flutter:
+    sdk: flutter
+  flutter_localizations:        # لدعم اللغة العربية والاتجاه من اليمين لليسار (RTL)
     sdk: flutter
   
   # --- State Management & Architecture ---
@@ -28,14 +30,10 @@ dependencies:
   # --- UI & Utilities ---
   intl: ^0.20.2                 # لتنسيق التواريخ (Date Formatting)
   google_fonts: ^6.1.0          # (اختياري) لاستخدام خطوط عصرية مثل Cairo أو Almarai
-  flutter_localizations:        # لدعم اللغة العربية والاتجاه من اليمين لليسار (RTL)
-    sdk: flutter
   share_plus: ^10.0.0           # إضافة حزمة المشاركة الحديثة
   go_router: ^17.3.0
-
-  easy_localization: ^3.0.8
-  package_info_plus: ^8.0.0  # لقراءة رقم إصدار التطبيق برمجياً
-  url_launcher: ^6.3.0       # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
+  package_info_plus: ^8.0.0     # لقراءة رقم إصدار التطبيق برمجياً
+  url_launcher: ^6.3.0          # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
   
 dev_dependencies:
   flutter_test:
@@ -52,12 +50,9 @@ dev_dependencies:
 
   # Generate Icon App
   flutter_launcher_icons: ^0.14.4
-flutter:
 
-  # Material Icons font is
+flutter:
   uses-material-design: true
-  assets:
-    - assets/translations/
   
   fonts:
     - family: Cairo
@@ -65,6 +60,7 @@ flutter:
         - asset: assets/fonts/Cairo-Regular.ttf
         - asset: assets/fonts/Cairo-Bold.ttf
           weight: 700
+
 flutter_native_splash:
   color: "#F8F9FA" # لون الخلفية للوضع النهاري (Light Background)
   color_dark: "#121212" # لون الخلفية للوضع الليلي (Dark Background)
