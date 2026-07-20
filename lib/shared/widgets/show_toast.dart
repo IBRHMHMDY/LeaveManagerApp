@@ -60,11 +60,11 @@ class AppToast {
     _timer?.cancel();
 
     final overlayState = Overlay.of(context);
-
+    
     _currentOverlay = OverlayEntry(
       builder: (context) => SafeArea(
         child: Align(
-          alignment: Alignment.topCenter,
+          alignment: Alignment.bottomCenter, // التعديل 1: التوجيه للأسفل
           child: _ToastAnimatedWidget(
             title: title,
             message: message,
@@ -127,22 +127,24 @@ class _ToastAnimatedWidgetState extends State<_ToastAnimatedWidget>
     // إعداد الأنيميشن عند ظهور الـ Toast
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 400),
+      duration: const Duration(milliseconds: 500),
     );
 
-    _slideAnimation =
-        Tween<Offset>(
-          begin: const Offset(0, -1), // يبدأ من خارج الشاشة بالأعلى
-          end: Offset.zero,
-        ).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: Curves.easeOutCubic,
-          ),
-        );
+    // التعديل 2: أنيميشن احترافي من الأسفل باستخدام Curves.easeOutBack
+    _slideAnimation = Tween<Offset>(
+      begin: const Offset(0, 1.5), // يبدأ من أسفل الشاشة
+      end: Offset.zero,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutBack, // يضيف تأثير الارتداد (Bounce) الاحترافي
+      reverseCurve: Curves.easeInCubic, // تسريع الخروج عند السحب
+    ));
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeIn),
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeIn,
+      ),
     );
 
     _animationController.forward();
@@ -155,9 +157,9 @@ class _ToastAnimatedWidgetState extends State<_ToastAnimatedWidget>
     super.dispose();
   }
 
-  /// دالة الإغلاق اليدوي بالسحب (Swipe up to dismiss)
+  /// دالة الإغلاق اليدوي بالسحب (Swipe down to dismiss)
   Future<void> _dismissToast() async {
-    // استخدام await بدلاً من .then()
+    // التعديل 3: استخدام async/await بدلاً من .then()
     await _animationController.reverse();
     widget.onDismissed();
   }
@@ -173,21 +175,21 @@ class _ToastAnimatedWidgetState extends State<_ToastAnimatedWidget>
         opacity: _fadeAnimation,
         child: GestureDetector(
           onVerticalDragUpdate: (details) {
-            if (details.primaryDelta! < -5) {
-              _dismissToast(); // إغلاق عند السحب للأعلى
+            // التعديل 4: الإغلاق يتم عند السحب للأسفل (موجب)
+            if (details.primaryDelta! > 5) {
+              _dismissToast(); 
             }
           },
           child: Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            // التعديل 5: رفع منطقة الإشعار عن حافة الشاشة بشكل ملحوظ
+            margin: const EdgeInsets.only(bottom: 90, left: 16, right: 16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: isDark
-                      ? Colors.transparent
-                      : widget.color.withAlpha(20),
+                  color: isDark ? Colors.transparent : widget.color.withAlpha(20),
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),

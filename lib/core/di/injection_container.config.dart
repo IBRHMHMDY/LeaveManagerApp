@@ -13,6 +13,20 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
+import '../../features/holidays/data/datasources/holidays_local_data_source.dart'
+    as _i828;
+import '../../features/holidays/data/repositories/holidays_repository_impl.dart'
+    as _i106;
+import '../../features/holidays/domain/repositories/holidays_repository.dart'
+    as _i171;
+import '../../features/holidays/domain/usecases/get_financial_year_holidays_usecase.dart'
+    as _i1053;
+import '../../features/holidays/domain/usecases/get_upcoming_holiday_usecase.dart'
+    as _i11;
+import '../../features/holidays/domain/usecases/initialize_holidays_usecase.dart'
+    as _i606;
+import '../../features/holidays/presentation/cubit/holidays_cubit.dart'
+    as _i120;
 import '../../features/home/presentation/cubit/home_cubit.dart' as _i9;
 import '../../features/leaves/data/datasources/leaves_local_data_source.dart'
     as _i1005;
@@ -60,6 +74,9 @@ extension GetItInjectableX on _i174.GetIt {
       preResolve: true,
     );
     gh.lazySingleton<_i982.AppDatabase>(() => registerModule.appDatabase);
+    gh.lazySingleton<_i828.HolidaysLocalDataSource>(
+      () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),
+    );
     gh.lazySingleton<_i599.SettingsLocalDataSource>(
       () => _i599.SettingsLocalDataSourceImpl(gh<_i982.AppDatabase>()),
     );
@@ -72,8 +89,29 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i202.ThemeCubit>(
       () => _i202.ThemeCubit(sharedPreferences: gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i171.HolidaysRepository>(
+      () => _i106.HolidaysRepositoryImpl(gh<_i828.HolidaysLocalDataSource>()),
+    );
+    gh.lazySingleton<_i1053.GetFinancialYearHolidaysUseCase>(
+      () => _i1053.GetFinancialYearHolidaysUseCase(
+        gh<_i171.HolidaysRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i11.GetUpcomingHolidayUseCase>(
+      () => _i11.GetUpcomingHolidayUseCase(gh<_i171.HolidaysRepository>()),
+    );
+    gh.lazySingleton<_i606.InitializeHolidaysUseCase>(
+      () => _i606.InitializeHolidaysUseCase(gh<_i171.HolidaysRepository>()),
+    );
     gh.lazySingleton<_i388.LeaveRepository>(
       () => _i408.LeaveRepositoryImpl(gh<_i1005.LeavesLocalDataSource>()),
+    );
+    gh.factory<_i120.HolidaysCubit>(
+      () => _i120.HolidaysCubit(
+        gh<_i606.InitializeHolidaysUseCase>(),
+        gh<_i11.GetUpcomingHolidayUseCase>(),
+        gh<_i1053.GetFinancialYearHolidaysUseCase>(),
+      ),
     );
     gh.lazySingleton<_i643.CheckSettingsExistUseCase>(
       () => _i643.CheckSettingsExistUseCase(gh<_i674.SettingsRepository>()),

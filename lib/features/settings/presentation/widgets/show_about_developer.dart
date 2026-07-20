@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:leave_manager/app/splash/widgets/custom_app_logo_icon.dart';
@@ -37,7 +38,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
   Future<void> _loadPackageInfo() async {
     final info = await PackageInfo.fromPlatform();
     setState(() {
-      _version = '${info.version} (${info.buildNumber})';
+      _version = info.version;
     });
   }
 
@@ -60,7 +61,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
     // ضع رقم هاتفك هنا مع مفتاح الدولة بدون أصفار أو علامة + (مثال لمصر: 201000000000)
     const String phoneNumber = '2001007576297'; 
     // الرسالة الافتراضية التي ستظهر في المحادثة
-    final String message = Uri.encodeComponent('مرحباً، لدي استفسار بخصوص تطبيق دفتر أجازاتى.');
+    final String message = Uri.encodeComponent('مرحباً، لدي استفسار بخصوص تطبيق مدير اجازاتى.');
     
     // استخدام الرابط العالمي wa.me لضمان التوافقية
     final Uri whatsappUri = Uri.parse('https://wa.me/$phoneNumber?text=$message');
@@ -76,35 +77,35 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
           // 1. مؤشر السحب (Drag Handle)
           Container(
-            width: 45,
-            height: 5,
+            width: 45.w,
+            height: 5.h,
             decoration: BoxDecoration(
               color: colorScheme.onSurface.withAlpha(50),
               borderRadius: BorderRadius.circular(10),
             ),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
 
           // 2. شعار التطبيق
           CustomAppLogoIcon(context),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
           // 3. اسم التطبيق وإصداره
           Text(
-            'دفتر اجازاتى',
+            'مدير اجازاتى',
             style: TextStyle(
-              fontSize: 22,
+              fontSize: 22.sp,
               fontWeight: FontWeight.w900,
               color: colorScheme.onSurface,
             ),
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
           Text(
             'الإصدار $_version',
             style: TextStyle(
@@ -114,14 +115,14 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
               letterSpacing: 1.2,
             ),
           ),
-          const SizedBox(height: 32),
+          SizedBox(height: 32.h),
 
           // 4. بطاقة معلومات المطور
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16.r),
             decoration: BoxDecoration(
               color: colorScheme.surfaceContainerHighest.withAlpha(100),
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r),
               border: Border.all(color: colorScheme.outline.withAlpha(50)),
             ),
             child: Column(
@@ -132,20 +133,20 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
                   style: TextStyle(
                     fontSize: 13.5,
                     color: colorScheme.onSurface.withAlpha(200),
-                    height: 1.5,
+                    height: 1.5.r,
                   ),
                 ),
-                const SizedBox(height: 16),
+                SizedBox(height: 16.h),
                 const Divider(),
-                const SizedBox(height: 8),
+                SizedBox(height: 8.h),
                 Text(
                   'تطوير وتصميم',
-                  style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withAlpha(150)),
+                  style: TextStyle(fontSize: 12.sp, color: colorScheme.onSurface.withAlpha(150)),
                 ),
                 Text(
                   'IbrahimHamdy',
                   style: TextStyle(
-                    fontSize: 16,
+                    fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: colorScheme.primary,
                   ),
@@ -153,7 +154,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
               ],
             ),
           ),
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
 
           // 5. زر التواصل عبر واتساب (الجديد)
           ElevatedButton.icon(
@@ -167,10 +168,10 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
               ),
             ),
             icon: const Icon(Icons.chat_bubble_outline_rounded), // أيقونة المحادثة
-            label: const Text('تواصل عبر واتساب', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            label: Text('تواصل عبر واتساب', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
             onPressed: _launchWhatsApp,
           ),
-          const SizedBox(height: 12),
+          SizedBox(height: 12.h),
 
           // 6. زر التواصل عبر البريد الإلكتروني (تصميم مختلف لتمييزه)
           OutlinedButton.icon(
@@ -183,16 +184,16 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
               ),
             ),
             icon: const Icon(Icons.mail_outline_rounded),
-            label: const Text('إرسال بريد إلكتروني', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+            label: Text('إرسال بريد إلكتروني', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
             onPressed: _launchEmail,
           ),
           
-          const SizedBox(height: 24),
+          SizedBox(height: 24.h),
           
           // 7. حقوق الملكية
           Text(
             '© ${DateTime.now().year} جميع الحقوق محفوظة',
-            style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withAlpha(100)),
+            style: TextStyle(fontSize: 12.sp, color: colorScheme.onSurface.withAlpha(100)),
           ),
           const SizedBox(height: 16),
         ],

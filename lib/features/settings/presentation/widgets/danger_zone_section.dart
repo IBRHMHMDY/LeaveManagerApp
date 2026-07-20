@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
@@ -16,22 +17,22 @@ class DangerZoneSection extends StatelessWidget {
 
     return Column(
       children: [
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         const Divider(),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
             foregroundColor: Colors.red.shade700,
             side: BorderSide(color: Colors.red.shade700),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(12.r),
             ),
           ),
-          icon: const Icon(Icons.delete_forever, size: 18),
-          label: const Text(
+          icon: Icon(Icons.delete_forever, size: 24.sp),
+          label: Text(
             'تصفير الأرصدة (مسح سجلات الإجازات)',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
           ),
           onPressed: () => ConfirmDeleteDialog(
             titleDialog: 'تأكيد التصفير',
@@ -50,41 +51,14 @@ class DangerZoneSection extends StatelessWidget {
             padding: const EdgeInsets.symmetric(vertical: 16),
             foregroundColor: colorScheme.onSurface.withAlpha(200),
           ),
-          icon: const Icon(Icons.info_outline_rounded),
-          label: const Text(
+          icon: Icon(Icons.info_outline_rounded, size: 24.sp,),
+          label: Text(
             'عن التطبيق',
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
           ),
           onPressed: () => showAboutDeveloperBottomSheet(context),
         ),
       ],
     );
   }
-
-  // void _showConfirmationDialog(BuildContext context) {
-  //   showDialog(
-  //     context: context,
-  //     builder: (ctx) => AlertDialog(
-  //       title: const Text(),
-  //       content: const Text(
-  //         'هل أنت متأكد من أنك تريد مسح جميع سجلات الإجازات؟ هذا الإجراء لا يمكن التراجع عنه.',
-  //       ),
-  //       actions: [
-  //         TextButton(
-  //           onPressed: () => context.pop(ctx),
-  //           child: const Text('إلغاء'),
-  //         ),
-  //         ElevatedButton(
-  //           style: ElevatedButton.styleFrom(
-  //             backgroundColor: Colors.red,
-  //             foregroundColor: Colors.white,
-  //             elevation: 0,
-  //           ),
-  //           onPressed: () {},
-  //           child: const Text('نعم، مسح'),
-  //         ),
-  //       ],
-  //     ),
-  //   );
-  // }
 }

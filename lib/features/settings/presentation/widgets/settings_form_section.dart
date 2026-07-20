@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 
@@ -31,29 +32,30 @@ class SettingsFormSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const Text(
+        Text(
           'البيانات الشخصية',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 16.h),
         CustomTextField(
           label: 'اسم الموظف',
           icon: Icons.person_outline,
           controller: nameController,
           validator: (val) => val == null || val.trim().isEmpty ? 'مطلوب' : null,
         ),
+        SizedBox(height: 12.h),
         CustomTextField(
           label: 'المسمى الوظيفي',
           icon: Icons.work_outline,
           controller: jobController,
           validator: (val) => val == null || val.trim().isEmpty ? 'مطلوب' : null,
         ),
-        const SizedBox(height: 16),
-        const Text(
-          'الأرصدة السنوية المستحقة',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+        SizedBox(height: 16.h),
+        Text(
+          'الأرصدة المستحقة',
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: 18.h),
         Row(
           children: [
             Expanded(
@@ -65,7 +67,7 @@ class SettingsFormSection extends StatelessWidget {
                 validator: _numberValidator,
               ),
             ),
-            const SizedBox(width: 16),
+            SizedBox(width: 16.w),
             Expanded(
               child: CustomTextField(
                 label: 'إجمالي العارضة',

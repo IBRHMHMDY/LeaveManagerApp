@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
+
 enum AlertType { info, warning, error }
+
 class BuildAlertBanners extends StatelessWidget {
   final String message;
   final AlertType alertType;
@@ -45,53 +48,13 @@ class BuildAlertBanners extends StatelessWidget {
           // إضافة تنبيه معلوماتي (Info)
           if (currentMonth == 6) {
             alerts.add(
-              Container(
-                margin: const EdgeInsets.only(bottom: 12),
-                padding: const EdgeInsets.all(16),
-                decoration: BoxDecoration(
-                  color: bgColor,
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: baseColor.withAlpha(isDark ? 80 : 40),
-                    width: 1,
-                  ),
-                  boxShadow: [
-                    if (!isDark)
-                      BoxShadow(
-                        color: baseColor.withAlpha(15),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                  ],
-                ),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: baseColor.withAlpha(40),
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(iconData, color: baseColor, size: 22),
-                    ),
-                    const SizedBox(width: 14),
-                    Expanded(
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 4.0),
-                        child: Text(
-                          message,
-                          style: TextStyle(
-                            color: textColor,
-                            fontWeight: FontWeight.w600,
-                            fontSize: 14,
-                            height: 1.4,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+              ShowAlertBanner(
+                bgColor: bgColor,
+                baseColor: baseColor,
+                isDark: isDark,
+                iconData: iconData,
+                message: message,
+                textColor: textColor,
               ),
             );
           }
@@ -99,6 +62,78 @@ class BuildAlertBanners extends StatelessWidget {
         }
         return const SizedBox.shrink();
       },
+    );
+  }
+}
+
+class ShowAlertBanner extends StatelessWidget {
+  const ShowAlertBanner({
+    super.key,
+    required this.bgColor,
+    required this.baseColor,
+    required this.isDark,
+    required this.iconData,
+    required this.message,
+    required this.textColor,
+  });
+
+  final Color bgColor;
+  final Color baseColor;
+  final bool isDark;
+  final IconData iconData;
+  final String message;
+  final Color textColor;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: baseColor.withAlpha(isDark ? 80 : 40),
+          width: 1,
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: baseColor.withAlpha(15),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+        ],
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: baseColor.withAlpha(40),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(iconData, color: baseColor, size: 22),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Padding(
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                message,
+                style: TextStyle(
+                  color: textColor,
+                  fontWeight: FontWeight.w600,
+                  fontSize: 14,
+                  height: 1.4,
+                ),
+              ),
+            ),
+          ),
+          SizedBox(height: 16.h),
+        ],
+      ),
     );
   }
 }

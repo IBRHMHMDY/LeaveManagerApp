@@ -1,5 +1,7 @@
+// lib/features/leaves/presentation/widgets/add_leave_form.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // 1. استيراد ScreenUtil
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
@@ -55,7 +57,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             dropdownColor: colorScheme.surface,
             style: TextStyle(
               color: colorScheme.onSurface,
-              fontSize: 16,
+              fontSize: 16.sp, // متجاوب
               fontFamily: 'Cairo',
             ),
             decoration: InputDecoration(
@@ -66,23 +68,24 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               prefixIcon: Icon(
                 Icons.category_rounded,
                 color: colorScheme.primary,
+                size: 24.w, // متجاوب
               ),
               filled: true,
               fillColor: fillColor,
               border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r), // متجاوب
               ),
               enabledBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(12.r), // متجاوب
                 borderSide: BorderSide(color: borderColor),
               ),
               focusedBorder: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(12),
-                borderSide: BorderSide(color: colorScheme.primary, width: 2),
+                borderRadius: BorderRadius.circular(12.r), // متجاوب
+                borderSide: BorderSide(color: colorScheme.primary, width: 2.w),
               ),
-              contentPadding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 16,
+              contentPadding: EdgeInsets.symmetric(
+                horizontal: 16.w, // متجاوب (إزالة const)
+                vertical: 16.h, // متجاوب
               ),
             ),
             items: const [
@@ -100,7 +103,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               });
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h), // متجاوب (إزالة const)
 
           // استخدام المكون المستقل الجديد لاختيار التاريخ
           CustomDateRangePickerField(
@@ -108,7 +111,6 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             endDate: _endDate,
             hintText: 'اضغط لاختيار فترة الإجازة',
             firstDate: FinancialYearCalculator.currentFinancialYearStart,
-            // تحديد الحد الأقصى كاليوم الحالي لمنع اختيار تواريخ مستقبلية
             lastDate: DateTime.now(),
             onDateSelected: (DateTimeRange? pickedRange) {
               if (pickedRange != null) {
@@ -119,7 +121,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               }
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
 
           // حقل الملاحظات
           CustomTextField(
@@ -127,7 +129,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             icon: Icons.notes_rounded,
             controller: _notesController,
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: 8.h),
 
           // زر الحفظ
           BlocBuilder<LeavesBloc, LeavesState>(
@@ -138,10 +140,10 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: colorScheme.primary,
                   foregroundColor: colorScheme.onPrimary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  padding: EdgeInsets.symmetric(vertical: 16.h), // متجاوب (إزالة const)
                   elevation: 0,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(12.r), // متجاوب
                   ),
                 ),
                 onPressed: isLoading
@@ -165,24 +167,24 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                       },
                 child: isLoading
                     ? SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: 24.h, // متجاوب
+                        width: 24.w,  // متجاوب
                         child: CircularProgressIndicator(
                           color: colorScheme.onPrimary,
                           strokeWidth: 2.5,
                         ),
                       )
-                    : const Text(
+                    : Text(
                         'حفظ الإجازة',
                         style: TextStyle(
-                          fontSize: 16,
+                          fontSize: 16.sp, // متجاوب
                           fontWeight: FontWeight.bold,
                         ),
                       ),
               );
             },
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: 16.h),
         ],
       ),
     );

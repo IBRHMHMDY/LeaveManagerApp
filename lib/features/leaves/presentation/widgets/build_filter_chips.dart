@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // استيراد المكتبة
 import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart';
 
 class BuildFilterChips extends StatelessWidget {
@@ -27,11 +28,11 @@ class BuildFilterChips extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
 
     return Container(
-      margin: const EdgeInsets.all(16.0),
-      padding: const EdgeInsets.all(4.0),
+      margin: EdgeInsets.all(16.w), // إزالة const واستخدام .w
+      padding: EdgeInsets.all(4.w), // إزالة const واستخدام .w
       decoration: BoxDecoration(
         color: colorScheme.surfaceContainerHighest.withAlpha(80),
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(16.r), // متجاوب
       ),
       child: Row(
         children: LeaveFilter.values.map((filter) {
@@ -43,16 +44,16 @@ class BuildFilterChips extends StatelessWidget {
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                padding: const EdgeInsets.symmetric(vertical: 12),
+                padding: EdgeInsets.symmetric(vertical: 12.h), // إزالة const واستخدام .h
                 decoration: BoxDecoration(
                   color: isSelected ? colorScheme.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(12.r), // متجاوب
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
                             color: colorScheme.primary.withAlpha(40),
-                            blurRadius: 8,
-                            offset: const Offset(0, 2),
+                            blurRadius: 8.r, // متجاوب
+                            offset: Offset(0, 2.h), // متجاوب
                           )
                         ]
                       : [],
@@ -62,14 +63,14 @@ class BuildFilterChips extends StatelessWidget {
                   children: [
                     Icon(
                       _getFilterIcon(filter),
-                      size: 16,
+                      size: 16.w, // حجم الأيقونة متجاوب
                       color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
                     ),
-                    const SizedBox(width: 6),
+                    SizedBox(width: 6.w), // مسافة متجاوبة
                     Text(
                       filter.label,
                       style: TextStyle(
-                        fontSize: 13,
+                        fontSize: 13.sp, // حجم الخط متجاوب
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
                         color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
                       ),

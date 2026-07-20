@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
@@ -8,8 +9,6 @@ import 'package:leave_manager/features/leaves/presentation/widgets/build_filter_
 import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
-
-// استيراد الشيمر الجديد
 import 'package:leave_manager/features/leaves/presentation/widgets/leave_list_shimmer.dart';
 
 class LeaveScreen extends StatefulWidget {
@@ -39,7 +38,6 @@ class _LeaveScreenState extends State<LeaveScreen> {
           },
           child: Column(
             children: [
-              // شريط التصفية بالتصميم العصري الجديد
               BuildFilterChips(
                 selectedFilter: _selectedFilter,
                 onFilterChanged: (newFilter) {
@@ -62,17 +60,13 @@ class _LeaveScreenState extends State<LeaveScreen> {
                         }
                         return leave.leaveType == LeaveType.casual;
                       }).toList();
-        
-                      // حالة عدم وجود بيانات باستخدام Lottie
                       if (filteredLeaves.isEmpty) {
                         return const CustomEmptyState();
                       }
-        
-                      // استخدام ListView.builder للقوائم الطويلة حسب معايير 2026
                       return ListView.builder(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16.0,
-                          vertical: 8.0,
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 16.0.w,
+                          vertical: 8.0.h,
                         ),
                         itemCount: filteredLeaves.length,
                         itemBuilder: (context, index) {

@@ -17,4 +17,20 @@ extension StringNumberParsing on String {
 
     return int.tryParse(normalized) ?? 0;
   }
+  
+}
+
+///تنسيق الأيام المتبقية بشكل ذكي باللغة العربية
+extension RemainingDaysExtension on int {
+  String get remainingDaysText {
+    if (this == 0) {
+      return 'اليوم!';
+    } else if (this == 1) {
+      return 'غداً';
+    } else if (this == 2) {
+      return 'بعد يومين';
+    } else {
+      return 'متبقي $this أيام';
+    }
+  }
 }

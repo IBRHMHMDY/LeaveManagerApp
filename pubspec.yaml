@@ -45,7 +45,8 @@ flutter:
   # Material Icons font is
   uses-material-design: true
   assets:
-    - assets/animations/empty_leaves.json
+    - assets/json/animations/empty_leaves.json
+    - assets/json/holidays.json
   fonts:
     - family: Cairo
       fonts:

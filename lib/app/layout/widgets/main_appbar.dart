@@ -6,7 +6,7 @@ class MainAppbar extends StatelessWidget implements PreferredSizeWidget {
   @override
   Widget build(BuildContext context) {
     return AppBar(
-          title: const Text('دفتر أجازاتى'),
+          title: const Text('مدير اجازاتى'),
           centerTitle: true,
         );
   }

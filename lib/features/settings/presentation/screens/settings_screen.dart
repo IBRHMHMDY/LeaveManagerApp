@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
@@ -28,7 +29,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _jobController = TextEditingController(text: 'موظف');
-  final _regularLeavesController = TextEditingController(text: '21');
+  final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
 
   @override
@@ -37,7 +38,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _loadInitialData();
   }
 
-  // AMD 2026 Rule: Always dispose controllers to prevent memory leaks.
   @override
   void dispose() {
     _nameController.dispose();
@@ -103,7 +103,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
       child: Scaffold(
         appBar: AppBar(title: const Text('الاعدادات')),
         body: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: EdgeInsets.all(16.0.r),
           child: Form(
             key: _formKey,
             child: Column(
@@ -117,12 +117,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   casualLeavesController: _casualLeavesController,
                 ),
                 
-                const SizedBox(height: 24),
+                SizedBox(height: 24.w),
                 
                 // 2. قسم التفضيلات والمظهر
                 const ThemeSelectionSection(),
                 
-                const SizedBox(height: 32),
+                SizedBox(height: 32.h),
                 
                 // 3. زر الحفظ
                 BlocBuilder<SettingsBloc, SettingsState>(
@@ -130,25 +130,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     final isLoading = state is SettingsLoading;
                     return ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        padding: EdgeInsets.symmetric(vertical: 16.h),
                         backgroundColor: colorScheme.primary,
                         foregroundColor: colorScheme.onPrimary,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                       ),
                       onPressed: isLoading ? null : _saveSettings,
                       child: isLoading
-                          ? const SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
+                          ? SizedBox(
+                              height: 24.h,
+                              width: 24.w,
+                              child: const CircularProgressIndicator(
                                 color: Colors.white,
                                 strokeWidth: 2,
                               ),
                             )
-                          : const Text(
+                          : Text(
                               'حفظ الإعدادات',
-                              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
                             ),
                     );
                   },
@@ -157,7 +157,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // 4. قسم منطقة الخطر (التصفير وعن التطبيق)
                 if (!widget.isFirstTime) const DangerZoneSection(),
                 
-                const SizedBox(height: 32),
+                SizedBox(height: 32.h),
               ],
             ),
           ),

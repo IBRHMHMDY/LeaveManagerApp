@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart'; // استيراد المكتبة
 import 'package:shimmer/shimmer.dart';
 
 /// مكون يعرض هيكل تحميل (Skeleton) لقائمة الإجازات
@@ -12,18 +13,18 @@ class LeaveListShimmer extends StatelessWidget {
     final highlightColor = isDark ? Colors.grey[700]! : Colors.grey[100]!;
 
     return ListView.builder(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-      itemCount: 5, // عدد العناصر الوهمية
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h), // إزالة const
+      itemCount: 5,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
           baseColor: baseColor,
           highlightColor: highlightColor,
           child: Container(
-            margin: const EdgeInsets.only(bottom: 14),
-            height: 100,
+            margin: EdgeInsets.only(bottom: 14.h), // إزالة const واستخدام .h
+            height: 100.h, // ارتفاع متجاوب يطابق البطاقة الأصلية
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(16.r), // متجاوب
             ),
           ),
         );

@@ -1,4 +1,6 @@
+// lib/features/home/presentation/widgets/balances_loading_shimmer.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
 
 class BalancesLoadingShimmer extends StatelessWidget {
@@ -13,7 +15,7 @@ class BalancesLoadingShimmer extends StatelessWidget {
     return Row(
       children: [
         Expanded(child: _buildShimmerCard(baseColor, highlightColor)),
-        const SizedBox(width: 16),
+        SizedBox(width: 16.w), // مسافة عرضية متجاوبة
         Expanded(child: _buildShimmerCard(baseColor, highlightColor)),
       ],
     );
@@ -24,9 +26,10 @@ class BalancesLoadingShimmer extends StatelessWidget {
       baseColor: baseColor,
       highlightColor: highlightColor,
       child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        child: const SizedBox(
-          height: 200, // ارتفاع مقارب للبطاقة الأصلية
+        // توافق مع الزوايا في المكون الحقيقي
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        child: SizedBox(
+          height: 200.h, // ارتفاع متجاوب مقارب للبطاقة الأصلية
           width: double.infinity,
         ),
       ),

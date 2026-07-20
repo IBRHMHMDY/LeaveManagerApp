@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:leave_manager/shared/themes/theme_cubit.dart';
 
 class ThemeSelectionSection extends StatelessWidget {
@@ -13,29 +14,29 @@ class ThemeSelectionSection extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           'إعدادات النظام والتفضيلات',
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
-        const SizedBox(height: 12),
+        SizedBox(height: 12.h),
         Container(
           decoration: BoxDecoration(
             color: colorScheme.surfaceContainerHighest.withAlpha(50),
-            borderRadius: BorderRadius.circular(16),
+            borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: colorScheme.outline.withAlpha(40)),
           ),
           child: BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {
               return SwitchListTile(
-                title: const Text(
+                title: Text(
                   'الوضع الليلي',
-                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                  style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
                   isCurrentDark 
                       ? 'تفعيل المظهر الداكن للراحة البصرية' 
                       : 'تفعيل المظهر الفاتح لسطوع أوضح',
-                  style: TextStyle(fontSize: 12, color: colorScheme.onSurface.withAlpha(140)),
+                  style: TextStyle(fontSize: 12.sp, color: colorScheme.onSurface.withAlpha(140)),
                 ),
                 secondary: Icon(
                   isCurrentDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
