@@ -6,6 +6,7 @@ import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/app/splash/widgets/custom_app_logo.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
+import 'package:leave_manager/shared/widgets/current_version.dart';
 import '../../features/settings/presentation/bloc/settings_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -197,16 +198,7 @@ class _SplashScreenState extends State<SplashScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Text(
-                      'Version 1.0.0',
-                      style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.onSurface.withAlpha(100),
-                        letterSpacing: 1.5,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
+                    const CurrentVersion(),
                   ],
                 ),
               ),

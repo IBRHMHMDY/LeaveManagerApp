@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:package_info_plus/package_info_plus.dart';
+import 'package:leave_manager/shared/widgets/current_version.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:leave_manager/app/splash/widgets/custom_app_logo_icon.dart';
 
@@ -27,20 +27,14 @@ class _AboutDeveloperContent extends StatefulWidget {
 }
 
 class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
-  String _version = '';
+  
 
   @override
   void initState() {
     super.initState();
-    _loadPackageInfo();
   }
 
-  Future<void> _loadPackageInfo() async {
-    final info = await PackageInfo.fromPlatform();
-    setState(() {
-      _version = info.version;
-    });
-  }
+
 
   // دالة فتح البريد الإلكتروني
   Future<void> _launchEmail() async {
@@ -106,15 +100,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
             ),
           ),
           SizedBox(height: 12.h),
-          Text(
-            'الإصدار $_version',
-            style: TextStyle(
-              fontSize: 14,
-              color: colorScheme.onSurface.withAlpha(150),
-              fontWeight: FontWeight.bold,
-              letterSpacing: 1.2,
-            ),
-          ),
+          const CurrentVersion(),
           SizedBox(height: 32.h),
 
           // 4. بطاقة معلومات المطور
