@@ -1,6 +1,6 @@
-// lib/core/themes/app_theme.dart
+// lib/shared/themes/app_theme.dart
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
+import 'app_colors.dart';
 
 class AppTheme {
   static const String fontFamily = 'Cairo';
@@ -31,6 +31,29 @@ class AppTheme {
           fontFamily: fontFamily,
         ),
       ),
+      // إعدادات شريط التنقل للوضع الفاتح
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.lightSurface,
+        elevation: 0,
+        indicatorColor: AppColors.primaryTeal.withAlpha(40),
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryTeal,
+              fontFamily: fontFamily,
+            );
+          }
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.lightText.withAlpha(150),
+            fontFamily: fontFamily,
+          );
+        }),
+      ),
     );
   }
 
@@ -59,6 +82,29 @@ class AppTheme {
           fontWeight: FontWeight.bold,
           fontFamily: fontFamily,
         ),
+      ),
+      // إعدادات شريط التنقل للوضع المظلم
+      navigationBarTheme: NavigationBarThemeData(
+        backgroundColor: AppColors.darkSurface,
+        elevation: 0,
+        indicatorColor: AppColors.primaryTeal.withAlpha(40),
+        labelBehavior: NavigationDestinationLabelBehavior.onlyShowSelected,
+        labelTextStyle: WidgetStateProperty.resolveWith((states) {
+          if (states.contains(WidgetState.selected)) {
+            return const TextStyle(
+              fontSize: 13,
+              fontWeight: FontWeight.bold,
+              color: AppColors.primaryTeal,
+              fontFamily: fontFamily,
+            );
+          }
+          return TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+            color: AppColors.darkText.withAlpha(150),
+            fontFamily: fontFamily,
+          );
+        }),
       ),
     );
   }

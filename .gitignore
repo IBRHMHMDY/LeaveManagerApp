@@ -46,3 +46,5 @@ app.*.map.json
 # حماية مفاتيح التوقيع الرقمي
 android/key.properties
 *.jks
+# Version 1.0.0
+/bundle

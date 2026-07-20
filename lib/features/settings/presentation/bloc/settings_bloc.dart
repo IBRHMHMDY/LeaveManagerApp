@@ -1,48 +1,13 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
-import '../../domain/entities/settings_entity.dart';
-import '../../domain/usecases/settings_usecase.dart';
-import '../../../../core/usecases/base_usecase.dart';
+import 'package:injectable/injectable.dart';
+import 'package:leave_manager/core/usecases/base_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/check_settings_exit_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/get_settings_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/save_settings_usecase.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 
-// --- Events ---
-abstract class SettingsEvent extends Equatable {
-  @override
-  List<Object> get props => [];
-}
-
-class CheckSettingsEvent extends SettingsEvent {}
-class LoadSettingsEvent extends SettingsEvent {}
-class SaveSettingsEvent extends SettingsEvent {
-  final Settings settings;
-  SaveSettingsEvent(this.settings);
-  @override
-  List<Object> get props => [settings];
-}
-
-// --- States ---
-abstract class SettingsState extends Equatable {
-  @override
-  List<Object> get props => [];
-}
-
-class SettingsInitial extends SettingsState {}
-class SettingsLoading extends SettingsState {}
-class SettingsLoaded extends SettingsState {
-  final Settings settings;
-  SettingsLoaded(this.settings);
-  @override
-  List<Object> get props => [settings];
-}
-class SettingsNotFound extends SettingsState {} // يستخدم للتوجيه لشاشة الإعدادات
-class SettingsSavedSuccess extends SettingsState {}
-class SettingsError extends SettingsState {
-  final String message;
-  SettingsError(this.message);
-  @override
-  List<Object> get props => [message];
-}
-
-// --- BLoC ---
+@injectable
 class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final CheckSettingsExistUseCase checkSettingsExist;
   final GetSettingsUseCase getSettings;

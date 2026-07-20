@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
+import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
 import 'package:leave_manager/core/errors/failures.dart';
@@ -8,7 +9,7 @@ import 'package:leave_manager/features/settings/data/models/settings_mapper.dart
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
 import 'package:leave_manager/features/settings/domain/repositories/settings_repository.dart';
 
-
+@LazySingleton(as: SettingsRepository)
 class SettingsRepositoryImpl implements SettingsRepository {
   final SettingsLocalDataSource localDataSource;
 

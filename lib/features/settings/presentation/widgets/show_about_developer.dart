@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:leave_manager/features/app/presentation/widgets/custom_app_logo_icon.dart';
+import 'package:leave_manager/app/splash/widgets/custom_app_logo_icon.dart';
 
 void showAboutDeveloperBottomSheet(BuildContext context) {
   final colorScheme = Theme.of(context).colorScheme;

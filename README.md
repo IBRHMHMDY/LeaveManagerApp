@@ -1,4 +1,4 @@
-# vacation_tracker
+# Leave Manager
 
 A new Flutter project.
 

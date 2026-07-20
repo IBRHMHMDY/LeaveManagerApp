@@ -1,5 +1,6 @@
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
+import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
 import 'package:leave_manager/core/errors/failures.dart';
@@ -9,6 +10,7 @@ import 'package:leave_manager/features/leaves/data/models/leave_record_mapper.da
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
 
+@LazySingleton(as: LeaveRepository)
 class LeaveRepositoryImpl implements LeaveRepository {
   final LeavesLocalDataSource localDataSource;
 

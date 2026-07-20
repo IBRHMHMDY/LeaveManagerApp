@@ -1,4 +1,5 @@
 import 'package:drift/drift.dart';
+import 'package:injectable/injectable.dart';
 import '../../../../core/database/app_database.dart';
 import '../../../../core/errors/exceptions.dart';
 
@@ -9,7 +10,7 @@ abstract class LeavesLocalDataSource {
   Future<void> deleteLeaveRecord(int id);
 
 }
-
+@LazySingleton(as: LeavesLocalDataSource)
 class LeavesLocalDataSourceImpl implements LeavesLocalDataSource {
   final AppDatabase db;
 

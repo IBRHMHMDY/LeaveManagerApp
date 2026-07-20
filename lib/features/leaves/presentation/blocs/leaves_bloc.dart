@@ -1,5 +1,5 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:equatable/equatable.dart';
+import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_balance_entity.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
@@ -7,67 +7,11 @@ import 'package:leave_manager/features/leaves/domain/usecases/add_leave_usecase.
 import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/delete_leave_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/get_current_year_leaves_usecase.dart';
-import 'package:leave_manager/features/settings/domain/usecases/settings_usecase.dart';
+import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
+import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
+import 'package:leave_manager/features/settings/domain/usecases/reset_balances_usecase.dart';
 
-
-// --- Events ---
-abstract class LeavesEvent extends Equatable {
-  @override
-  List<Object> get props => [];
-}
-
-class LoadBalancesAndLeavesEvent extends LeavesEvent {}
-
-class AddNewLeaveEvent extends LeavesEvent {
-  final LeaveRecord leave;
-  AddNewLeaveEvent(this.leave);
-  @override
-  List<Object> get props => [leave];
-}
-
-class ResetAllLeavesEvent extends LeavesEvent {}
-
-class DeleteLeaveEvent extends LeavesEvent {
-  final int leaveId;
-  DeleteLeaveEvent(this.leaveId);
-  @override
-  List<Object> get props => [leaveId];
-}
-
-// --- States ---
-abstract class LeavesState extends Equatable {
-  @override
-  List<Object> get props => [];
-}
-
-class LeavesInitial extends LeavesState {}
-
-class LeavesLoading extends LeavesState {}
-
-class LeavesLoaded extends LeavesState {
-  final LeaveBalance balance;
-  final List<LeaveRecord> currentYearLeaves;
-
-  LeavesLoaded({required this.balance, required this.currentYearLeaves});
-
-  @override
-  List<Object> get props => [balance, currentYearLeaves];
-}
-
-class LeaveAddedSuccess extends LeavesState {}
-
-class LeavesError extends LeavesState {
-  final String message;
-  LeavesError(this.message);
-  @override
-  List<Object> get props => [message];
-}
-
-class LeavesResetSuccess extends LeavesState {}
-
-class LeaveDeletedSuccess extends LeavesState {}
-
-// --- BLoC ---
+@injectable
 class LeavesBloc extends Bloc<LeavesEvent, LeavesState> {
   final CalculateBalancesUseCase calculateBalances;
   final GetCurrentYearLeavesUseCase getCurrentYearLeaves;

@@ -1,7 +1,7 @@
 name: leave_manager
 description: "Leave Manager App - تتبع إجازاتك بذكاء وسهولة."
-publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.0.1+1
+publish_to: 'none'
+version: 1.1.0+2
 
 environment:
   sdk: ^3.11.5
@@ -9,62 +9,50 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  
-  # --- State Management & Architecture ---
   flutter_bloc: ^8.1.3          # لإدارة الحالة (BLoC Pattern)
   equatable: ^2.0.5             # لمقارنة الكائنات بسهولة (ضروري للـ BLoC والـ Entities)
   dartz: ^0.10.1                # للبرمجة الوظيفية ومعالجة الأخطاء (Either و Unit)
   get_it: ^7.6.4                # لحقن الاعتماديات (Dependency Injection)
-
-  # --- Storages Data ---
   shared_preferences: ^2.3.0  # لحفظ تفضيلات المستخدم (مثل الثيم واللغة)
-
-  # --- Database (Drift - SQLite) ---
   drift: ^2.14.1                # مكتبة قاعدة البيانات الرئيسية
   sqlite3_flutter_libs: ^0.5.18 # مكتبات التشغيل الأصلية لـ SQLite
   path_provider: ^2.1.1         # للوصول إلى مسارات التخزين في الجهاز (مجلد المستندات)
   path: ^1.8.3                  # للتعامل مع مسارات الملفات برمجياً
-
-  # --- UI & Utilities ---
   intl: ^0.20.2                 # لتنسيق التواريخ (Date Formatting)
   google_fonts: ^6.1.0          # (اختياري) لاستخدام خطوط عصرية مثل Cairo أو Almarai
   flutter_localizations:        # لدعم اللغة العربية والاتجاه من اليمين لليسار (RTL)
     sdk: flutter
   share_plus: ^10.0.0           # إضافة حزمة المشاركة الحديثة
   go_router: ^17.3.0
-
-  easy_localization: ^3.0.8
   package_info_plus: ^8.0.0  # لقراءة رقم إصدار التطبيق برمجياً
   url_launcher: ^6.3.0       # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
-  
+  shimmer: ^3.0.0
+  flutter_screenutil: ^5.9.0
+  lottie: ^3.1.0
+  injectable: ^2.6.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
-  
-  # --- Code Generation ---
   build_runner: ^2.4.7           # المحرك الأساسي لتوليد الأكواد
   drift_dev: ^2.14.1             # لتوليد ملفات قاعدة البيانات الخاصة بـ Drift (ملفات .g.dart)
-
-  # --- Code Quality ---
+  injectable_generator: ^2.6.0
   flutter_lints: ^3.0.1           # قواعد تحليل الكود القياسية للحفاظ على نظافة الكود
   flutter_native_splash: ^2.4.7   # لتسريع عرض الشاشه الاساسيه عند بدء التطبيق
   change_app_package_name: ^1.5.0
-
-  # Generate Icon App
   flutter_launcher_icons: ^0.14.4
-flutter:
 
+flutter:
   # Material Icons font is
   uses-material-design: true
   assets:
-    - assets/translations/
-  
+    - assets/animations/empty_leaves.json
   fonts:
     - family: Cairo
       fonts:
         - asset: assets/fonts/Cairo-Regular.ttf
         - asset: assets/fonts/Cairo-Bold.ttf
           weight: 700
+
 flutter_native_splash:
   color: "#F8F9FA" # لون الخلفية للوضع النهاري (Light Background)
   color_dark: "#121212" # لون الخلفية للوضع الليلي (Dark Background)

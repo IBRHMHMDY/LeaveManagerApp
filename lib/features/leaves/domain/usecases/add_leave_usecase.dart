@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/errors/failures.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
@@ -7,6 +8,7 @@ import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
 
+@lazySingleton
 class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
   final LeaveRepository repository;
   final CalculateBalancesUseCase calculateBalances; // تم حقن حاسبة الأرصدة هنا

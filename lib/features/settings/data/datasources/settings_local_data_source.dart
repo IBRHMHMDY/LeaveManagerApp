@@ -1,5 +1,6 @@
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart' show debugPrint;
+import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
 
@@ -9,7 +10,7 @@ abstract class SettingsLocalDataSource {
   Future<void> saveSettings(SettingsTableCompanion companion);
   Future<void> resetBalances();
 }
-
+@LazySingleton(as: SettingsLocalDataSource)
 class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
   final AppDatabase db;
 

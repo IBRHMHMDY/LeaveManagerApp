@@ -1,9 +1,10 @@
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/errors/failures.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
 
-
+@lazySingleton
 class DeleteLeaveUseCase implements BaseUseCase<Unit, int> {
   final LeaveRepository repository;
 
