@@ -7,14 +7,29 @@ import 'package:path/path.dart' as p;
 import 'tables/settings_table.dart';
 import 'tables/leave_records_table.dart';
 
-part 'app_database.g.dart'; 
+part 'app_database.g.dart';
 
-@DriftDatabase(tables: [SettingsTable, LeaveRecordsTable,HolidaysTable])
+@DriftDatabase(tables: [SettingsTable, LeaveRecordsTable, HolidaysTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 1;
+  int get schemaVersion => 2;
+
+  @override
+  MigrationStrategy get migration {
+    return MigrationStrategy(
+      onCreate: (Migrator m) async {
+        // إنشاء جميع الجداول للمستخدمين الجدد
+        await m.createAll();
+      },
+      onUpgrade: (Migrator m, int from, int to) async {
+        if (from == 1) {
+          await m.createTable(holidaysTable);
+        }
+      },
+    );
+  }
 }
 
 LazyDatabase _openConnection() {

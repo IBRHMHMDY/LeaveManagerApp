@@ -179,7 +179,7 @@ class _LeaveDetails extends StatelessWidget {
             borderRadius: BorderRadius.circular(20.r), // متجاوب
           ),
           child: Text(
-            isRegular ? 'اعتيادية' : 'عارضة',
+            isRegular ? 'أجازه اعتيادى' : 'أجازه عارضة',
             style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12.sp), // متجاوب
           ),
         ),
@@ -192,7 +192,7 @@ class _LeaveDetails extends StatelessWidget {
               child: Text(
                 leave.startDate.isAtSameMomentAs(leave.endDate) 
                     ? leave.startDate.toFormattedDate() 
-                    : '${leave.startDate.toFormattedDate()}  إلى  ${leave.endDate.toFormattedDate()}',
+                    : '${leave.startDate.toFormattedDate()}  -  ${leave.endDate.toFormattedDate()}',
                 style: TextStyle(
                   fontSize: 13.5.sp, // متجاوب
                   color: colorScheme.onSurface,

@@ -11,10 +11,7 @@ class HolidaysScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('العطلات الرسمية'),
-        centerTitle: true,
-      ),
+      appBar: AppBar(title: const Text('العطلات الرسمية'), centerTitle: true),
       body: BlocBuilder<HolidaysCubit, HolidaysState>(
         builder: (context, state) {
           if (state is HolidaysLoading || state is HolidaysInitial) {
@@ -43,7 +40,7 @@ class HolidaysScreen extends StatelessWidget {
               itemBuilder: (context, index) {
                 final holiday = holidays[index];
                 final isPast = holiday.endDate.isBefore(DateTime.now());
-                
+
                 return _buildHolidayCard(context, holiday, isPast);
               },
             );
@@ -60,8 +57,12 @@ class HolidaysScreen extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
 
     // استخدام ألوان باهتة للعطلات السابقة للدلالة البصرية
-    final cardColor = isPast ? colorScheme.surfaceContainerHighest.withAlpha(100) : colorScheme.surface;
-    final textColor = isPast ? colorScheme.onSurfaceVariant : colorScheme.onSurface;
+    final cardColor = isPast
+        ? colorScheme.surfaceContainerHighest.withAlpha(100)
+        : colorScheme.surface;
+    final textColor = isPast
+        ? colorScheme.onSurfaceVariant
+        : colorScheme.onSurface;
 
     return Container(
       margin: EdgeInsets.only(bottom: 12.h),
@@ -75,34 +76,6 @@ class HolidaysScreen extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: EdgeInsets.all(12.w),
-            decoration: BoxDecoration(
-              color: isPast ? Colors.grey.withAlpha(50) : colorScheme.primary.withAlpha(30),
-              borderRadius: BorderRadius.circular(12.r),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  '${holiday.daysCount}',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: isPast ? Colors.grey : colorScheme.primary,
-                  ),
-                ),
-                Text(
-                  'أيام',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: isPast ? Colors.grey : colorScheme.primary,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          SizedBox(width: 16.w),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,7 +86,7 @@ class HolidaysScreen extends StatelessWidget {
                     fontSize: 16.sp,
                     fontWeight: FontWeight.bold,
                     color: textColor,
-                    decoration: isPast ? TextDecoration.lineThrough : null, // شطب العطلات السابقة
+                    decoration: isPast ? TextDecoration.lineThrough : null,
                   ),
                 ),
                 SizedBox(height: 6.h),
@@ -135,6 +108,36 @@ class HolidaysScreen extends StatelessWidget {
                       ),
                     ),
                   ],
+                ),
+              ],
+            ),
+          ),
+
+          Container(
+            padding: EdgeInsets.all(12.w),
+            decoration: BoxDecoration(
+              color: isPast
+                  ? Colors.grey.withAlpha(50)
+                  : colorScheme.primary.withAlpha(30),
+              borderRadius: BorderRadius.circular(12.r),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${holiday.daysCount}',
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.bold,
+                    color: isPast ? Colors.grey : colorScheme.primary,
+                  ),
+                ),
+                Text(
+                  'أيام',
+                  style: TextStyle(
+                    fontSize: 11.sp,
+                    color: isPast ? Colors.grey : colorScheme.primary,
+                  ),
                 ),
               ],
             ),

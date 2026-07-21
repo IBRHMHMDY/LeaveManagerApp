@@ -10,12 +10,10 @@ import 'package:leave_manager/features/settings/domain/entities/settings_entity.
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/danger_zone_section.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/settings_form_section.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/theme_selection_section.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
-
-// استيراد المكونات المجزأة
-import '../widgets/settings_form_section.dart';
-import '../widgets/theme_selection_section.dart';
-import '../widgets/danger_zone_section.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isFirstTime;
@@ -75,6 +73,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         totalCasualLeaves: _casualLeavesController.text.toIntSafely(),
       );
 
+      
       context.read<SettingsBloc>().add(SaveSettingsEvent(settings));
     }
   }
@@ -101,7 +100,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('الاعدادات')),
+        appBar: AppBar(
+          title: Text(
+            'الاعدادات',
+            style: Theme.of(context).textTheme.displaySmall?.copyWith(
+              fontSize: 22.sp,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
         body: SingleChildScrollView(
           padding: EdgeInsets.all(16.0.r),
           child: Form(
@@ -109,22 +116,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // 1. قسم بيانات الموظف والأرصدة
                 SettingsFormSection(
                   nameController: _nameController,
                   jobController: _jobController,
                   regularLeavesController: _regularLeavesController,
                   casualLeavesController: _casualLeavesController,
                 ),
-                
+
                 SizedBox(height: 24.w),
-                
-                // 2. قسم التفضيلات والمظهر
+
                 const ThemeSelectionSection(),
-                
+
                 SizedBox(height: 32.h),
-                
-                // 3. زر الحفظ
+
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
                     final isLoading = state is SettingsLoading;
@@ -134,9 +138,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
                         backgroundColor: colorScheme.primary,
                         foregroundColor: colorScheme.onPrimary,
                         elevation: 0,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12.r),
+                        ),
                       ),
-                      onPressed: isLoading ? null : _saveSettings,
+                      onPressed: isLoading ? null :  _saveSettings,
                       child: isLoading
                           ? SizedBox(
                               height: 24.h,
@@ -148,15 +154,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             )
                           : Text(
                               'حفظ الإعدادات',
-                              style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                fontSize: 16.sp,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                     );
                   },
                 ),
-                
+
                 // 4. قسم منطقة الخطر (التصفير وعن التطبيق)
                 if (!widget.isFirstTime) const DangerZoneSection(),
-                
+
                 SizedBox(height: 32.h),
               ],
             ),

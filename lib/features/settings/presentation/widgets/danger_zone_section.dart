@@ -34,16 +34,26 @@ class DangerZoneSection extends StatelessWidget {
             'تصفير الأرصدة (مسح سجلات الإجازات)',
             style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
           ),
-          onPressed: () => ConfirmDeleteDialog(
-            titleDialog: 'تأكيد التصفير',
-            contentDialog:
-                'هل أنت متأكد من أنك تريد مسح جميع سجلات الإجازات؟ هذا الإجراء لا يمكن التراجع عنه.',
-            onPressedButton: () {
-              context.read<LeavesBloc>().add(ResetAllLeavesEvent());
-              context.pop();
-              AppToast.showSuccess(context, 'تم تصفير الأرصدة بنجاح');
-            },
-          ),
+          onPressed: (){
+            showDialog(
+              context: context,
+              builder: (BuildContext dialogContext) {
+                return ConfirmDeleteDialog(
+                  titleDialog: 'تأكيد التصفير',
+                  contentDialog:
+                      'هل أنت متأكد من أنك تريد مسح جميع سجلات الإجازات؟ هذا الإجراء لا يمكن التراجع عنه.',
+                  onPressedButton: () {
+                    // 1. إرسال الحدث للـ BLoC
+                    context.read<LeavesBloc>().add(ResetAllLeavesEvent());
+                    // 2. إغلاق الـ Dialog باستخدام الـ context الخاص به
+                    dialogContext.pop();
+                    // 3. عرض رسالة النجاح
+                    AppToast.showSuccess(context, 'تم تصفير الأرصدة بنجاح');
+                  },
+                );
+              },
+            );
+          }
         ),
         const SizedBox(height: 16),
         TextButton.icon(
