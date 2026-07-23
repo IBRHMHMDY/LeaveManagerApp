@@ -7,6 +7,7 @@ abstract class SettingsState extends Equatable {
 }
 
 class SettingsInitial extends SettingsState {}
+class SettingsExists extends SettingsState {}
 class SettingsLoading extends SettingsState {}
 class SettingsLoaded extends SettingsState {
   final Settings settings;
@@ -14,7 +15,7 @@ class SettingsLoaded extends SettingsState {
   @override
   List<Object> get props => [settings];
 }
-class SettingsNotFound extends SettingsState {} // يستخدم للتوجيه لشاشة الإعدادات
+class SettingsNotFound extends SettingsState {}
 class SettingsSavedSuccess extends SettingsState {}
 class SettingsError extends SettingsState {
   final String message;

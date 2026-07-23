@@ -30,10 +30,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
 
+  // ✅ 1. تعريف متغير حالة محلي قابل للتعديل
+  late bool _isFirstTime;
+
   @override
   void initState() {
     super.initState();
+    // ✅ 2. تهيئة المتغير بالقيمة القادمة من الـ Router عند بناء الشاشة لأول مرة
+    _isFirstTime = widget.isFirstTime;
     _loadInitialData();
+  }
+
+  void _loadInitialData() {
+    if (!_isFirstTime) {
+      final state = context.read<SettingsBloc>().state;
+      if (state is SettingsLoaded) {
+        _populateFields(state.settings);
+      }
+    }
   }
 
   @override
@@ -43,15 +57,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _regularLeavesController.dispose();
     _casualLeavesController.dispose();
     super.dispose();
-  }
-
-  void _loadInitialData() {
-    if (!widget.isFirstTime) {
-      final state = context.read<SettingsBloc>().state;
-      if (state is SettingsLoaded) {
-        _populateFields(state.settings);
-      }
-    }
   }
 
   void _populateFields(Settings settings) {
@@ -73,7 +78,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         totalCasualLeaves: _casualLeavesController.text.toIntSafely(),
       );
 
-      
       context.read<SettingsBloc>().add(SaveSettingsEvent(settings));
     }
   }
@@ -84,15 +88,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
-        if (state is SettingsLoaded && !widget.isFirstTime) {
+        if (state is SettingsLoaded && !_isFirstTime) {
           if (_nameController.text.isEmpty) {
             _populateFields(state.settings);
           }
         } else if (state is SettingsSavedSuccess) {
-          AppToast.showSuccess(context, 'تم حفظ الإعدادات بنجاح');
           context.read<SettingsBloc>().add(LoadSettingsEvent());
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
-          if (widget.isFirstTime) {
+          AppToast.showSuccess(context, 'تم حفظ الإعدادات بنجاح');
+          
+          if (_isFirstTime) {
+            setState(() {
+              _isFirstTime = false;
+            });
             context.go(AppRouter.home);
           }
         } else if (state is SettingsError) {
@@ -163,8 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
 
-                // 4. قسم منطقة الخطر (التصفير وعن التطبيق)
-                if (!widget.isFirstTime) const DangerZoneSection(),
+                if (!_isFirstTime) const DangerZoneSection(),
 
                 SizedBox(height: 32.h),
               ],

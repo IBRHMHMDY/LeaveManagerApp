@@ -56,13 +56,16 @@ class AppRouter {
           ),
           // الفرع الثالث: الإعدادات
           StatefulShellBranch(
-            routes: [
-              GoRoute(
-                path: settings,
-                builder: (context, state) => const SettingsScreen(isFirstTime: false),
+                routes: [
+                  GoRoute(
+                    path: settings,
+                    builder: (context, state) {
+                      final isFirstTime = state.extra as bool? ?? false;
+                      return SettingsScreen(isFirstTime: isFirstTime);
+                    },
+                  ),
+                ],
               ),
-            ],
-          ),
         ],
       ),
     ],

@@ -10,6 +10,7 @@ abstract class SettingsLocalDataSource {
   Future<void> saveSettings(SettingsTableCompanion companion);
   Future<void> resetBalances();
 }
+
 @LazySingleton(as: SettingsLocalDataSource)
 class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
   final AppDatabase db;
@@ -40,13 +41,11 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
   @override
   Future<void> saveSettings(SettingsTableCompanion companion) async {
     try {
-      // استخدام insertOrReplace بدلاً من insertOnConflictUpdate لضمان التوافق مع كافة الأجهزة
       await db.into(db.settingsTable).insert(
         companion,
         mode: InsertMode.insertOrReplace,
       );
     } catch (e) {
-      // يفضل طباعة الخطأ لتسهيل تتبعه أثناء التطوير
       debugPrint('Database Error: $e');
       throw DatabaseException('فشل في حفظ الإعدادات');
     }

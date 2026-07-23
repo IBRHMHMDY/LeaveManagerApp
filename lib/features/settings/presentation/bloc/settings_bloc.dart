@@ -24,7 +24,7 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
       final result = await checkSettingsExist(const NoParams());
       result.fold(
         (failure) => emit(SettingsError(failure.message)),
-        (exists) => exists ? emit(SettingsInitial()) /* جاهز للتحميل */ : emit(SettingsNotFound()),
+        (exists) => exists ? emit(SettingsExists()) : emit(SettingsNotFound()),
       );
     });
 

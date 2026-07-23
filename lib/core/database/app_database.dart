@@ -20,7 +20,6 @@ class AppDatabase extends _$AppDatabase {
   MigrationStrategy get migration {
     return MigrationStrategy(
       onCreate: (Migrator m) async {
-        // إنشاء جميع الجداول للمستخدمين الجدد
         await m.createAll();
       },
       onUpgrade: (Migrator m, int from, int to) async {
