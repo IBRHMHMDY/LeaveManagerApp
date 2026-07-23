@@ -11,7 +11,7 @@ import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances
 @lazySingleton
 class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
   final LeaveRepository repository;
-  final CalculateBalancesUseCase calculateBalances; // تم حقن حاسبة الأرصدة هنا
+  final CalculateBalancesUseCase calculateBalances;
 
   AddLeaveUseCase({
     required this.repository,
@@ -68,8 +68,8 @@ class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
               final isOverlapping = !newStart.isAfter(oldEnd) && !newEnd.isBefore(oldStart);
 
               if (isOverlapping) {
-                final leaveTypeName = existingLeave.leaveType == LeaveType.regular ? 'اعتيادية' : 'عارضة';
-                return Left(ValidationFailure('لديك إجازة"$leaveTypeName" مسجلة بالفعل في نفس الفترة، يرجى مراجعة السجل.'));
+                // final leaveTypeName = existingLeave.leaveType == LeaveType.regular ? 'اعتيادية' : 'عارضة';
+                return const Left(ValidationFailure('تم تسجيل اجازه  او عطله رسميه فى هذا التاريخ او هذه الفتره ، يرجى مراجعة هذا التاريخ بالسجل.'));
               }
             }
 

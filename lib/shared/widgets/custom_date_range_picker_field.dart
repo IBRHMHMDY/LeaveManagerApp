@@ -7,10 +7,9 @@ class CustomDateRangePickerField extends StatelessWidget {
   final DateTime? endDate;
   final String hintText;
   final ValueChanged<DateTimeRange?> onDateSelected;
-  
-  // حدود السنة المالية التي يتم تمريرها من الميزة المستدعية
   final DateTime firstDate;
   final DateTime lastDate;
+  final bool Function(DateTime)? selectableDayPredicate;
 
   const CustomDateRangePickerField({
     super.key,
@@ -20,12 +19,13 @@ class CustomDateRangePickerField extends StatelessWidget {
     required this.firstDate,
     required this.lastDate,
     this.hintText = 'اضغط لاختيار الفترة',
+    this.selectableDayPredicate,
   });
 
   Future<void> _pickDateRange(BuildContext context) async {
     final now = DateTime.now();
 
-    // القاعدة الأساسية: إذا كانت نهاية السنة المالية (lastDate) في المستقبل، 
+    // القاعدة الأساسية: إذا كانت نهاية السنة المالية (lastDate) في المستقبل،
     // يتم حدّها بتاريخ اليوم لمنع اختيار أي تاريخ مستقبلي.
     DateTime effectiveLastDate = lastDate.isAfter(now) ? now : lastDate;
 
@@ -38,16 +38,19 @@ class CustomDateRangePickerField extends StatelessWidget {
       context: context,
       firstDate: firstDate,
       lastDate: effectiveLastDate,
-      initialDateRange: startDate != null && endDate != null && startDate != endDate
+        selectableDayPredicate: selectableDayPredicate == null
+          ? null
+          : (day, start, end) => selectableDayPredicate!(day),
+      initialEntryMode: DatePickerEntryMode.calendarOnly,
+      initialDateRange:
+          startDate != null && endDate != null && startDate != endDate
           ? DateTimeRange(start: startDate!, end: endDate!)
           : null,
       saveText: 'تأكيد',
       cancelText: 'إلغاء',
       helpText: 'اختر الفترة (من - إلى)',
-      builder: (context, child) => Theme(
-        data: Theme.of(context),
-        child: child!,
-      ),
+      builder: (context, child) =>
+          Theme(data: Theme.of(context), child: child!),
     );
 
     if (picked != null) {
@@ -61,7 +64,7 @@ class CustomDateRangePickerField extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
     final borderColor = isDark ? Colors.white24 : Colors.grey.shade300;
     final fillColor = isDark ? Colors.black12 : Colors.grey.shade50;
-    
+
     final hasDate = startDate != null && endDate != null;
 
     // AMD 2026: معالجة منطق النص المنعكس على الواجهة بشكل نظيف
@@ -71,7 +74,8 @@ class CustomDateRangePickerField extends StatelessWidget {
       if (startDate!.isAtSameMomentAs(endDate!)) {
         displayText = startDate!.toFormattedDate();
       } else {
-        displayText = '${startDate!.toFormattedDate()}   -   ${endDate!.toFormattedDate()}';
+        displayText =
+            '${startDate!.toFormattedDate()}   -   ${endDate!.toFormattedDate()}';
       }
     }
 
@@ -90,10 +94,7 @@ class CustomDateRangePickerField extends StatelessWidget {
         ),
         child: Row(
           children: [
-            Icon(
-              Icons.date_range_rounded,
-              color: colorScheme.primary,
-            ),
+            Icon(Icons.date_range_rounded, color: colorScheme.primary),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -103,7 +104,9 @@ class CustomDateRangePickerField extends StatelessWidget {
                 style: TextStyle(
                   fontSize: 15,
                   fontWeight: hasDate ? FontWeight.bold : FontWeight.normal,
-                  color: hasDate ? colorScheme.primary : colorScheme.onSurface.withAlpha(150),
+                  color: hasDate
+                      ? colorScheme.primary
+                      : colorScheme.onSurface.withAlpha(150),
                 ),
               ),
             ),
