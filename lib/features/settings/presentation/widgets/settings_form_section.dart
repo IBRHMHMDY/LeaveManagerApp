@@ -52,7 +52,7 @@ class SettingsFormSection extends StatelessWidget {
         ),
         SizedBox(height: 16.h),
         Text(
-          'الأرصدة المستحقة',
+          'الأرصدة السنويه المستحقة',
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 18.h),
@@ -71,7 +71,7 @@ class SettingsFormSection extends StatelessWidget {
             Expanded(
               child: CustomTextField(
                 label: 'إجمالي العارضة',
-                icon: Icons.event_busy,
+                icon: Icons.event_available,
                 controller: casualLeavesController,
                 keyboardType: TextInputType.number,
                 validator: _numberValidator,

@@ -68,16 +68,21 @@ class _HomeScreenState extends State<HomeScreen> {
             if (state is HomeLoading || state is HomeInitial) {
               return const Center(child: BalancesLoadingShimmer());
             }
-      
             if (state is HomeLoaded) {
               return RefreshIndicator(
                 onRefresh: () async {
                   await context.read<HomeCubit>().loadHomeData();
                 },
                 child: ListView(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16.w,
+                    vertical: 16.h,
+                  ),
                   children: [
-                    WelcomeCard(employeeName: state.settings.employeeName,role: state.settings.jobTitle,),
+                    WelcomeCard(
+                      employeeName: state.settings.employeeName,
+                      role: state.settings.jobTitle,
+                    ),
                     SizedBox(height: 16.h),
                     const BuildFinancialYearCard(),
                     SizedBox(height: 16.h),
@@ -102,24 +107,19 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
-                    
                     const BuildAlertBanners(
                       alertType: AlertType.info,
                       message:
                           'تنبيه: اقترب موعد نهاية السنة المالية، يرجى تسوية رصيد إجازاتك.',
                     ),
-                   
-      
                     BuildBalancesSection(
                       balance: state.balance,
                       settings: state.settings,
                     ),
                     SizedBox(height: 24.h),
-      
+
                     BuildCurrentMonthLeaves(leaves: state.currentMonthLeaves),
-                    SizedBox(
-                      height: 80.h,
-                    ), // مساحة أسفل القائمة لمنع التداخل مع NavigationBar
+                    SizedBox(height: 80.h),
                   ],
                 ),
               );
