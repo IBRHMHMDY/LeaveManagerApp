@@ -9,7 +9,6 @@ import 'package:leave_manager/features/home/presentation/cubit/home_cubit.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_state.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
-import 'package:leave_manager/features/leaves/presentation/widgets/show_add_leave_bottomsheet.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/home/presentation/widgets/balances_loading_shimmer.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_balances_section.dart';
@@ -18,8 +17,6 @@ import 'package:leave_manager/features/home/presentation/widgets/build_financial
 import 'package:leave_manager/app/layout/widgets/welcome_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_alert_banners.dart';
-import 'package:leave_manager/shared/themes/app_colors.dart';
-import 'package:leave_manager/shared/widgets/add_leave_button.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -127,13 +124,6 @@ class _HomeScreenState extends State<HomeScreen> {
             return const SizedBox.shrink();
           },
         ),
-      ),
-      floatingActionButton: AddLeaveButton(
-        onTap: () => showAddLeaveBottomSheet(context),
-        label: const Text('إضافة إجازة'),
-        icon: const Icon(Icons.add),
-        backgroundColor: AppColors.accentCoral,
-        foregroundColor: Colors.white,
       ),
     );
   }

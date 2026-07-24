@@ -6,9 +6,6 @@ import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/build_filter_chips.dart';
-import 'package:leave_manager/features/leaves/presentation/widgets/show_add_leave_bottomsheet.dart';
-import 'package:leave_manager/shared/themes/app_colors.dart';
-import 'package:leave_manager/shared/widgets/add_leave_button.dart';
 import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
@@ -27,16 +24,11 @@ class _LeaveScreenState extends State<LeaveScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('الاجازات'),
-      ),
+      appBar: AppBar(title: const Text('الاجازات')),
       body: BlocListener<LeavesBloc, LeavesState>(
         listener: (context, state) {
           if (state is LeaveDeletedSuccess) {
-            AppToast.showSuccess(
-              context,
-              'تم حذف الإجازة بنجاح',
-            );
+            AppToast.showSuccess(context, 'تم حذف الإجازة بنجاح');
           } else if (state is LeavesError) {
             AppToast.showError(context, state.message);
           }
@@ -51,12 +43,14 @@ class _LeaveScreenState extends State<LeaveScreen> {
                 });
               },
             ),
-            
+
             Expanded(
               child: BlocBuilder<LeavesBloc, LeavesState>(
                 builder: (context, state) {
                   if (state is LeavesLoaded) {
-                    final filteredLeaves = state.currentYearLeaves.where((leave) {
+                    final filteredLeaves = state.currentYearLeaves.where((
+                      leave,
+                    ) {
                       if (_selectedFilter == LeaveFilter.all) {
                         return true;
                       }
@@ -83,22 +77,14 @@ class _LeaveScreenState extends State<LeaveScreen> {
                       },
                     );
                   }
-                  
-                  return  const LeaveListShimmer();
+
+                  return const LeaveListShimmer();
                 },
               ),
             ),
           ],
         ),
       ),
-        floatingActionButton: AddLeaveButton(
-        onTap: () => showAddLeaveBottomSheet(context),
-        label: const Text('إضافة إجازة'),
-        icon: const Icon(Icons.add),
-        backgroundColor: AppColors.accentCoral,
-        foregroundColor: Colors.white,
-      ),
-      
     );
   }
 }

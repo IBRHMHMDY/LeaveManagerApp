@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
-import 'package:leave_manager/shared/themes/app_colors.dart';
 
 class BuildFinancialYearCard extends StatelessWidget {
   const BuildFinancialYearCard({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
     return Card(
       elevation: 0,
       color: Theme.of(context).colorScheme.primaryContainer,
@@ -33,12 +34,12 @@ class BuildFinancialYearCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   const SizedBox(width: 8),
-                  const Text(
+                  Text(
                     'العام المالى الحالى',
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: AppColors.lightText,
+                      color: isDark? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onSurface,
                     ),
                   ),
                   Text(
@@ -46,7 +47,7 @@ class BuildFinancialYearCard extends StatelessWidget {
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.onPrimaryContainer,
+                      color: Theme.of(context).colorScheme.primary,
                     ),
                   ),
                 ],

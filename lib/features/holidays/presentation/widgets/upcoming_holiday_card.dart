@@ -18,7 +18,6 @@ class UpcomingHolidayCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        // الانتقال إلى شاشة قائمة العطلات الرسمية
         context.push(AppRouter.holidays);
       },
       borderRadius: BorderRadius.circular(16.r),

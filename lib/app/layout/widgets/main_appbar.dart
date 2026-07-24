@@ -6,10 +6,8 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    // استدعاء الثيم المخصص من طبقة shared
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
-
     return AppBar(
       backgroundColor: Colors.transparent,
       elevation: 0,
@@ -24,20 +22,12 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               Text(
-                'دفتر إجازاتي',
+                'مدير إجازاتي',
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
-                  color: colorScheme.onSurface, // استخدام لون النص من الثيم
+                  color: colorScheme.onSurface,
                 ),
               ),
-              const SizedBox(height: 8,),
-              // Text(
-              //   'تتبع ذكي وسلس للأرصدة',
-              //   style: theme.textTheme.bodyMedium?.copyWith(
-              //     color: colorScheme.onSurface.withOpacity(0.6),
-              //     fontWeight: FontWeight.w500,
-              //   ),
-              // ),
             ],
           ),
         ],

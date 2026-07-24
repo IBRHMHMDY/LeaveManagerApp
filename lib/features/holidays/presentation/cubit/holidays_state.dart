@@ -21,7 +21,6 @@ class HolidaysLoaded extends HolidaysState {
     required this.financialYearHolidays,
   });
 
-  // وضعنا المتغيرات في props ليقوم Equatable بمقارنتها بشكل صحيح
   @override
   List<Object?> get props => [upcomingHoliday, financialYearHolidays];
 }

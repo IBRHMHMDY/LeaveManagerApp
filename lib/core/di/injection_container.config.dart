@@ -48,6 +48,8 @@ import '../../features/settings/data/repositories/settings_repository_impl.dart'
     as _i955;
 import '../../features/settings/domain/repositories/settings_repository.dart'
     as _i674;
+import '../../features/settings/domain/usecases/check_settings_exist_usecase.dart'
+    as _i787;
 import '../../features/settings/domain/usecases/check_settings_exit_usecase.dart'
     as _i643;
 import '../../features/settings/domain/usecases/get_settings_usecase.dart'
@@ -112,6 +114,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i11.GetUpcomingHolidayUseCase>(),
         gh<_i1053.GetFinancialYearHolidaysUseCase>(),
       ),
+    );
+    gh.lazySingleton<_i787.CheckSettingsExistUseCase>(
+      () => _i787.CheckSettingsExistUseCase(gh<_i674.SettingsRepository>()),
     );
     gh.lazySingleton<_i643.CheckSettingsExistUseCase>(
       () => _i643.CheckSettingsExistUseCase(gh<_i674.SettingsRepository>()),
