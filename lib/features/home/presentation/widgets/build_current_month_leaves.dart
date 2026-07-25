@@ -2,17 +2,27 @@ import 'package:flutter/material.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_card.dart';
 import 'package:leave_manager/shared/themes/app_colors.dart';
 
 class BuildCurrentMonthLeaves extends StatelessWidget {
   final List<LeaveRecord> leaves;
+  // [إضافة] استقبال قائمة الراحات المستهلكة
+  final List<RestAllowance> restAllowances;
 
-  const BuildCurrentMonthLeaves({super.key, required this.leaves});
+  const BuildCurrentMonthLeaves({
+    super.key,
+    required this.leaves,
+    required this.restAllowances,
+  });
 
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    if (leaves.isEmpty) {
+    
+    // إخفاء القسم بالكامل إذا لم يكن هناك إجازات أو راحات مستهلكة
+    if (leaves.isEmpty && restAllowances.isEmpty) {
       return const SizedBox.shrink();
     }
 
@@ -24,24 +34,32 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
           children: [
             const Text(
               'إجازات الشهر الحالي',
-             style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold
-              )
+              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             Text(
               now.toFormatCurrentMonthYear,
               style: const TextStyle(
                 color: AppColors.primaryTeal,
                 fontSize: 16,
-                fontWeight: FontWeight.bold
-              )
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
         const SizedBox(height: 16),
+        
+        // عرض كروت الإجازات العادية
         ...leaves.map((leave) {
-          return CustomLeaveCard(key: ValueKey(leave.id), leave: leave);
+          return CustomLeaveCard(key: ValueKey('leave_${leave.id}'), leave: leave);
+        }),
+
+        // [إضافة] عرض كروت الراحات المستهلكة (طلب إجازة تعويضية)
+        ...restAllowances.map((allowance) {
+          return RestAllowanceCard(
+            key: ValueKey('rest_${allowance.id}'),
+            allowance: allowance,
+            isEarnedTab: false, // نمرر false لعرضها كإجازة مستهلكة
+          );
         }),
       ],
     );

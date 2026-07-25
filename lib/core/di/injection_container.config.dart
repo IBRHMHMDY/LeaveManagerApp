@@ -42,6 +42,22 @@ import '../../features/leaves/domain/usecases/delete_leave_usecase.dart'
 import '../../features/leaves/domain/usecases/get_current_year_leaves_usecase.dart'
     as _i972;
 import '../../features/leaves/presentation/blocs/leaves_bloc.dart' as _i562;
+import '../../features/rest_allowances/data/datasources/rest_allowances_local_data_source.dart'
+    as _i637;
+import '../../features/rest_allowances/data/repositories/rest_allowances_repository_impl.dart'
+    as _i657;
+import '../../features/rest_allowances/domain/repositories/rest_allowances_repository.dart'
+    as _i314;
+import '../../features/rest_allowances/domain/usecases/add_earned_rest_usecase.dart'
+    as _i245;
+import '../../features/rest_allowances/domain/usecases/consume_rest_usecase.dart'
+    as _i51;
+import '../../features/rest_allowances/domain/usecases/delete_rest_allowance_usecase.dart'
+    as _i399;
+import '../../features/rest_allowances/domain/usecases/get_rest_allowances_usecase.dart'
+    as _i285;
+import '../../features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart'
+    as _i673;
 import '../../features/settings/data/datasources/settings_local_data_source.dart'
     as _i599;
 import '../../features/settings/data/repositories/settings_repository_impl.dart'
@@ -85,6 +101,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1005.LeavesLocalDataSource>(
       () => _i1005.LeavesLocalDataSourceImpl(gh<_i982.AppDatabase>()),
     );
+    gh.lazySingleton<_i637.RestAllowancesLocalDataSource>(
+      () => _i637.RestAllowancesLocalDataSourceImpl(gh<_i982.AppDatabase>()),
+    );
+    gh.lazySingleton<_i314.RestAllowancesRepository>(
+      () => _i657.RestAllowancesRepositoryImpl(
+        gh<_i637.RestAllowancesLocalDataSource>(),
+      ),
+    );
     gh.lazySingleton<_i674.SettingsRepository>(
       () => _i955.SettingsRepositoryImpl(gh<_i599.SettingsLocalDataSource>()),
     );
@@ -115,6 +139,21 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1053.GetFinancialYearHolidaysUseCase>(),
       ),
     );
+    gh.lazySingleton<_i245.AddEarnedRestUseCase>(
+      () => _i245.AddEarnedRestUseCase(gh<_i314.RestAllowancesRepository>()),
+    );
+    gh.lazySingleton<_i51.ConsumeRestUseCase>(
+      () => _i51.ConsumeRestUseCase(gh<_i314.RestAllowancesRepository>()),
+    );
+    gh.lazySingleton<_i399.DeleteRestAllowanceUseCase>(
+      () => _i399.DeleteRestAllowanceUseCase(
+        gh<_i314.RestAllowancesRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i285.GetRestAllowancesUseCase>(
+      () =>
+          _i285.GetRestAllowancesUseCase(gh<_i314.RestAllowancesRepository>()),
+    );
     gh.lazySingleton<_i787.CheckSettingsExistUseCase>(
       () => _i787.CheckSettingsExistUseCase(gh<_i674.SettingsRepository>()),
     );
@@ -137,6 +176,14 @@ extension GetItInjectableX on _i174.GetIt {
         saveSettings: gh<_i109.SaveSettingsUseCase>(),
       ),
     );
+    gh.factory<_i673.RestAllowancesBloc>(
+      () => _i673.RestAllowancesBloc(
+        getRestAllowances: gh<_i285.GetRestAllowancesUseCase>(),
+        addEarnedRest: gh<_i245.AddEarnedRestUseCase>(),
+        consumeRest: gh<_i51.ConsumeRestUseCase>(),
+        deleteRestAllowance: gh<_i399.DeleteRestAllowanceUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i501.DeleteLeaveUseCase>(
       () => _i501.DeleteLeaveUseCase(gh<_i388.LeaveRepository>()),
     );
@@ -149,17 +196,18 @@ extension GetItInjectableX on _i174.GetIt {
         getCurrentYearLeavesUseCase: gh<_i972.GetCurrentYearLeavesUseCase>(),
       ),
     );
-    gh.lazySingleton<_i442.AddLeaveUseCase>(
-      () => _i442.AddLeaveUseCase(
-        repository: gh<_i388.LeaveRepository>(),
-        calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
-      ),
-    );
     gh.factory<_i9.HomeCubit>(
       () => _i9.HomeCubit(
         getSettings: gh<_i1029.GetSettingsUseCase>(),
         calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
         getCurrentYearLeaves: gh<_i972.GetCurrentYearLeavesUseCase>(),
+        getRestAllowances: gh<_i285.GetRestAllowancesUseCase>(),
+      ),
+    );
+    gh.lazySingleton<_i442.AddLeaveUseCase>(
+      () => _i442.AddLeaveUseCase(
+        repository: gh<_i388.LeaveRepository>(),
+        calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
       ),
     );
     gh.factory<_i562.LeavesBloc>(

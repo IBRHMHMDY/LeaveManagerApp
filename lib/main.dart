@@ -7,6 +7,7 @@ import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_cubit.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/shared/themes/app_theme.dart';
 import 'package:leave_manager/shared/themes/theme_cubit.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
@@ -37,6 +38,7 @@ class LeaveManagerApp extends StatelessWidget {
             BlocProvider(
               create: (_) => sl<HolidaysCubit>()..loadHolidays(),
             ),
+            BlocProvider(create: (_) => sl<RestAllowancesBloc>()),
           ],
           child: BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {

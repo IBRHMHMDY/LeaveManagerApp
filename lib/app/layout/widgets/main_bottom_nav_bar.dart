@@ -1,4 +1,3 @@
-// lib/app/layout/widgets/main_bottom_nav_bar.dart
 import 'package:flutter/material.dart';
 
 class MainBottomNavBar extends StatelessWidget {
@@ -52,19 +51,28 @@ class MainBottomNavBar extends StatelessWidget {
           indicatorColor: colorScheme.primary.withAlpha(40),
           animationDuration: const Duration(milliseconds: 400),
           destinations: [
+            // 0: الرئيسية
             NavigationDestination(
-              icon: Icon(Icons.home, color: colorScheme.onSurfaceVariant),
-              selectedIcon: Icon(Icons.home, color: colorScheme.primary),
+              icon: Icon(Icons.home_outlined, color: colorScheme.onSurfaceVariant),
+              selectedIcon: Icon(Icons.home_rounded, color: colorScheme.primary),
               label: 'الرئيسية',
             ),
+            // 1: الإجازات
             NavigationDestination(
-              icon: Icon(Icons.calendar_month, color: colorScheme.onSurfaceVariant),
-              selectedIcon: Icon(Icons.calendar_month, color: colorScheme.primary),
-              label: 'الاجازات',
+              icon: Icon(Icons.calendar_month_outlined, color: colorScheme.onSurfaceVariant),
+              selectedIcon: Icon(Icons.calendar_month_rounded, color: colorScheme.primary),
+              label: 'الإجازات',
             ),
+            // 2: بدلات الراحة [إضافة جديدة]
             NavigationDestination(
-              icon: Icon(Icons.settings, color: colorScheme.onSurfaceVariant),
-              selectedIcon: Icon(Icons.settings, color: colorScheme.primary),
+              icon: Icon(Icons.workspace_premium_outlined, color: colorScheme.onSurfaceVariant),
+              selectedIcon: Icon(Icons.workspace_premium_rounded, color: colorScheme.primary),
+              label: 'بدلات الراحة',
+            ),
+            // 3: الإعدادات
+            NavigationDestination(
+              icon: Icon(Icons.settings_outlined, color: colorScheme.onSurfaceVariant),
+              selectedIcon: Icon(Icons.settings_rounded, color: colorScheme.primary),
               label: 'الإعدادات',
             ),
           ],

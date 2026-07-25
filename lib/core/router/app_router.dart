@@ -6,6 +6,7 @@ import 'package:leave_manager/app/layout/main_layout.dart';
 import 'package:leave_manager/features/holidays/presentation/screens/holidays_screen.dart';
 import 'package:leave_manager/features/home/presentation/screens/home_screen.dart';
 import 'package:leave_manager/features/leaves/presentation/screens/leave_screen.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/screens/rest_allowances_screen.dart'; // [إضافة] شاشة بدلات الراحة
 import 'package:leave_manager/features/settings/presentation/screens/settings_screen.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
@@ -17,6 +18,7 @@ class AppRouter {
   static const String home = '/home';
   static const String leaves = '/leaves';
   static const String holidays = '/holidays';
+  static const String restAllowances = '/rest_allowances'; // [إضافة] مسار بدلات الراحة
   static const String settings = '/settings';
   static const String setup = '/setup';
 
@@ -35,13 +37,13 @@ class AppRouter {
           body: SafeArea(child: SettingsScreen(isFirstTime: true)),
         ),
       ),
-      // استخدام StatefulShellRoute.indexedStack لإدارة التبويبات
+      // إدارة الـ Bottom Navigation باستخدام StatefulShellRoute
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainLayout(navigationShell: navigationShell);
         },
         branches: [
-          // الفرع الأول: الرئيسية
+          // الفرع الأول (0): الرئيسية والعطلات
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -54,7 +56,7 @@ class AppRouter {
               ),
             ],
           ),
-          // الفرع الثاني: الإجازات
+          // الفرع الثاني (1): الإجازات
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -63,7 +65,16 @@ class AppRouter {
               ),
             ],
           ),
-          // الفرع الثالث: الإعدادات
+          // الفرع الثالث (2): بدلات الراحة [إضافة جديدة]
+          StatefulShellBranch(
+            routes: [
+              GoRoute(
+                path: restAllowances,
+                builder: (context, state) => const RestAllowancesScreen(),
+              ),
+            ],
+          ),
+          // الفرع الرابع (3): الإعدادات
           StatefulShellBranch(
             routes: [
               GoRoute(

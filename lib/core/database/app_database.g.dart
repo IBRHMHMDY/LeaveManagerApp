@@ -1122,6 +1122,314 @@ class HolidaysTableCompanion extends UpdateCompanion<HolidayModel> {
   }
 }
 
+class $RestAllowancesTableTable extends RestAllowancesTable
+    with TableInfo<$RestAllowancesTableTable, RestAllowanceModel> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $RestAllowancesTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _earnedDateMeta = const VerificationMeta(
+    'earnedDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> earnedDate = GeneratedColumn<DateTime>(
+    'earned_date',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _consumedDateMeta = const VerificationMeta(
+    'consumedDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> consumedDate = GeneratedColumn<DateTime>(
+    'consumed_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
+  @override
+  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
+    'notes',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [id, earnedDate, consumedDate, notes];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'rest_allowances_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<RestAllowanceModel> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('earned_date')) {
+      context.handle(
+        _earnedDateMeta,
+        earnedDate.isAcceptableOrUnknown(data['earned_date']!, _earnedDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_earnedDateMeta);
+    }
+    if (data.containsKey('consumed_date')) {
+      context.handle(
+        _consumedDateMeta,
+        consumedDate.isAcceptableOrUnknown(
+          data['consumed_date']!,
+          _consumedDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('notes')) {
+      context.handle(
+        _notesMeta,
+        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  RestAllowanceModel map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return RestAllowanceModel(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      earnedDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}earned_date'],
+      )!,
+      consumedDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}consumed_date'],
+      ),
+      notes: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notes'],
+      ),
+    );
+  }
+
+  @override
+  $RestAllowancesTableTable createAlias(String alias) {
+    return $RestAllowancesTableTable(attachedDatabase, alias);
+  }
+}
+
+class RestAllowanceModel extends DataClass
+    implements Insertable<RestAllowanceModel> {
+  final int id;
+  final DateTime earnedDate;
+  final DateTime? consumedDate;
+  final String? notes;
+  const RestAllowanceModel({
+    required this.id,
+    required this.earnedDate,
+    this.consumedDate,
+    this.notes,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['earned_date'] = Variable<DateTime>(earnedDate);
+    if (!nullToAbsent || consumedDate != null) {
+      map['consumed_date'] = Variable<DateTime>(consumedDate);
+    }
+    if (!nullToAbsent || notes != null) {
+      map['notes'] = Variable<String>(notes);
+    }
+    return map;
+  }
+
+  RestAllowancesTableCompanion toCompanion(bool nullToAbsent) {
+    return RestAllowancesTableCompanion(
+      id: Value(id),
+      earnedDate: Value(earnedDate),
+      consumedDate: consumedDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(consumedDate),
+      notes: notes == null && nullToAbsent
+          ? const Value.absent()
+          : Value(notes),
+    );
+  }
+
+  factory RestAllowanceModel.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return RestAllowanceModel(
+      id: serializer.fromJson<int>(json['id']),
+      earnedDate: serializer.fromJson<DateTime>(json['earnedDate']),
+      consumedDate: serializer.fromJson<DateTime?>(json['consumedDate']),
+      notes: serializer.fromJson<String?>(json['notes']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'earnedDate': serializer.toJson<DateTime>(earnedDate),
+      'consumedDate': serializer.toJson<DateTime?>(consumedDate),
+      'notes': serializer.toJson<String?>(notes),
+    };
+  }
+
+  RestAllowanceModel copyWith({
+    int? id,
+    DateTime? earnedDate,
+    Value<DateTime?> consumedDate = const Value.absent(),
+    Value<String?> notes = const Value.absent(),
+  }) => RestAllowanceModel(
+    id: id ?? this.id,
+    earnedDate: earnedDate ?? this.earnedDate,
+    consumedDate: consumedDate.present ? consumedDate.value : this.consumedDate,
+    notes: notes.present ? notes.value : this.notes,
+  );
+  RestAllowanceModel copyWithCompanion(RestAllowancesTableCompanion data) {
+    return RestAllowanceModel(
+      id: data.id.present ? data.id.value : this.id,
+      earnedDate: data.earnedDate.present
+          ? data.earnedDate.value
+          : this.earnedDate,
+      consumedDate: data.consumedDate.present
+          ? data.consumedDate.value
+          : this.consumedDate,
+      notes: data.notes.present ? data.notes.value : this.notes,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RestAllowanceModel(')
+          ..write('id: $id, ')
+          ..write('earnedDate: $earnedDate, ')
+          ..write('consumedDate: $consumedDate, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, earnedDate, consumedDate, notes);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is RestAllowanceModel &&
+          other.id == this.id &&
+          other.earnedDate == this.earnedDate &&
+          other.consumedDate == this.consumedDate &&
+          other.notes == this.notes);
+}
+
+class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
+  final Value<int> id;
+  final Value<DateTime> earnedDate;
+  final Value<DateTime?> consumedDate;
+  final Value<String?> notes;
+  const RestAllowancesTableCompanion({
+    this.id = const Value.absent(),
+    this.earnedDate = const Value.absent(),
+    this.consumedDate = const Value.absent(),
+    this.notes = const Value.absent(),
+  });
+  RestAllowancesTableCompanion.insert({
+    this.id = const Value.absent(),
+    required DateTime earnedDate,
+    this.consumedDate = const Value.absent(),
+    this.notes = const Value.absent(),
+  }) : earnedDate = Value(earnedDate);
+  static Insertable<RestAllowanceModel> custom({
+    Expression<int>? id,
+    Expression<DateTime>? earnedDate,
+    Expression<DateTime>? consumedDate,
+    Expression<String>? notes,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (earnedDate != null) 'earned_date': earnedDate,
+      if (consumedDate != null) 'consumed_date': consumedDate,
+      if (notes != null) 'notes': notes,
+    });
+  }
+
+  RestAllowancesTableCompanion copyWith({
+    Value<int>? id,
+    Value<DateTime>? earnedDate,
+    Value<DateTime?>? consumedDate,
+    Value<String?>? notes,
+  }) {
+    return RestAllowancesTableCompanion(
+      id: id ?? this.id,
+      earnedDate: earnedDate ?? this.earnedDate,
+      consumedDate: consumedDate ?? this.consumedDate,
+      notes: notes ?? this.notes,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (earnedDate.present) {
+      map['earned_date'] = Variable<DateTime>(earnedDate.value);
+    }
+    if (consumedDate.present) {
+      map['consumed_date'] = Variable<DateTime>(consumedDate.value);
+    }
+    if (notes.present) {
+      map['notes'] = Variable<String>(notes.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('RestAllowancesTableCompanion(')
+          ..write('id: $id, ')
+          ..write('earnedDate: $earnedDate, ')
+          ..write('consumedDate: $consumedDate, ')
+          ..write('notes: $notes')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1129,6 +1437,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LeaveRecordsTableTable leaveRecordsTable =
       $LeaveRecordsTableTable(this);
   late final $HolidaysTableTable holidaysTable = $HolidaysTableTable(this);
+  late final $RestAllowancesTableTable restAllowancesTable =
+      $RestAllowancesTableTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1137,6 +1447,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     settingsTable,
     leaveRecordsTable,
     holidaysTable,
+    restAllowancesTable,
   ];
 }
 
@@ -1760,6 +2071,201 @@ typedef $$HolidaysTableTableProcessedTableManager =
       HolidayModel,
       PrefetchHooks Function()
     >;
+typedef $$RestAllowancesTableTableCreateCompanionBuilder =
+    RestAllowancesTableCompanion Function({
+      Value<int> id,
+      required DateTime earnedDate,
+      Value<DateTime?> consumedDate,
+      Value<String?> notes,
+    });
+typedef $$RestAllowancesTableTableUpdateCompanionBuilder =
+    RestAllowancesTableCompanion Function({
+      Value<int> id,
+      Value<DateTime> earnedDate,
+      Value<DateTime?> consumedDate,
+      Value<String?> notes,
+    });
+
+class $$RestAllowancesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
+  $$RestAllowancesTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get earnedDate => $composableBuilder(
+    column: $table.earnedDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get consumedDate => $composableBuilder(
+    column: $table.consumedDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$RestAllowancesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
+  $$RestAllowancesTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get earnedDate => $composableBuilder(
+    column: $table.earnedDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get consumedDate => $composableBuilder(
+    column: $table.consumedDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get notes => $composableBuilder(
+    column: $table.notes,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$RestAllowancesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
+  $$RestAllowancesTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get earnedDate => $composableBuilder(
+    column: $table.earnedDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get consumedDate => $composableBuilder(
+    column: $table.consumedDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notes =>
+      $composableBuilder(column: $table.notes, builder: (column) => column);
+}
+
+class $$RestAllowancesTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $RestAllowancesTableTable,
+          RestAllowanceModel,
+          $$RestAllowancesTableTableFilterComposer,
+          $$RestAllowancesTableTableOrderingComposer,
+          $$RestAllowancesTableTableAnnotationComposer,
+          $$RestAllowancesTableTableCreateCompanionBuilder,
+          $$RestAllowancesTableTableUpdateCompanionBuilder,
+          (
+            RestAllowanceModel,
+            BaseReferences<
+              _$AppDatabase,
+              $RestAllowancesTableTable,
+              RestAllowanceModel
+            >,
+          ),
+          RestAllowanceModel,
+          PrefetchHooks Function()
+        > {
+  $$RestAllowancesTableTableTableManager(
+    _$AppDatabase db,
+    $RestAllowancesTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$RestAllowancesTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$RestAllowancesTableTableOrderingComposer(
+                $db: db,
+                $table: table,
+              ),
+          createComputedFieldComposer: () =>
+              $$RestAllowancesTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<DateTime> earnedDate = const Value.absent(),
+                Value<DateTime?> consumedDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+              }) => RestAllowancesTableCompanion(
+                id: id,
+                earnedDate: earnedDate,
+                consumedDate: consumedDate,
+                notes: notes,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required DateTime earnedDate,
+                Value<DateTime?> consumedDate = const Value.absent(),
+                Value<String?> notes = const Value.absent(),
+              }) => RestAllowancesTableCompanion.insert(
+                id: id,
+                earnedDate: earnedDate,
+                consumedDate: consumedDate,
+                notes: notes,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$RestAllowancesTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $RestAllowancesTableTable,
+      RestAllowanceModel,
+      $$RestAllowancesTableTableFilterComposer,
+      $$RestAllowancesTableTableOrderingComposer,
+      $$RestAllowancesTableTableAnnotationComposer,
+      $$RestAllowancesTableTableCreateCompanionBuilder,
+      $$RestAllowancesTableTableUpdateCompanionBuilder,
+      (
+        RestAllowanceModel,
+        BaseReferences<
+          _$AppDatabase,
+          $RestAllowancesTableTable,
+          RestAllowanceModel
+        >,
+      ),
+      RestAllowanceModel,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -1770,4 +2276,6 @@ class $AppDatabaseManager {
       $$LeaveRecordsTableTableTableManager(_db, _db.leaveRecordsTable);
   $$HolidaysTableTableTableManager get holidaysTable =>
       $$HolidaysTableTableTableManager(_db, _db.holidaysTable);
+  $$RestAllowancesTableTableTableManager get restAllowancesTable =>
+      $$RestAllowancesTableTableTableManager(_db, _db.restAllowancesTable);
 }

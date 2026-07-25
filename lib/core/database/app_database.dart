@@ -6,15 +6,16 @@ import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'tables/settings_table.dart';
 import 'tables/leave_records_table.dart';
+import 'tables/rest_allowances_table.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [SettingsTable, LeaveRecordsTable, HolidaysTable])
+@DriftDatabase(tables: [SettingsTable, LeaveRecordsTable, HolidaysTable,RestAllowancesTable])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 2;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -25,6 +26,9 @@ class AppDatabase extends _$AppDatabase {
       onUpgrade: (Migrator m, int from, int to) async {
         if (from == 1) {
           await m.createTable(holidaysTable);
+        }
+        if (from < 3) {
+          await m.createTable(restAllowancesTable);
         }
       },
     );

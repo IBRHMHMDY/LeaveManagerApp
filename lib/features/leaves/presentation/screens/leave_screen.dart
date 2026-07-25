@@ -60,7 +60,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
                       return leave.leaveType == LeaveType.casual;
                     }).toList();
                     if (filteredLeaves.isEmpty) {
-                      return const CustomEmptyState();
+                      return const CustomEmptyState(titleEmpty: 'لا توجد اجازات مسجله حتى الآن',contentEmpty: 'قم بتسجيل اجازتك الاولى',);
                     }
                     return ListView.builder(
                       padding: EdgeInsets.symmetric(

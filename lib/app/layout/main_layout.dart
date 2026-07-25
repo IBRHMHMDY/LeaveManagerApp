@@ -7,7 +7,6 @@ import 'package:leave_manager/features/leaves/presentation/widgets/show_add_leav
 import 'package:leave_manager/shared/themes/app_colors.dart';
 import 'package:leave_manager/shared/widgets/add_leave_button.dart';
 
-/// الواجهة الهيكلية الرئيسية (Layout) باستخدام GoRouter
 class MainLayout extends StatelessWidget {
   final StatefulNavigationShell navigationShell;
 
@@ -50,15 +49,17 @@ class MainLayout extends StatelessWidget {
 
   Widget? _buildFloatingActionButton(BuildContext context) {
     final currentIndex = navigationShell.currentIndex;
-    if (currentIndex > 1) {
+    
+    // إخفاء الـ FAB في شاشة بدلات الراحة (2) والإعدادات (3)
+    if (currentIndex >= 2) {
       return null;
     }
-
+    
     return AddLeaveButton(
       onTap: () => showAddLeaveBottomSheet(context),
-      label: const Text('إضافة إجازة'),
+      label: const Text('إجازة جديدة'),
       icon: const Icon(Icons.add),
-      backgroundColor:  AppColors.primaryTeal,
+      backgroundColor: AppColors.primaryTeal,
       foregroundColor: Colors.white,
     );
   }
