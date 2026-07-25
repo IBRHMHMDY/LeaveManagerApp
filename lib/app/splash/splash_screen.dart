@@ -152,7 +152,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              'إدارة ذكية لإجازاتك السنوية',
+                              'تتبع إجازاتك بذكاء وسهولة',
                               style: Theme.of(context).textTheme.titleSmall?.copyWith(
                                     color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w600,
