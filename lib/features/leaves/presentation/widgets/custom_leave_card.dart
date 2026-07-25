@@ -191,8 +191,8 @@ class _LeaveDetails extends StatelessWidget {
             Expanded(
               child: Text(
                 leave.startDate.isAtSameMomentAs(leave.endDate) 
-                    ? leave.startDate.toFormattedDate() 
-                    : '${leave.startDate.toFormattedDate()}  -  ${leave.endDate.toFormattedDate()}',
+                    ? leave.startDate.toFormatCurrentLocale() 
+                    : '${leave.startDate.toFormatCurrentLocale()}  -  ${leave.endDate.toFormatCurrentLocale()}',
                 style: TextStyle(
                   fontSize: 13.5.sp, // متجاوب
                   color: colorScheme.onSurface,

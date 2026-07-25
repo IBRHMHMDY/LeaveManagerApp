@@ -58,6 +58,26 @@ class UpcomingHolidayCard extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (upcomingHoliday != null)
+                    Container(
+                      padding: EdgeInsets.symmetric(
+                        horizontal: 12.w,
+                        vertical: 8.h,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colorScheme.primary.withAlpha(20),
+                        borderRadius: BorderRadius.circular(20.r),
+                      ),
+                      child: Text(
+                        upcomingHoliday!.daysLeft.remainingDaysText,
+                        style: TextStyle(
+                          fontSize: 11.sp,
+                          fontWeight: FontWeight.bold,
+                          color: colorScheme.primary,
+                        ),
+                      ),
+                    ),
+                  SizedBox(height: 8.h),
                   if (upcomingHoliday != null) ...[
                     Text(
                       upcomingHoliday!.name,
@@ -69,7 +89,7 @@ class UpcomingHolidayCard extends StatelessWidget {
                     ),
                     SizedBox(height: 2.h),
                     Text(
-                      upcomingHoliday!.startDate.toHolidayFormat(),
+                      upcomingHoliday!.startDate.toFormatFullDaysDate(),
                       style: TextStyle(
                         fontSize: 14.sp,
                         color: colorScheme.primary,
@@ -86,23 +106,8 @@ class UpcomingHolidayCard extends StatelessWidget {
                       ),
                     ),
                   ],
-                  SizedBox(height: 8.h,),
-                  if (upcomingHoliday != null)
-                        Container(
-                          padding: EdgeInsets.symmetric(horizontal: 12.w, vertical: 8.h),
-                          decoration: BoxDecoration(
-                            color: colorScheme.primary.withAlpha(20),
-                            borderRadius: BorderRadius.circular(20.r),
-                          ),
-                          child: Text(
-                            upcomingHoliday!.daysLeft.remainingDaysText,
-                            style: TextStyle(
-                              fontSize: 11.sp,
-                              fontWeight: FontWeight.bold,
-                              color: colorScheme.primary,
-                            ),
-                          ),
-                        ),
+                  
+                  
                 ],
               ),
             ),

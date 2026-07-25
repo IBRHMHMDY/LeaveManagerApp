@@ -30,7 +30,7 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
               )
             ),
             Text(
-              now.currentMonthYear,
+              now.toFormatCurrentMonthYear,
               style: const TextStyle(
                 color: AppColors.primaryTeal,
                 fontSize: 16,

@@ -1,5 +1,4 @@
 // lib/features/leaves/presentation/widgets/add_leave_form.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -36,12 +35,11 @@ class AddLeaveFormState extends State<AddLeaveForm> {
     super.dispose();
   }
 
-  /// دالة للتحقق مما إذا كان اليوم يقع ضمن أي عطلة رسمية أو إجازة مسجلة مسبقاً
+  /// التحقق من أن اليوم غير محجوز مسبقاً كعطلة أو كإجازة سابقة (تمنع النقر المباشر)
   bool _isDaySelectable(
       DateTime day, List<Holiday> holidays, List<LeaveRecord> existingLeaves) {
     final dateToCheck = DateTime(day.year, day.month, day.day);
 
-    // 1. التحقق من العطلات الرسمية
     for (final holiday in holidays) {
       final start = DateTime(
           holiday.startDate.year, holiday.startDate.month, holiday.startDate.day);
@@ -50,11 +48,10 @@ class AddLeaveFormState extends State<AddLeaveForm> {
 
       if ((dateToCheck.isAtSameMomentAs(start) || dateToCheck.isAfter(start)) &&
           (dateToCheck.isAtSameMomentAs(end) || dateToCheck.isBefore(end))) {
-        return false; // اليوم ضمن عطلة رسمية
+        return false;
       }
     }
 
-    // 2. التحقق من الإجازات المسجلة مسبقاً للموظف
     for (final leave in existingLeaves) {
       final start = DateTime(
           leave.startDate.year, leave.startDate.month, leave.startDate.day);
@@ -63,11 +60,35 @@ class AddLeaveFormState extends State<AddLeaveForm> {
 
       if ((dateToCheck.isAtSameMomentAs(start) || dateToCheck.isAfter(start)) &&
           (dateToCheck.isAtSameMomentAs(end) || dateToCheck.isBefore(end))) {
-        return false; // اليوم تم تسجيله كإجازة مسبقاً
+        return false;
       }
     }
 
-    return true; // يمكن اختياره
+    return true;
+  }
+
+  /// التحقق من تداخل النطاق الزمني بالكامل مع أي عطلة أو إجازة سابقة (تمنع التحديد الممتد)
+  bool _hasOverlap(DateTime start, DateTime end, List<Holiday> holidays, List<LeaveRecord> existingLeaves) {
+    final rangeStart = DateTime(start.year, start.month, start.day);
+    final rangeEnd = DateTime(end.year, end.month, end.day);
+
+    // 1. التحقق من التقاطع مع العطلات الرسمية
+    for (final holiday in holidays) {
+      final hStart = DateTime(holiday.startDate.year, holiday.startDate.month, holiday.startDate.day);
+      final hEnd = DateTime(holiday.endDate.year, holiday.endDate.month, holiday.endDate.day);
+      // إذا كان النطاق يتقاطع مع العطلة
+      if (!rangeStart.isAfter(hEnd) && !rangeEnd.isBefore(hStart)) return true;
+    }
+
+    // 2. التحقق من التقاطع مع الإجازات السابقة
+    for (final leave in existingLeaves) {
+      final lStart = DateTime(leave.startDate.year, leave.startDate.month, leave.startDate.day);
+      final lEnd = DateTime(leave.endDate.year, leave.endDate.month, leave.endDate.day);
+      // إذا كان النطاق يتقاطع مع إجازة سابقة
+      if (!rangeStart.isAfter(lEnd) && !rangeEnd.isBefore(lStart)) return true;
+    }
+
+    return false;
   }
 
   @override
@@ -77,14 +98,12 @@ class AddLeaveFormState extends State<AddLeaveForm> {
     final borderColor = isDark ? Colors.white24 : Colors.grey.shade300;
     final fillColor = isDark ? Colors.black12 : Colors.grey.shade50;
 
-    // جلب العطلات الرسمية
     final holidaysState = context.watch<HolidaysCubit>().state;
     List<Holiday> holidays = [];
     if (holidaysState is HolidaysLoaded) {
       holidays = holidaysState.financialYearHolidays;
     }
 
-    // جلب الإجازات المسجلة مسبقاً
     final leavesState = context.watch<LeavesBloc>().state;
     List<LeaveRecord> existingLeaves = [];
     if (leavesState is LeavesLoaded) {
@@ -95,11 +114,9 @@ class AddLeaveFormState extends State<AddLeaveForm> {
       bloc: context.read<LeavesBloc>(),
       listener: (context, state) {
         if (state is LeaveAddedSuccess) {
-          AppToast.showSuccess(context, 'تمت إضافة الإجازة بنجاح');
+          AppToast.showSuccess(context, 'تم إضافة الإجازة بنجاح');
           context.pop();
-        } 
-        // 👇 إضافة الاستماع لحالة الخطأ لعرض التنبيه
-        else if (state is LeavesError) {
+        } else if (state is LeavesError) {
           AppToast.showError(context, state.message);
         }
       },
@@ -111,11 +128,10 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             initialValue: _selectedType,
             dropdownColor: colorScheme.surface,
             style: TextStyle(
-              color: colorScheme.onSurface,
-              fontSize: 16.sp,
-              fontFamily: 'Cairo',
-              fontWeight: FontWeight.bold
-            ),
+                color: colorScheme.onSurface,
+                fontSize: 16.sp,
+                fontFamily: 'Cairo',
+                fontWeight: FontWeight.bold),
             decoration: InputDecoration(
               labelText: 'نوع الإجازة',
               labelStyle: TextStyle(
@@ -147,7 +163,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             items: const [
               DropdownMenuItem(
                 value: LeaveType.regular,
-                child: Text('إعتيادي'),
+                child: Text('اعتيادي'),
               ),
               DropdownMenuItem(value: LeaveType.casual, child: Text('عارضة')),
             ],
@@ -160,14 +176,13 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             },
           ),
           SizedBox(height: 16.h),
-          
+
           CustomDateRangePickerField(
             startDate: _startDate,
             endDate: _endDate,
-            hintText: 'تاريخ بداية ونهاية الإجازة',
+            hintText: 'اختر تاريخ الإجازة',
             firstDate: FinancialYearCalculator.currentFinancialYearStart,
-            lastDate: DateTime.now(),
-            // 👇 تمرير الإجازات المسجلة مع العطلات لمنع المستخدم من اختيارها أصلاً
+            lastDate: DateTime(DateTime.now().year + 10),
             selectableDayPredicate: (day) =>
                 _isDaySelectable(day, holidays, existingLeaves),
             onDateSelected: (DateTimeRange? pickedRange) {
@@ -180,14 +195,14 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             },
           ),
           SizedBox(height: 16.h),
-          
+
           CustomTextField(
             label: 'ملاحظات (اختياري)',
             icon: Icons.notes_rounded,
             controller: _notesController,
           ),
           SizedBox(height: 8.h),
-          
+
           BlocBuilder<LeavesBloc, LeavesState>(
             bloc: context.read<LeavesBloc>(),
             builder: (context, state) {
@@ -206,6 +221,16 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                     ? null
                     : () {
                         if (_startDate != null && _endDate != null) {
+                          
+                          // التحقق من تداخل النطاق المختار مع أي عطلة أو إجازة
+                          if (_hasOverlap(_startDate!, _endDate!, holidays, existingLeaves)) {
+                            AppToast.showError(
+                              context, 
+                              'الفترة المحددة تتخللها عطلة رسمية أو إجازة سابقة. يرجى تقسيم الإجازة.'
+                            );
+                            return;
+                          }
+
                           final daysCount =
                               _endDate!.difference(_startDate!).inDays + 1;
                           final record = LeaveRecord(
@@ -231,7 +256,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                         ),
                       )
                     : Text(
-                        'إضافه أجازه',
+                        'إضافة الإجازة',
                         style: TextStyle(
                           fontSize: 16.sp,
                           fontWeight: FontWeight.bold,

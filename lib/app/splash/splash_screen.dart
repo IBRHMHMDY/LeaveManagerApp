@@ -1,3 +1,4 @@
+// lib/app/splash/splash_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,8 +20,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _logoScaleAnimation;
   late Animation<Offset> _textSlideAnimation;
@@ -29,46 +29,36 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-
-    // إخفاء الأشرطة للحصول على شاشة كاملة
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-
-    // 1. إعداد المتحكم في الحركة (Animation Controller)
+    
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(
-        milliseconds: 2000,
-      ), // مدة الحركة أصبحت أسرع وأكثر حيوية
+      duration: const Duration(milliseconds: 2000), 
     );
-
-    // 2. حركة ارتداد (Elastic Bounce) للشعار
+    
     _logoScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
       ),
     );
-
-    // 3. حركة انزلاق (Slide Up) للنصوص للأعلى
-    _textSlideAnimation =
-        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
-          ),
-        );
-
-    // 4. ظهور تدريجي عام (Fade)
+    
+    _textSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
+    
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.2, 1.0, curve: Curves.easeIn),
       ),
     );
-
+    
     _animationController.forward();
-
-    // تقليل وقت الانتظار إلى 3 ثوانٍ لتحسين الـ UX
+    
     Future.delayed(const Duration(milliseconds: 3000), () {
       if (mounted) {
         context.read<SettingsBloc>().add(CheckSettingsEvent());
@@ -85,21 +75,24 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   Widget build(BuildContext context) {
     return BlocListener<SettingsBloc, SettingsState>(
-      listener: (context, state) {
-if (state is SettingsExists) {
+      listener: (context, state) { 
+        if (state is SettingsExists) {
           context.read<SettingsBloc>().add(LoadSettingsEvent());
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
           context.go(AppRouter.home);
         } else if (state is SettingsNotFound) {
-          context.go(AppRouter.settings, extra: true);
+          // التوجيه إلى مسار الإعداد المستقل
+          context.go(AppRouter.setup); 
         } else if (state is SettingsError) {
           AppToast.showError(context, state.message);
-          context.go(AppRouter.settings, extra: true); 
+          // التوجيه إلى مسار الإعداد المستقل في حالة الخطأ أيضاً
+          context.go(AppRouter.setup); 
         }
       },
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
         body: Stack(
+          // ... (باقي الكود كما هو دون تغيير في تصميم الـ Stack)
           children: [
             Positioned(
               top: -100,
@@ -125,19 +118,15 @@ if (state is SettingsExists) {
                 ),
               ),
             ),
-
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  // الشعار المخصص مع حركة التكبير والارتداد
                   ScaleTransition(
                     scale: _logoScaleAnimation,
                     child: CustomAppLogo(context),
                   ),
                   const SizedBox(height: 32),
-
-                  // النصوص مع حركة الانزلاق والظهور
                   SlideTransition(
                     position: _textSlideAnimation,
                     child: FadeTransition(
@@ -145,34 +134,27 @@ if (state is SettingsExists) {
                       child: Column(
                         children: [
                           Text(
-                            'مدير اجازاتى',
-                            style: Theme.of(context).textTheme.headlineMedium
-                                ?.copyWith(
+                            'مدير إجازاتي',
+                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
                                   fontWeight: FontWeight.w900,
                                   color: Theme.of(context).colorScheme.primary,
                                   letterSpacing: 1.2,
                                 ),
                           ),
                           const SizedBox(height: 12),
-                          // استخدام شارة (Chip) للنص الفرعي ليكون أكثر عصرية
                           Container(
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(
-                                context,
-                              ).colorScheme.primaryContainer.withAlpha(150),
+                              color: Theme.of(context).colorScheme.primaryContainer.withAlpha(150),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
-                              'نظم إجازاتك بسهولة وذكاء',
-                              style: Theme.of(context).textTheme.titleSmall
-                                  ?.copyWith(
-                                    color: Theme.of(
-                                      context,
-                                    ).colorScheme.primary,
+                              'إدارة ذكية لإجازاتك السنوية',
+                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                                    color: Theme.of(context).colorScheme.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
                             ),
@@ -184,8 +166,6 @@ if (state is SettingsExists) {
                 ],
               ),
             ),
-
-            // مؤشر التحميل والإصدار في الأسفل
             Positioned(
               bottom: 48,
               left: 0,
@@ -199,9 +179,7 @@ if (state is SettingsExists) {
                       height: 32,
                       child: CircularProgressIndicator(
                         strokeWidth: 3.5,
-                        color: Theme.of(
-                          context,
-                        ).colorScheme.primary.withAlpha(150),
+                        color: Theme.of(context).colorScheme.primary.withAlpha(150),
                         strokeCap: StrokeCap.round,
                       ),
                     ),
