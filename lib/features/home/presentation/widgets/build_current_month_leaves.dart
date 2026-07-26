@@ -8,7 +8,6 @@ import 'package:leave_manager/shared/themes/app_colors.dart';
 
 class BuildCurrentMonthLeaves extends StatelessWidget {
   final List<LeaveRecord> leaves;
-  // [إضافة] استقبال قائمة الراحات المستهلكة
   final List<RestAllowance> restAllowances;
 
   const BuildCurrentMonthLeaves({
@@ -21,7 +20,6 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     
-    // إخفاء القسم بالكامل إذا لم يكن هناك إجازات أو راحات مستهلكة
     if (leaves.isEmpty && restAllowances.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -48,17 +46,15 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
         ),
         const SizedBox(height: 16),
         
-        // عرض كروت الإجازات العادية
         ...leaves.map((leave) {
           return CustomLeaveCard(key: ValueKey('leave_${leave.id}'), leave: leave);
         }),
 
-        // [إضافة] عرض كروت الراحات المستهلكة (طلب إجازة تعويضية)
+        // التحديث هنا: إزالة isEarnedTab والاعتماد على ذكاء الكارت
         ...restAllowances.map((allowance) {
           return RestAllowanceCard(
             key: ValueKey('rest_${allowance.id}'),
             allowance: allowance,
-            isEarnedTab: false, // نمرر false لعرضها كإجازة مستهلكة
           );
         }),
       ],

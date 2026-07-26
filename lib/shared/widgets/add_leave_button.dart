@@ -12,6 +12,7 @@ class AddLeaveButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FloatingActionButton.extended(
+      elevation: 0,
       onPressed: onTap,
       icon: icon,
       label: label,

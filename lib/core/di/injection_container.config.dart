@@ -176,14 +176,6 @@ extension GetItInjectableX on _i174.GetIt {
         saveSettings: gh<_i109.SaveSettingsUseCase>(),
       ),
     );
-    gh.factory<_i673.RestAllowancesBloc>(
-      () => _i673.RestAllowancesBloc(
-        getRestAllowances: gh<_i285.GetRestAllowancesUseCase>(),
-        addEarnedRest: gh<_i245.AddEarnedRestUseCase>(),
-        consumeRest: gh<_i51.ConsumeRestUseCase>(),
-        deleteRestAllowance: gh<_i399.DeleteRestAllowanceUseCase>(),
-      ),
-    );
     gh.lazySingleton<_i501.DeleteLeaveUseCase>(
       () => _i501.DeleteLeaveUseCase(gh<_i388.LeaveRepository>()),
     );
@@ -194,6 +186,16 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i952.CalculateBalancesUseCase(
         getSettingsUseCase: gh<_i1029.GetSettingsUseCase>(),
         getCurrentYearLeavesUseCase: gh<_i972.GetCurrentYearLeavesUseCase>(),
+      ),
+    );
+    gh.factory<_i673.RestAllowancesBloc>(
+      () => _i673.RestAllowancesBloc(
+        getRestAllowances: gh<_i285.GetRestAllowancesUseCase>(),
+        addEarnedRest: gh<_i245.AddEarnedRestUseCase>(),
+        consumeRest: gh<_i51.ConsumeRestUseCase>(),
+        deleteRestAllowance: gh<_i399.DeleteRestAllowanceUseCase>(),
+        getLeaves: gh<_i972.GetCurrentYearLeavesUseCase>(),
+        getHolidays: gh<_i1053.GetFinancialYearHolidaysUseCase>(),
       ),
     );
     gh.factory<_i9.HomeCubit>(

@@ -11,7 +11,7 @@ import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dar
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/build_rest_allowance_shortcut_card.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_stats_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/home/presentation/widgets/balances_loading_shimmer.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_balances_section.dart';
@@ -123,13 +123,28 @@ class _HomeScreenState extends State<HomeScreen> {
                       balance: state.balance,
                       settings: state.settings,
                     ),
-                    SizedBox(height: 24.h),
-                    const BuildRestAllowanceShortcutCard(),
                     SizedBox(height: 16.h),
+                    BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
+                      builder: (context, state) {
+                        if (state is RestAllowancesLoaded) {
+                          return Column(
+                            children: [
+                              RestAllowanceStatsCard(
+                                totalAvailableDays: state.totalAvailableDays,
+                                totalConsumedDays: state.totalConsumedDays,
+                              ),
+                            ],
+                          );
+                        }
+                        return const SizedBox.shrink();
+                      },
+                    ),
                     SizedBox(height: 24.h),
 
-                    BuildCurrentMonthLeaves(leaves: state.currentMonthLeaves,
-                      restAllowances: state.currentMonthRestAllowances,),
+                    BuildCurrentMonthLeaves(
+                      leaves: state.currentMonthLeaves,
+                      restAllowances: state.currentMonthRestAllowances,
+                    ),
                     SizedBox(height: 80.h),
                   ],
                 ),

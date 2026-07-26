@@ -4,7 +4,6 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_stats_card.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_tabs.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_card.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_action_buttons.dart';
@@ -62,32 +61,14 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
           if (state is RestAllowancesLoading || state is RestAllowancesInitial) {
             return const Center(child: CircularProgressIndicator());
           }
-
           if (state is RestAllowancesLoaded) {
-            final listToDisplay = _showEarned ? state.availableAllowances : state.consumedAllowances;
+            final listToDisplay = _showEarned ? state.earnedAllowances : state.consumedAllowances;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                  child: Text(
-                    'هنا يمكنك تسجيل أيام العمل الإضافية أو العطلات الرسمية التي عملت بها لكسب "بدل راحة" واستخدامها لاحقاً كإجازات تعويضية.',
-                    style: TextStyle(
-                      fontSize: 14.sp,
-                      color: colorScheme.onSurface.withAlpha(180),
-                      height: 1.5,
-                    ),
-                    textAlign: TextAlign.right,
-                  ),
-                ),
-                RestAllowanceStatsCard(
-                  totalAvailable: state.totalAvailable,
-                  totalConsumed: state.totalConsumed,
-                  totalEarned: state.totalAvailable + state.totalConsumed,
-                ),
                 RestAllowanceTabs(
                   showEarned: _showEarned,
-                  earnedCount: state.availableAllowances.length,
+                  earnedCount: state.earnedAllowances.length,
                   consumedCount: state.consumedAllowances.length,
                   onChanged: (isEarned) {
                     setState(() {
@@ -97,14 +78,13 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
                 ),
                 Expanded(
                   child: listToDisplay.isEmpty
-                      ? const CustomEmptyState(titleEmpty: 'لا يوجد رصيد ايام عمل اضافيه', contentEmpty: 'قم باضافه عمل اضافى لكسب يوم بدل راحه',)
+                      ? const CustomEmptyState(titleEmpty: 'لا يوجد رصيد متاح!', contentEmpty: 'عليك تسجيل يوم عمل اضافى أولاً .')
                       : ListView.builder(
                           padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
                           itemCount: listToDisplay.length,
                           itemBuilder: (context, index) {
                             return RestAllowanceCard(
                               allowance: listToDisplay[index],
-                              isEarnedTab: _showEarned,
                             );
                           },
                         ),

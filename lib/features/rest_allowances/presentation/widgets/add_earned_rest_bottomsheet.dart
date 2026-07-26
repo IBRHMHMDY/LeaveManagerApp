@@ -6,6 +6,9 @@ import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
+// [إضافة] استيراد كيان وحالة العطلات للبحث فيها
+import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
+import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
 import 'package:leave_manager/shared/widgets/custom_date_range_picker_field.dart';
 import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 import 'package:leave_manager/shared/widgets/show_bottom_sheet.dart';
@@ -14,7 +17,7 @@ import 'package:leave_manager/shared/widgets/show_toast.dart';
 void showAddEarnedRestBottomSheet(BuildContext context) {
   ShowBottomSheet.show(
     context: context,
-    title: 'كسب راحة',
+    title: 'إضافة عمل إضافي',
     icon: Icons.add_circle_outline_rounded,
     isScrollControlled: true,
     child: const _AddEarnedRestForm(),
@@ -29,12 +32,12 @@ class _AddEarnedRestForm extends StatefulWidget {
 }
 
 class _AddEarnedRestFormState extends State<_AddEarnedRestForm> {
-  DateTime? _selectedDate;
+  DateTime? _startDate;
+  DateTime? _endDate;
   final TextEditingController _notesController = TextEditingController();
 
   @override
   void dispose() {
-    // [قاعدة AMD 2026]: تنظيف الذاكرة (Memory Leak Prevention)
     _notesController.dispose();
     super.dispose();
   }
@@ -47,32 +50,51 @@ class _AddEarnedRestFormState extends State<_AddEarnedRestForm> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        // ملاحظة توضيحية للمستخدم
         Text(
-          'اختر تاريخ يوم العمل الإضافي أو العطلة التي عملت بها لكسب يوم راحة.',
+          'قم بتحديد النطاق الزمني للعمل الإضافي (أيام الراحة المكتسبة).',
           style: TextStyle(fontSize: 14.sp, color: colorScheme.onSurface.withAlpha(150)),
         ),
         SizedBox(height: 16.h),
         
-        // حقل اختيار التاريخ (نستخدم Range picker لكن نجبره على يوم واحد بتحديد Start = End)
         CustomDateRangePickerField(
-          startDate: _selectedDate,
-          endDate: _selectedDate, // نمرر نفس التاريخ لاختيار يوم واحد
+          startDate: _startDate,
+          endDate: _endDate,
           hintText: 'تاريخ العمل الإضافي',
           firstDate: FinancialYearCalculator.currentFinancialYearStart,
-          lastDate: DateTime.now(), // لا يمكن كسب راحة في المستقبل
+          lastDate: FinancialYearCalculator.currentFinancialYearEnd,
           onDateSelected: (DateTimeRange? pickedRange) {
             if (pickedRange != null) {
               setState(() {
-                // نأخذ الـ start فقط لأننا نحتاج يوماً واحداً
-                _selectedDate = pickedRange.start;
+                _startDate = pickedRange.start;
+                _endDate = pickedRange.end;
+
+                // [تعديل 1]: تعبئة الملاحظات تلقائياً إذا كان اليوم يوافق عطلة رسمية
+                final holidaysState = context.read<HolidaysCubit>().state;
+                if (holidaysState is HolidaysLoaded) {
+                  final startOnly = DateTime(_startDate!.year, _startDate!.month, _startDate!.day);
+                  bool isHoliday = false;
+
+                  for (var holiday in holidaysState.financialYearHolidays) {
+                    final hStart = DateTime(holiday.startDate.year, holiday.startDate.month, holiday.startDate.day);
+                    final hEnd = DateTime(holiday.endDate.year, holiday.endDate.month, holiday.endDate.day);
+                    
+                    if (!startOnly.isBefore(hStart) && !startOnly.isAfter(hEnd)) {
+                      _notesController.text = holiday.name; // كتابة اسم العطلة (مثل: ثورة 23 يوليو)
+                      isHoliday = true;
+                      break;
+                    }
+                  }
+                  
+                  if (!isHoliday) {
+                    _notesController.clear();
+                  }
+                }
               });
             }
           },
         ),
         SizedBox(height: 16.h),
         
-        // حقل الملاحظات
         CustomTextField(
           label: 'ملاحظات (اختياري)',
           icon: Icons.notes_rounded,
@@ -80,7 +102,6 @@ class _AddEarnedRestFormState extends State<_AddEarnedRestForm> {
         ),
         SizedBox(height: 24.h),
         
-        // زر الحفظ المرتبط بحالة الـ BLoC
         BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
           builder: (context, state) {
             final isLoading = state is RestAllowancesLoading;
@@ -95,19 +116,19 @@ class _AddEarnedRestFormState extends State<_AddEarnedRestForm> {
               onPressed: isLoading
                   ? null
                   : () {
-                      if (_selectedDate == null) {
-                        AppToast.showError(context, 'يرجى اختيار تاريخ العمل الإضافي.');
+                      if (_startDate == null || _endDate == null) {
+                        AppToast.showError(context, 'يرجى تحديد التواريخ أولاً.');
                         return;
                       }
                       
                       context.read<RestAllowancesBloc>().add(
                         AddEarnedRestEvent(
-                          earnedDate: _selectedDate!,
+                          startDate: _startDate!,
+                          endDate: _endDate!,
                           notes: _notesController.text.trim(),
                         ),
                       );
                       
-                      // إغلاق الـ BottomSheet بعد الإضافة
                       context.pop();
                     },
               child: isLoading
@@ -116,7 +137,7 @@ class _AddEarnedRestFormState extends State<_AddEarnedRestForm> {
                       width: 24.h,
                       child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2),
                     )
-                  : Text('حفظ يوم عمل اضافى', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                  : Text('حفظ الرصيد', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
             );
           },
         ),

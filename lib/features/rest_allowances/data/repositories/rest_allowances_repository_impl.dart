@@ -27,31 +27,25 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
   }
 
   @override
-  Future<Either<Failure, Unit>> addEarnedRest(DateTime earnedDate, String? notes) async {
+  Future<Either<Failure, Unit>> addRestAllowance(RestAllowance allowance) async {
     try {
       final companion = RestAllowancesTableCompanion(
-        earnedDate: Value(earnedDate),
-        notes: notes != null && notes.isNotEmpty ? Value(notes) : const Value.absent(),
+        type: Value(allowance.type),
+        startDate: Value(allowance.startDate),
+        endDate: Value(allowance.endDate),
+        daysCount: Value(allowance.daysCount),
+        notes: allowance.notes != null && allowance.notes!.isNotEmpty 
+            ? Value(allowance.notes) 
+            : const Value.absent(),
+        // تمرير الحقل الجديد لقاعدة البيانات
+        linkedEarnedDate: allowance.linkedEarnedDate != null 
+            ? Value(allowance.linkedEarnedDate) 
+            : const Value.absent(),
       );
       await localDataSource.addRestAllowance(companion);
       return const Right(unit);
     } on DatabaseException catch (e) {
-      return Left(DatabaseFailure(e.message));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> consumeRest(int id, DateTime consumedDate) async {
-    try {
-      // هنا نقوم بتحديث السجل وإضافة تاريخ الاستهلاك
-      final companion = RestAllowancesTableCompanion(
-        id: Value(id),
-        consumedDate: Value(consumedDate),
-      );
-      await localDataSource.updateRestAllowance(companion);
-      return const Right(unit);
-    } on DatabaseException catch (e) {
-      return Left(DatabaseFailure(e.message));
+      return Left(DatabaseFailure(e.message)); // استخدام dartz لمعالجة الأخطاء
     }
   }
 

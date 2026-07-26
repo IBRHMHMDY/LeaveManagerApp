@@ -5,9 +5,12 @@ extension RestAllowanceMapper on RestAllowanceModel {
   RestAllowance toDomain() {
     return RestAllowance(
       id: id,
-      earnedDate: earnedDate,
-      consumedDate: consumedDate,
+      type: type,
+      startDate: startDate,
+      endDate: endDate,
+      daysCount: daysCount,
       notes: notes,
+      linkedEarnedDate: linkedEarnedDate, // التعيين الجديد
     );
   }
 }

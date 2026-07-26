@@ -10,63 +10,34 @@ import 'package:leave_manager/shared/widgets/confirm_delete_dialog.dart';
 
 class RestAllowanceCard extends StatelessWidget {
   final RestAllowance allowance;
-  final bool isEarnedTab;
 
   const RestAllowanceCard({
     super.key,
     required this.allowance,
-    required this.isEarnedTab,
   });
 
-  Future<void> _handleDelete(BuildContext context) async {
-    // 1. نظهر الـ Dialog وننتظر إجابته (true = حذف، false = إلغاء)
-    final bool? shouldDelete = await showDialog<bool>(
-      context: context,
-      builder: (dialogContext) {
-        return ConfirmDeleteDialog(
-          titleDialog: 'حذف سجل الراحة',
-          contentDialog:
-              'سيتم حذف هذا اليوم نهائياً، ولا يمكن التراجع عن هذا الإجراء. هل أنت متأكد من الحذف؟',
-          // 2. نقوم فقط بإرجاع true لغلق الـ Dialog
-          onPressedButton: () => dialogContext.pop(true),
-        );
-      },
-    );
-
-    // 3. التحقق من النتيجة والمتابعة إذا كانت الشاشة لا تزال مفتوحة
-    if (shouldDelete == true && context.mounted) {
-      context.read<RestAllowancesBloc>().add(DeleteRestEvent(allowance.id));
-    }
-  }
+  
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
 
-    // تحديد اللون الأساسي بناءً على حالة الكارت (مكتسب أم مستهلك)
-    final Color color = isEarnedTab ? Colors.deepPurpleAccent : colorScheme.primary;
+    final isEarned = allowance.isEarned;
+    final Color color = isEarned ?  Colors.orange.shade700: Colors.deepPurpleAccent;
+    final String typeLabel = isEarned ? 'يوم عمل اضافى' : 'بدل راحة';
 
-    final displayDate = isEarnedTab
-        ? allowance.earnedDate
-        : (allowance.consumedDate ?? allowance.earnedDate);
-
-    // تحديد نوع الراحة لعرضه في شريط العنوان (Badge)
-    final String typeLabel = isEarnedTab ? 'راحة مكتسبة' : 'إجازة تعويضية';
-
-    // استخدام Dismissible لدعم ميزة الحذف بالسحب (Swipe to delete) مثل الإجازات
     return Dismissible(
       key: ValueKey('rest_allowance_${allowance.id}'),
       direction: DismissDirection.endToStart,
       background: _DismissibleBackground(),
       confirmDismiss: (direction) async {
-        bool? confirm = false;
+        bool confirm = false;
         await showDialog(
           context: context,
           builder: (ctx) => ConfirmDeleteDialog(
-            titleDialog: 'حذف سجل الراحة',
-            contentDialog:
-                'سيتم حذف هذا اليوم نهائياً، ولا يمكن التراجع عن هذا الإجراء. هل أنت متأكد من الحذف؟',
+            titleDialog: 'تأكيد الحذف',
+            contentDialog: 'هل أنت متأكد من حذف هذا السجل؟',
             onPressedButton: () {
               confirm = true;
               ctx.pop();
@@ -100,7 +71,6 @@ class RestAllowanceCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // الشريط اللوني الجانبي (مثل CustomLeaveCard)
               Container(width: 6.w, color: color),
               Expanded(
                 child: Padding(
@@ -108,12 +78,10 @@ class RestAllowanceCard extends StatelessWidget {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // التفاصيل الأساسية
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            // Badge نوع الراحة
                             Container(
                               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
                               decoration: BoxDecoration(
@@ -130,8 +98,6 @@ class RestAllowanceCard extends StatelessWidget {
                               ),
                             ),
                             SizedBox(height: 12.h),
-                            
-                            // سطر التاريخ
                             Row(
                               children: [
                                 Icon(
@@ -142,7 +108,9 @@ class RestAllowanceCard extends StatelessWidget {
                                 SizedBox(width: 8.w),
                                 Expanded(
                                   child: Text(
-                                    displayDate.toFormatCurrentLocale(),
+                                    allowance.startDate.isAtSameMomentAs(allowance.endDate)
+                                        ? allowance.startDate.toFormatCurrentLocale()
+                                        : '${allowance.startDate.toFormatCurrentLocale()}  -  ${allowance.endDate.toFormatCurrentLocale()}',
                                     style: TextStyle(
                                       fontSize: 13.5.sp,
                                       color: colorScheme.onSurface,
@@ -152,8 +120,31 @@ class RestAllowanceCard extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            
-                            // سطر الملاحظات (يظهر فقط إذا كان هناك ملاحظات)
+                            if (allowance.isConsumed && allowance.linkedEarnedDate != null) ...[
+                              SizedBox(height: 8.h),
+                              Container(
+                                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
+                                decoration: BoxDecoration(
+                                  color: Colors.blue.withAlpha(20),
+                                  borderRadius: BorderRadius.circular(8.r),
+                                ),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    Icon(Icons.link_rounded, size: 14.w, color: Colors.blue.shade700),
+                                    SizedBox(width: 6.w),
+                                    Text(
+                                      allowance.linkedEarnedDate!.toFormatCurrentLocale(),
+                                      style: TextStyle(
+                                        fontSize: 12.sp,
+                                        color: Colors.blue.shade700,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                             if (allowance.notes != null && allowance.notes!.isNotEmpty) ...[
                               SizedBox(height: 10.h),
                               Container(
@@ -189,13 +180,30 @@ class RestAllowanceCard extends StatelessWidget {
                         ),
                       ),
                       SizedBox(width: 16.w),
-                      // أيقونة الحذف بدلاً من المربع الذي يعرض الأيام
-                      IconButton(
-                        onPressed: () => _handleDelete(context),
-                        icon: Icon(
-                          Icons.delete_outline_rounded,
-                          color: Colors.red.shade400,
-                        ),
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
+                            decoration: BoxDecoration(
+                              color: color.withAlpha(15),
+                              borderRadius: BorderRadius.circular(12.r),
+                              border: Border.all(color: color.withAlpha(30)),
+                            ),
+                            child: Column(
+                              children: [
+                                Text(
+                                  '${allowance.daysCount}',
+                                  style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 20.sp, height: 1.1),
+                                ),
+                                Text(
+                                  'يوم',
+                                  style: TextStyle(color: color, fontSize: 10.sp, fontWeight: FontWeight.bold),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -209,7 +217,6 @@ class RestAllowanceCard extends StatelessWidget {
   }
 }
 
-// واجهة السحب للحذف (Swipe to delete) مطابقة لتلك الموجودة في الإجازات
 class _DismissibleBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {

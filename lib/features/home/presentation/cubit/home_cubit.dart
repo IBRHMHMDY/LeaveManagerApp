@@ -12,7 +12,6 @@ class HomeCubit extends Cubit<HomeState> {
   final GetSettingsUseCase getSettings;
   final CalculateBalancesUseCase calculateBalances;
   final GetCurrentYearLeavesUseCase getCurrentYearLeaves;
-  // [إضافة] UseCase الخاص ببدلات الراحة
   final GetRestAllowancesUseCase getRestAllowances;
 
   HomeCubit({
@@ -24,13 +23,12 @@ class HomeCubit extends Cubit<HomeState> {
 
   Future<void> loadHomeData() async {
     emit(HomeLoading());
-
-    // [معايير AMD 2026]: جلب البيانات بالتوازي (Concurrency)
+    
     final results = await Future.wait([
       getSettings(const NoParams()),
       calculateBalances(const NoParams()),
       getCurrentYearLeaves(const NoParams()),
-      getRestAllowances(const NoParams()), // جلب الراحات
+      getRestAllowances(const NoParams()), 
     ]);
 
     final settingsResult = results[0] as dynamic;
@@ -54,16 +52,18 @@ class HomeCubit extends Cubit<HomeState> {
                     final currentMonth = now.month;
                     final currentYear = now.year;
 
-                    // تصفية الإجازات العادية للشهر الحالي
                     final monthLeaves = leaves.where((leave) =>
                         leave.startDate.month == currentMonth &&
                         leave.startDate.year == currentYear).toList();
 
-                    // [إضافة] تصفية بدلات الراحة المستهلكة للشهر الحالي
+                    // التحديث هنا: استخدام الهيكلية الجديدة لفلترة الاستهلاك
                     final monthRestAllowances = allowances.where((allowance) {
-                      if (allowance.isAvailable || allowance.consumedDate == null) return false;
-                      return allowance.consumedDate!.month == currentMonth &&
-                             allowance.consumedDate!.year == currentYear;
+                      // استبعاد بدلات الراحة المكتسبة (نريد المستهلكة فقط في هذه القائمة)
+                      if (allowance.isEarned) return false;
+                      
+                      // الاعتماد على startDate بدلاً من consumedDate المحذوف
+                      return allowance.startDate.month == currentMonth &&
+                             allowance.startDate.year == currentYear;
                     }).toList();
 
                     emit(HomeLoaded(

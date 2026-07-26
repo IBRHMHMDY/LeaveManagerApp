@@ -1141,27 +1141,59 @@ class $RestAllowancesTableTable extends RestAllowancesTable
       'PRIMARY KEY AUTOINCREMENT',
     ),
   );
-  static const VerificationMeta _earnedDateMeta = const VerificationMeta(
-    'earnedDate',
+  static const VerificationMeta _typeMeta = const VerificationMeta('type');
+  @override
+  late final GeneratedColumn<int> type = GeneratedColumn<int>(
+    'type',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _startDateMeta = const VerificationMeta(
+    'startDate',
   );
   @override
-  late final GeneratedColumn<DateTime> earnedDate = GeneratedColumn<DateTime>(
-    'earned_date',
+  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
+    'start_date',
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _consumedDateMeta = const VerificationMeta(
-    'consumedDate',
+  static const VerificationMeta _endDateMeta = const VerificationMeta(
+    'endDate',
   );
   @override
-  late final GeneratedColumn<DateTime> consumedDate = GeneratedColumn<DateTime>(
-    'consumed_date',
+  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
+    'end_date',
     aliasedName,
-    true,
+    false,
     type: DriftSqlType.dateTime,
-    requiredDuringInsert: false,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _linkedEarnedDateMeta = const VerificationMeta(
+    'linkedEarnedDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> linkedEarnedDate =
+      GeneratedColumn<DateTime>(
+        'linked_earned_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _daysCountMeta = const VerificationMeta(
+    'daysCount',
+  );
+  @override
+  late final GeneratedColumn<int> daysCount = GeneratedColumn<int>(
+    'days_count',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
   );
   static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
@@ -1173,7 +1205,15 @@ class $RestAllowancesTableTable extends RestAllowancesTable
     requiredDuringInsert: false,
   );
   @override
-  List<GeneratedColumn> get $columns => [id, earnedDate, consumedDate, notes];
+  List<GeneratedColumn> get $columns => [
+    id,
+    type,
+    startDate,
+    endDate,
+    linkedEarnedDate,
+    daysCount,
+    notes,
+  ];
   @override
   String get aliasedName => _alias ?? actualTableName;
   @override
@@ -1189,22 +1229,46 @@ class $RestAllowancesTableTable extends RestAllowancesTable
     if (data.containsKey('id')) {
       context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
     }
-    if (data.containsKey('earned_date')) {
+    if (data.containsKey('type')) {
       context.handle(
-        _earnedDateMeta,
-        earnedDate.isAcceptableOrUnknown(data['earned_date']!, _earnedDateMeta),
+        _typeMeta,
+        type.isAcceptableOrUnknown(data['type']!, _typeMeta),
       );
     } else if (isInserting) {
-      context.missing(_earnedDateMeta);
+      context.missing(_typeMeta);
     }
-    if (data.containsKey('consumed_date')) {
+    if (data.containsKey('start_date')) {
       context.handle(
-        _consumedDateMeta,
-        consumedDate.isAcceptableOrUnknown(
-          data['consumed_date']!,
-          _consumedDateMeta,
+        _startDateMeta,
+        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_startDateMeta);
+    }
+    if (data.containsKey('end_date')) {
+      context.handle(
+        _endDateMeta,
+        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_endDateMeta);
+    }
+    if (data.containsKey('linked_earned_date')) {
+      context.handle(
+        _linkedEarnedDateMeta,
+        linkedEarnedDate.isAcceptableOrUnknown(
+          data['linked_earned_date']!,
+          _linkedEarnedDateMeta,
         ),
       );
+    }
+    if (data.containsKey('days_count')) {
+      context.handle(
+        _daysCountMeta,
+        daysCount.isAcceptableOrUnknown(data['days_count']!, _daysCountMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_daysCountMeta);
     }
     if (data.containsKey('notes')) {
       context.handle(
@@ -1225,14 +1289,26 @@ class $RestAllowancesTableTable extends RestAllowancesTable
         DriftSqlType.int,
         data['${effectivePrefix}id'],
       )!,
-      earnedDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}earned_date'],
+      type: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}type'],
       )!,
-      consumedDate: attachedDatabase.typeMapping.read(
+      startDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
-        data['${effectivePrefix}consumed_date'],
+        data['${effectivePrefix}start_date'],
+      )!,
+      endDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}end_date'],
+      )!,
+      linkedEarnedDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}linked_earned_date'],
       ),
+      daysCount: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}days_count'],
+      )!,
       notes: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
@@ -1249,23 +1325,32 @@ class $RestAllowancesTableTable extends RestAllowancesTable
 class RestAllowanceModel extends DataClass
     implements Insertable<RestAllowanceModel> {
   final int id;
-  final DateTime earnedDate;
-  final DateTime? consumedDate;
+  final int type;
+  final DateTime startDate;
+  final DateTime endDate;
+  final DateTime? linkedEarnedDate;
+  final int daysCount;
   final String? notes;
   const RestAllowanceModel({
     required this.id,
-    required this.earnedDate,
-    this.consumedDate,
+    required this.type,
+    required this.startDate,
+    required this.endDate,
+    this.linkedEarnedDate,
+    required this.daysCount,
     this.notes,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
-    map['earned_date'] = Variable<DateTime>(earnedDate);
-    if (!nullToAbsent || consumedDate != null) {
-      map['consumed_date'] = Variable<DateTime>(consumedDate);
+    map['type'] = Variable<int>(type);
+    map['start_date'] = Variable<DateTime>(startDate);
+    map['end_date'] = Variable<DateTime>(endDate);
+    if (!nullToAbsent || linkedEarnedDate != null) {
+      map['linked_earned_date'] = Variable<DateTime>(linkedEarnedDate);
     }
+    map['days_count'] = Variable<int>(daysCount);
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
@@ -1275,10 +1360,13 @@ class RestAllowanceModel extends DataClass
   RestAllowancesTableCompanion toCompanion(bool nullToAbsent) {
     return RestAllowancesTableCompanion(
       id: Value(id),
-      earnedDate: Value(earnedDate),
-      consumedDate: consumedDate == null && nullToAbsent
+      type: Value(type),
+      startDate: Value(startDate),
+      endDate: Value(endDate),
+      linkedEarnedDate: linkedEarnedDate == null && nullToAbsent
           ? const Value.absent()
-          : Value(consumedDate),
+          : Value(linkedEarnedDate),
+      daysCount: Value(daysCount),
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
@@ -1292,8 +1380,13 @@ class RestAllowanceModel extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return RestAllowanceModel(
       id: serializer.fromJson<int>(json['id']),
-      earnedDate: serializer.fromJson<DateTime>(json['earnedDate']),
-      consumedDate: serializer.fromJson<DateTime?>(json['consumedDate']),
+      type: serializer.fromJson<int>(json['type']),
+      startDate: serializer.fromJson<DateTime>(json['startDate']),
+      endDate: serializer.fromJson<DateTime>(json['endDate']),
+      linkedEarnedDate: serializer.fromJson<DateTime?>(
+        json['linkedEarnedDate'],
+      ),
+      daysCount: serializer.fromJson<int>(json['daysCount']),
       notes: serializer.fromJson<String?>(json['notes']),
     );
   }
@@ -1302,32 +1395,44 @@ class RestAllowanceModel extends DataClass
     serializer ??= driftRuntimeOptions.defaultSerializer;
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
-      'earnedDate': serializer.toJson<DateTime>(earnedDate),
-      'consumedDate': serializer.toJson<DateTime?>(consumedDate),
+      'type': serializer.toJson<int>(type),
+      'startDate': serializer.toJson<DateTime>(startDate),
+      'endDate': serializer.toJson<DateTime>(endDate),
+      'linkedEarnedDate': serializer.toJson<DateTime?>(linkedEarnedDate),
+      'daysCount': serializer.toJson<int>(daysCount),
       'notes': serializer.toJson<String?>(notes),
     };
   }
 
   RestAllowanceModel copyWith({
     int? id,
-    DateTime? earnedDate,
-    Value<DateTime?> consumedDate = const Value.absent(),
+    int? type,
+    DateTime? startDate,
+    DateTime? endDate,
+    Value<DateTime?> linkedEarnedDate = const Value.absent(),
+    int? daysCount,
     Value<String?> notes = const Value.absent(),
   }) => RestAllowanceModel(
     id: id ?? this.id,
-    earnedDate: earnedDate ?? this.earnedDate,
-    consumedDate: consumedDate.present ? consumedDate.value : this.consumedDate,
+    type: type ?? this.type,
+    startDate: startDate ?? this.startDate,
+    endDate: endDate ?? this.endDate,
+    linkedEarnedDate: linkedEarnedDate.present
+        ? linkedEarnedDate.value
+        : this.linkedEarnedDate,
+    daysCount: daysCount ?? this.daysCount,
     notes: notes.present ? notes.value : this.notes,
   );
   RestAllowanceModel copyWithCompanion(RestAllowancesTableCompanion data) {
     return RestAllowanceModel(
       id: data.id.present ? data.id.value : this.id,
-      earnedDate: data.earnedDate.present
-          ? data.earnedDate.value
-          : this.earnedDate,
-      consumedDate: data.consumedDate.present
-          ? data.consumedDate.value
-          : this.consumedDate,
+      type: data.type.present ? data.type.value : this.type,
+      startDate: data.startDate.present ? data.startDate.value : this.startDate,
+      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      linkedEarnedDate: data.linkedEarnedDate.present
+          ? data.linkedEarnedDate.value
+          : this.linkedEarnedDate,
+      daysCount: data.daysCount.present ? data.daysCount.value : this.daysCount,
       notes: data.notes.present ? data.notes.value : this.notes,
     );
   }
@@ -1336,66 +1441,104 @@ class RestAllowanceModel extends DataClass
   String toString() {
     return (StringBuffer('RestAllowanceModel(')
           ..write('id: $id, ')
-          ..write('earnedDate: $earnedDate, ')
-          ..write('consumedDate: $consumedDate, ')
+          ..write('type: $type, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('linkedEarnedDate: $linkedEarnedDate, ')
+          ..write('daysCount: $daysCount, ')
           ..write('notes: $notes')
           ..write(')'))
         .toString();
   }
 
   @override
-  int get hashCode => Object.hash(id, earnedDate, consumedDate, notes);
+  int get hashCode => Object.hash(
+    id,
+    type,
+    startDate,
+    endDate,
+    linkedEarnedDate,
+    daysCount,
+    notes,
+  );
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       (other is RestAllowanceModel &&
           other.id == this.id &&
-          other.earnedDate == this.earnedDate &&
-          other.consumedDate == this.consumedDate &&
+          other.type == this.type &&
+          other.startDate == this.startDate &&
+          other.endDate == this.endDate &&
+          other.linkedEarnedDate == this.linkedEarnedDate &&
+          other.daysCount == this.daysCount &&
           other.notes == this.notes);
 }
 
 class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
   final Value<int> id;
-  final Value<DateTime> earnedDate;
-  final Value<DateTime?> consumedDate;
+  final Value<int> type;
+  final Value<DateTime> startDate;
+  final Value<DateTime> endDate;
+  final Value<DateTime?> linkedEarnedDate;
+  final Value<int> daysCount;
   final Value<String?> notes;
   const RestAllowancesTableCompanion({
     this.id = const Value.absent(),
-    this.earnedDate = const Value.absent(),
-    this.consumedDate = const Value.absent(),
+    this.type = const Value.absent(),
+    this.startDate = const Value.absent(),
+    this.endDate = const Value.absent(),
+    this.linkedEarnedDate = const Value.absent(),
+    this.daysCount = const Value.absent(),
     this.notes = const Value.absent(),
   });
   RestAllowancesTableCompanion.insert({
     this.id = const Value.absent(),
-    required DateTime earnedDate,
-    this.consumedDate = const Value.absent(),
+    required int type,
+    required DateTime startDate,
+    required DateTime endDate,
+    this.linkedEarnedDate = const Value.absent(),
+    required int daysCount,
     this.notes = const Value.absent(),
-  }) : earnedDate = Value(earnedDate);
+  }) : type = Value(type),
+       startDate = Value(startDate),
+       endDate = Value(endDate),
+       daysCount = Value(daysCount);
   static Insertable<RestAllowanceModel> custom({
     Expression<int>? id,
-    Expression<DateTime>? earnedDate,
-    Expression<DateTime>? consumedDate,
+    Expression<int>? type,
+    Expression<DateTime>? startDate,
+    Expression<DateTime>? endDate,
+    Expression<DateTime>? linkedEarnedDate,
+    Expression<int>? daysCount,
     Expression<String>? notes,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
-      if (earnedDate != null) 'earned_date': earnedDate,
-      if (consumedDate != null) 'consumed_date': consumedDate,
+      if (type != null) 'type': type,
+      if (startDate != null) 'start_date': startDate,
+      if (endDate != null) 'end_date': endDate,
+      if (linkedEarnedDate != null) 'linked_earned_date': linkedEarnedDate,
+      if (daysCount != null) 'days_count': daysCount,
       if (notes != null) 'notes': notes,
     });
   }
 
   RestAllowancesTableCompanion copyWith({
     Value<int>? id,
-    Value<DateTime>? earnedDate,
-    Value<DateTime?>? consumedDate,
+    Value<int>? type,
+    Value<DateTime>? startDate,
+    Value<DateTime>? endDate,
+    Value<DateTime?>? linkedEarnedDate,
+    Value<int>? daysCount,
     Value<String?>? notes,
   }) {
     return RestAllowancesTableCompanion(
       id: id ?? this.id,
-      earnedDate: earnedDate ?? this.earnedDate,
-      consumedDate: consumedDate ?? this.consumedDate,
+      type: type ?? this.type,
+      startDate: startDate ?? this.startDate,
+      endDate: endDate ?? this.endDate,
+      linkedEarnedDate: linkedEarnedDate ?? this.linkedEarnedDate,
+      daysCount: daysCount ?? this.daysCount,
       notes: notes ?? this.notes,
     );
   }
@@ -1406,11 +1549,20 @@ class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
     if (id.present) {
       map['id'] = Variable<int>(id.value);
     }
-    if (earnedDate.present) {
-      map['earned_date'] = Variable<DateTime>(earnedDate.value);
+    if (type.present) {
+      map['type'] = Variable<int>(type.value);
     }
-    if (consumedDate.present) {
-      map['consumed_date'] = Variable<DateTime>(consumedDate.value);
+    if (startDate.present) {
+      map['start_date'] = Variable<DateTime>(startDate.value);
+    }
+    if (endDate.present) {
+      map['end_date'] = Variable<DateTime>(endDate.value);
+    }
+    if (linkedEarnedDate.present) {
+      map['linked_earned_date'] = Variable<DateTime>(linkedEarnedDate.value);
+    }
+    if (daysCount.present) {
+      map['days_count'] = Variable<int>(daysCount.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -1422,8 +1574,11 @@ class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
   String toString() {
     return (StringBuffer('RestAllowancesTableCompanion(')
           ..write('id: $id, ')
-          ..write('earnedDate: $earnedDate, ')
-          ..write('consumedDate: $consumedDate, ')
+          ..write('type: $type, ')
+          ..write('startDate: $startDate, ')
+          ..write('endDate: $endDate, ')
+          ..write('linkedEarnedDate: $linkedEarnedDate, ')
+          ..write('daysCount: $daysCount, ')
           ..write('notes: $notes')
           ..write(')'))
         .toString();
@@ -2074,15 +2229,21 @@ typedef $$HolidaysTableTableProcessedTableManager =
 typedef $$RestAllowancesTableTableCreateCompanionBuilder =
     RestAllowancesTableCompanion Function({
       Value<int> id,
-      required DateTime earnedDate,
-      Value<DateTime?> consumedDate,
+      required int type,
+      required DateTime startDate,
+      required DateTime endDate,
+      Value<DateTime?> linkedEarnedDate,
+      required int daysCount,
       Value<String?> notes,
     });
 typedef $$RestAllowancesTableTableUpdateCompanionBuilder =
     RestAllowancesTableCompanion Function({
       Value<int> id,
-      Value<DateTime> earnedDate,
-      Value<DateTime?> consumedDate,
+      Value<int> type,
+      Value<DateTime> startDate,
+      Value<DateTime> endDate,
+      Value<DateTime?> linkedEarnedDate,
+      Value<int> daysCount,
       Value<String?> notes,
     });
 
@@ -2100,13 +2261,28 @@ class $$RestAllowancesTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get earnedDate => $composableBuilder(
-    column: $table.earnedDate,
+  ColumnFilters<int> get type => $composableBuilder(
+    column: $table.type,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get consumedDate => $composableBuilder(
-    column: $table.consumedDate,
+  ColumnFilters<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get linkedEarnedDate => $composableBuilder(
+    column: $table.linkedEarnedDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get daysCount => $composableBuilder(
+    column: $table.daysCount,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2130,13 +2306,28 @@ class $$RestAllowancesTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get earnedDate => $composableBuilder(
-    column: $table.earnedDate,
+  ColumnOrderings<int> get type => $composableBuilder(
+    column: $table.type,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get consumedDate => $composableBuilder(
-    column: $table.consumedDate,
+  ColumnOrderings<DateTime> get startDate => $composableBuilder(
+    column: $table.startDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get endDate => $composableBuilder(
+    column: $table.endDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get linkedEarnedDate => $composableBuilder(
+    column: $table.linkedEarnedDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get daysCount => $composableBuilder(
+    column: $table.daysCount,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -2158,15 +2349,22 @@ class $$RestAllowancesTableTableAnnotationComposer
   GeneratedColumn<int> get id =>
       $composableBuilder(column: $table.id, builder: (column) => column);
 
-  GeneratedColumn<DateTime> get earnedDate => $composableBuilder(
-    column: $table.earnedDate,
+  GeneratedColumn<int> get type =>
+      $composableBuilder(column: $table.type, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get startDate =>
+      $composableBuilder(column: $table.startDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get endDate =>
+      $composableBuilder(column: $table.endDate, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get linkedEarnedDate => $composableBuilder(
+    column: $table.linkedEarnedDate,
     builder: (column) => column,
   );
 
-  GeneratedColumn<DateTime> get consumedDate => $composableBuilder(
-    column: $table.consumedDate,
-    builder: (column) => column,
-  );
+  GeneratedColumn<int> get daysCount =>
+      $composableBuilder(column: $table.daysCount, builder: (column) => column);
 
   GeneratedColumn<String> get notes =>
       $composableBuilder(column: $table.notes, builder: (column) => column);
@@ -2216,25 +2414,37 @@ class $$RestAllowancesTableTableTableManager
           updateCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                Value<DateTime> earnedDate = const Value.absent(),
-                Value<DateTime?> consumedDate = const Value.absent(),
+                Value<int> type = const Value.absent(),
+                Value<DateTime> startDate = const Value.absent(),
+                Value<DateTime> endDate = const Value.absent(),
+                Value<DateTime?> linkedEarnedDate = const Value.absent(),
+                Value<int> daysCount = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
               }) => RestAllowancesTableCompanion(
                 id: id,
-                earnedDate: earnedDate,
-                consumedDate: consumedDate,
+                type: type,
+                startDate: startDate,
+                endDate: endDate,
+                linkedEarnedDate: linkedEarnedDate,
+                daysCount: daysCount,
                 notes: notes,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
-                required DateTime earnedDate,
-                Value<DateTime?> consumedDate = const Value.absent(),
+                required int type,
+                required DateTime startDate,
+                required DateTime endDate,
+                Value<DateTime?> linkedEarnedDate = const Value.absent(),
+                required int daysCount,
                 Value<String?> notes = const Value.absent(),
               }) => RestAllowancesTableCompanion.insert(
                 id: id,
-                earnedDate: earnedDate,
-                consumedDate: consumedDate,
+                type: type,
+                startDate: startDate,
+                endDate: endDate,
+                linkedEarnedDate: linkedEarnedDate,
+                daysCount: daysCount,
                 notes: notes,
               ),
           withReferenceMapper: (p0) => p0

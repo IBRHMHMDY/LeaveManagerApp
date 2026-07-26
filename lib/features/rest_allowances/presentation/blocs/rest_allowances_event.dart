@@ -7,35 +7,42 @@ abstract class RestAllowancesEvent extends Equatable {
   List<Object?> get props => [];
 }
 
-/// حدث تحميل بدلات الراحة وفرزها
 class LoadRestAllowancesEvent extends RestAllowancesEvent {}
 
-/// حدث إضافة يوم كسب راحة جديد
 class AddEarnedRestEvent extends RestAllowancesEvent {
-  final DateTime earnedDate;
+  final DateTime startDate;
+  final DateTime endDate;
   final String? notes;
 
-  const AddEarnedRestEvent({required this.earnedDate, this.notes});
+  const AddEarnedRestEvent({
+    required this.startDate,
+    required this.endDate,
+    this.notes,
+  });
 
   @override
-  List<Object?> get props => [earnedDate, notes];
+  List<Object?> get props => [startDate, endDate, notes];
 }
 
-/// حدث استهلاك بدل راحة (طلب إجازة)
 class ConsumeRestEvent extends RestAllowancesEvent {
-  final int id;
-  final DateTime consumedDate;
+  final DateTime startDate;
+  final DateTime endDate;
+  final String? notes;
+  final DateTime linkedEarnedDate;
 
-  const ConsumeRestEvent({required this.id, required this.consumedDate});
+  const ConsumeRestEvent({
+    required this.startDate,
+    required this.endDate,
+    required this.linkedEarnedDate,
+    this.notes,
+  });
 
   @override
-  List<Object?> get props => [id, consumedDate];
+  List<Object?> get props => [startDate, endDate, notes, linkedEarnedDate];
 }
 
-/// حدث حذف سجل راحة (سواء كان مكتسباً أو مستهلكاً)
 class DeleteRestEvent extends RestAllowancesEvent {
   final int id;
-
   const DeleteRestEvent(this.id);
 
   @override

@@ -1,16 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/build_rest_allowance_shortcut_card.dart';
 
 class RestAllowanceStatsCard extends StatelessWidget {
-  final int totalAvailable;
-  final int totalConsumed;
-  final int totalEarned;
+  final int totalAvailableDays;
+  final int totalConsumedDays;
 
   const RestAllowanceStatsCard({
     super.key,
-    required this.totalAvailable,
-    required this.totalConsumed,
-    required this.totalEarned,
+    required this.totalAvailableDays,
+    required this.totalConsumedDays,
   });
 
   @override
@@ -19,12 +18,14 @@ class RestAllowanceStatsCard extends StatelessWidget {
     final isDark = colorScheme.brightness == Brightness.dark;
 
     return Container(
-      margin: EdgeInsets.all(16.w),
       padding: EdgeInsets.symmetric(vertical: 20.h),
       decoration: BoxDecoration(
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
-        border: Border.all(color: colorScheme.primary.withAlpha(50), width: 1.5),
+        border: Border.all(
+          color: colorScheme.primary.withAlpha(50),
+          width: 1.5,
+        ),
         boxShadow: [
           if (!isDark)
             BoxShadow(
@@ -34,14 +35,38 @@ class RestAllowanceStatsCard extends StatelessWidget {
             ),
         ],
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      child: Column(
         children: [
-          _StatItem(title: 'الرصيد المتاح', value: totalAvailable, color: Colors.deepPurpleAccent),
-          _buildDivider(colorScheme),
-          _StatItem(title: 'الراحات المستهلكة', value: totalConsumed, color: Colors.orange.shade700),
-          _buildDivider(colorScheme),
-          _StatItem(title: 'الراحات المكتسبة', value: totalEarned, color: colorScheme.primary),
+          Text(
+            'بدلات الراحة',
+            style: TextStyle(
+              fontSize: 20.sp,
+              fontWeight: FontWeight.bold,
+              color: colorScheme.onSurface,
+            ),
+          ),
+          SizedBox(height: 16.h),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              _StatItem(
+                title: 'الرصيد المتاح',
+                value: totalAvailableDays,
+                color: Colors.deepPurpleAccent,
+              ),
+              _buildDivider(colorScheme),
+              _StatItem(
+                title: 'الرصيد المستهلك',
+                value: totalConsumedDays,
+                color: Colors.orange.shade700,
+              ),
+            ],
+          ),
+          SizedBox(height: 16.h),
+          const Padding(
+            padding: EdgeInsets.all(12.0),
+            child: BuildRestAllowanceShortcutCard(),
+          ),
         ],
       ),
     );
@@ -61,7 +86,11 @@ class _StatItem extends StatelessWidget {
   final int value;
   final Color color;
 
-  const _StatItem({required this.title, required this.value, required this.color});
+  const _StatItem({
+    required this.title,
+    required this.value,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -78,11 +107,18 @@ class _StatItem extends StatelessWidget {
         SizedBox(height: 8.h),
         Text(
           '$value',
-          style: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.w900, color: color),
+          style: TextStyle(
+            fontSize: 24.sp,
+            fontWeight: FontWeight.w900,
+            color: color,
+          ),
         ),
         Text(
-          'أيام',
-          style: TextStyle(fontSize: 10.sp, color: Theme.of(context).colorScheme.onSurface.withAlpha(120)),
+          'يوم',
+          style: TextStyle(
+            fontSize: 10.sp,
+            color: Theme.of(context).colorScheme.onSurface.withAlpha(120),
+          ),
         ),
       ],
     );

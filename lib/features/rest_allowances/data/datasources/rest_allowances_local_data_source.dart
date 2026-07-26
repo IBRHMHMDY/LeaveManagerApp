@@ -6,7 +6,6 @@ import 'package:leave_manager/core/errors/exceptions.dart';
 abstract class RestAllowancesLocalDataSource {
   Future<void> addRestAllowance(RestAllowancesTableCompanion companion);
   Future<List<RestAllowanceModel>> getRestAllowances();
-  Future<void> updateRestAllowance(RestAllowancesTableCompanion companion);
   Future<void> deleteRestAllowance(int id);
 }
 
@@ -21,30 +20,19 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
     try {
       await db.into(db.restAllowancesTable).insert(companion);
     } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء حفظ كسب الراحة.');
+      throw DatabaseException('حدث خطأ أثناء إضافة سجل بدل الراحة.');
     }
   }
 
   @override
   Future<List<RestAllowanceModel>> getRestAllowances() async {
     try {
-      // جلب جميع الراحات مرتبة تنازلياً حسب تاريخ الكسب
+      // جلب جميع السجلات مرتبة تنازلياً حسب تاريخ البداية
       return await (db.select(db.restAllowancesTable)
-            ..orderBy([(t) => OrderingTerm.desc(t.earnedDate)]))
+            ..orderBy([(t) => OrderingTerm.desc(t.startDate)]))
           .get();
     } catch (e) {
       throw DatabaseException('حدث خطأ أثناء استرجاع بدلات الراحة.');
-    }
-  }
-
-  @override
-  Future<void> updateRestAllowance(RestAllowancesTableCompanion companion) async {
-    try {
-     await (db.update(db.restAllowancesTable)
-            ..where((tbl) => tbl.id.equals(companion.id.value)))
-          .write(companion);
-    } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء تحديث بدل الراحة.');
     }
   }
 

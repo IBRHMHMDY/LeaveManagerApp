@@ -12,43 +12,38 @@ class RestAllowancesInitial extends RestAllowancesState {}
 
 class RestAllowancesLoading extends RestAllowancesState {}
 
-/// الحالة الناجحة التي تحتوي على جميع القوائم والأرصدة جاهزة للعرض
 class RestAllowancesLoaded extends RestAllowancesState {
-  final List<RestAllowance> availableAllowances;
+  final List<RestAllowance> earnedAllowances;
   final List<RestAllowance> consumedAllowances;
-  final int totalAvailable;
-  final int totalConsumed;
+  final int totalAvailableDays; // الرصيد المتاح 
+  final int totalConsumedDays;  //الرصيد المستهلك 
 
   const RestAllowancesLoaded({
-    required this.availableAllowances,
+    required this.earnedAllowances,
     required this.consumedAllowances,
-    required this.totalAvailable,
-    required this.totalConsumed,
+    required this.totalAvailableDays,
+    required this.totalConsumedDays,
   });
 
   @override
   List<Object?> get props => [
-        availableAllowances,
+        earnedAllowances,
         consumedAllowances,
-        totalAvailable,
-        totalConsumed,
+        totalAvailableDays,
+        totalConsumedDays,
       ];
 }
 
-/// حالة الفشل تعرض رسالة الخطأ القادمة من الـ Failure
 class RestAllowancesError extends RestAllowancesState {
   final String message;
-
   const RestAllowancesError(this.message);
 
   @override
   List<Object?> get props => [message];
 }
 
-/// حالة مخصصة لنجاح العمليات (إضافة، تعديل، حذف) لعرض Toast للمستخدم
 class RestAllowanceActionSuccess extends RestAllowancesState {
   final String message;
-
   const RestAllowanceActionSuccess(this.message);
 
   @override

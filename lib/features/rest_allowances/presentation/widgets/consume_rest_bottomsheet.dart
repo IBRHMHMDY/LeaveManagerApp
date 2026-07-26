@@ -8,15 +8,15 @@ import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allo
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/build_empty_state.dart';
 import 'package:leave_manager/shared/widgets/custom_date_range_picker_field.dart';
+import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 import 'package:leave_manager/shared/widgets/show_bottom_sheet.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
 
 void showConsumeRestBottomSheet(BuildContext context) {
   ShowBottomSheet.show(
     context: context,
-    title: 'طلب إجازة راحة',
+    title: 'استهلاك رصيد بدل راحة',
     icon: Icons.event_available_rounded,
     isScrollControlled: true,
     child: const _ConsumeRestForm(),
@@ -31,117 +31,137 @@ class _ConsumeRestForm extends StatefulWidget {
 }
 
 class _ConsumeRestFormState extends State<_ConsumeRestForm> {
-  DateTime? _selectedConsumedDate;
-  RestAllowance? _selectedAllowance;
+  DateTime? _startDate;
+  DateTime? _endDate;
+  RestAllowance? _selectedEarnedAllowance;
+  final TextEditingController _notesController = TextEditingController();
+
+  @override
+  void dispose() {
+    _notesController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
-
-    return BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
-      builder: (context, state) {
-        if (state is RestAllowancesLoaded) {
-          final availableAllowances = state.availableAllowances;
-
-          if (availableAllowances.isEmpty) {
-            return const BuildEmptyState();
-          }
-
-          return Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Text(
-                'اختر يوم الراحة المكتسب الذي تود استهلاكه وتاريخ الإجازة المطلوب.',
-                style: TextStyle(fontSize: 14.sp, color: colorScheme.onSurface.withAlpha(150)),
-              ),
-              SizedBox(height: 16.h),
-              
-              // 1. اختيار بدل الراحة المكتسب المراد استهلاكه (Dropdown)
-              DropdownButtonFormField<RestAllowance>(
-                value: _selectedAllowance,
-                dropdownColor: colorScheme.surface,
-                icon: Icon(Icons.keyboard_arrow_down_rounded, color: colorScheme.primary),
-                decoration: InputDecoration(
-                  labelText: 'تاريخ يوم/ايام العمل الاضافى',
-                  prefixIcon: Icon(Icons.workspace_premium_outlined, color: colorScheme.primary),
-                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12.r),
-                    borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300),
-                  ),
-                ),
-                items: availableAllowances.map((allowance) {
-                  return DropdownMenuItem<RestAllowance>(
-                    value: allowance,
-                    child: Text(
-                      allowance.earnedDate.toFormatCurrentLocale(),
-                      style: TextStyle(fontSize: 16.sp, fontFamily: 'Cairo'),
-                    ),
-                  );
-                }).toList(),
-                onChanged: (val) {
-                  setState(() {
-                    _selectedAllowance = val;
-                  });
-                },
-              ),
-              SizedBox(height: 16.h),
-              
-              // 2. اختيار تاريخ الإجازة المطلوبة
-              CustomDateRangePickerField(
-                startDate: _selectedConsumedDate,
-                endDate: _selectedConsumedDate,
-                hintText: 'تاريخ بدل الراحه',
-                firstDate: FinancialYearCalculator.currentFinancialYearStart,
-                lastDate: FinancialYearCalculator.currentFinancialYearEnd, 
-                onDateSelected: (DateTimeRange? pickedRange) {
-                  if (pickedRange != null) {
-                    setState(() {
-                      _selectedConsumedDate = pickedRange.start;
-                    });
-                  }
-                },
-              ),
-              SizedBox(height: 24.h),
-              
-              // 3. زر الحفظ
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.orange.shade600,
-                  foregroundColor: Colors.white,
-                  padding: EdgeInsets.symmetric(vertical: 16.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
-                ),
-                onPressed: () {
-                  if (_selectedAllowance == null) {
-                    AppToast.showError(context, 'يرجى اختيار الراحة المكتسبة.');
-                    return;
-                  }
-                  if (_selectedConsumedDate == null) {
-                    AppToast.showError(context, 'يرجى تحديد تاريخ الإجازة.');
-                    return;
-                  }
-
-                  context.read<RestAllowancesBloc>().add(
-                    ConsumeRestEvent(
-                      id: _selectedAllowance!.id,
-                      consumedDate: _selectedConsumedDate!,
-                    ),
-                  );
-                  
-                  context.pop();
-                },
-                child: Text('إضافه بدل راحه', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
-              ),
-              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
-            ],
-          );
-        }
+    
+    // ضبط تاريخ البداية الديناميكي بناءً على الرصيد المختار
+    DateTime effectiveFirstDate = FinancialYearCalculator.currentFinancialYearStart;
+    if (_selectedEarnedAllowance != null && 
+        _selectedEarnedAllowance!.startDate.isAfter(effectiveFirstDate)) {
+      effectiveFirstDate = _selectedEarnedAllowance!.startDate;
+    }
+    
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Text(
+          'حدد النطاق الزمني لاستهلاك أيام من رصيد بدلات الراحة المتاح لديك.',
+          style: TextStyle(fontSize: 14.sp, color: colorScheme.onSurface.withAlpha(150)),
+        ),
+        SizedBox(height: 16.h),
         
-        return const Center(child: CircularProgressIndicator());
-      },
+        BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
+          builder: (context, state) {
+            if (state is RestAllowancesLoaded) {
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  DropdownButtonFormField<RestAllowance>(
+                    value: _selectedEarnedAllowance,
+                    dropdownColor: colorScheme.surface,
+                    decoration: InputDecoration(
+                      labelText: 'اختر العمل الإضافي (الرصيد)',
+                      prefixIcon: Icon(Icons.link_rounded, color: colorScheme.primary),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)), 
+                    ),
+                    items: state.earnedAllowances.map((allowance) {
+                      return DropdownMenuItem<RestAllowance>(
+                        value: allowance,
+                        child: Text(
+                        allowance.startDate.isAtSameMomentAs(allowance.endDate) ? 
+                        allowance.startDate.toFormatCurrentLocale() : '${allowance.startDate.toFormatCurrentLocale()} - ${allowance.endDate.toFormatCurrentLocale()}'),
+                      );
+                    }).toList(),
+                    onChanged: (val) {
+                      setState(() {
+                        _selectedEarnedAllowance = val;
+                        
+                        // إعادة تعيين التواريخ لتجنب أخطاء إذا اختار المستخدم رصيداً تاريخه أحدث من التاريخ المحدد مسبقاً
+                        if (_startDate != null && val != null && _startDate!.isBefore(val.startDate)) {
+                          _startDate = null;
+                          _endDate = null;
+                        }
+                        
+                        if (val != null) {
+                          if (val.notes != null && val.notes!.isNotEmpty) {
+                            _notesController.text = 'بدل عطله (${val.notes}) ';
+                          } else {
+                            _notesController.text = 'بدل إضافي';
+                          }
+                        }
+                      });
+                    },
+                  ),
+                  SizedBox(height: 16.h),
+                  
+                  CustomDateRangePickerField(
+                    startDate: _startDate,
+                    endDate: _endDate,
+                    hintText: 'تاريخ الاستهلاك (الراحة)',
+                    firstDate: effectiveFirstDate, // ربط تاريخ التقويم بتاريخ الاكتساب ديناميكياً
+                    lastDate: FinancialYearCalculator.currentFinancialYearEnd,
+                    onDateSelected: (pickedRange) {
+                      if (pickedRange != null) {
+                        setState(() {
+                          _startDate = pickedRange.start;
+                          _endDate = pickedRange.end;
+                        });
+                      }
+                    },
+                  ),
+                  SizedBox(height: 16.h),
+                  CustomTextField(
+                    label: 'ملاحظات (اختياري)',
+                    icon: Icons.notes_rounded,
+                    controller: _notesController,
+                  ),
+                  SizedBox(height: 24.h),
+                  
+                  ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.orange.shade600,
+                      padding: EdgeInsets.symmetric(vertical: 16.h),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                    ),
+                    onPressed: () {
+                      if (_selectedEarnedAllowance == null || _startDate == null || _endDate == null) {
+                        AppToast.showError(context, 'يرجى إكمال جميع الحقول.');
+                        return;
+                      }
+                      
+                      context.read<RestAllowancesBloc>().add(
+                        ConsumeRestEvent(
+                          startDate: _startDate!,
+                          endDate: _endDate!,
+                          linkedEarnedDate: _selectedEarnedAllowance!.startDate, 
+                          notes: _notesController.text.trim(),
+                        ),
+                      );
+                      context.pop();
+                    },
+                    child: Text('استهلاك الرصيد', style: TextStyle(color: Colors.white, fontSize: 16.sp)),
+                  ),
+                ],
+              );
+            }
+            return const CircularProgressIndicator();
+          },
+        ),
+        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+      ],
     );
   }
 }

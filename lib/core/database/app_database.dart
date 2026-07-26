@@ -20,13 +20,16 @@ class AppDatabase extends _$AppDatabase {
   @override
   MigrationStrategy get migration {
     return MigrationStrategy(
+      // schemaVersion => 1
       onCreate: (Migrator m) async {
         await m.createAll();
       },
       onUpgrade: (Migrator m, int from, int to) async {
+        // schemaVersion => 2
         if (from == 1) {
           await m.createTable(holidaysTable);
         }
+        // schemaVersion => 3
         if (from < 3) {
           await m.createTable(restAllowancesTable);
         }
