@@ -13,18 +13,18 @@ class LeaveListShimmer extends StatelessWidget {
     final highlightColor = isDark ? Colors.grey[700]! : Colors.grey[100]!;
 
     return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h), // إزالة const
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
       itemCount: 5,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
           baseColor: baseColor,
           highlightColor: highlightColor,
           child: Container(
-            margin: EdgeInsets.only(bottom: 14.h), // إزالة const واستخدام .h
-            height: 100.h, // ارتفاع متجاوب يطابق البطاقة الأصلية
+            margin: EdgeInsets.only(bottom: 14.h),
+            height: 100.h, 
             decoration: BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(16.r), // متجاوب
+              borderRadius: BorderRadius.circular(16.r), 
             ),
           ),
         );

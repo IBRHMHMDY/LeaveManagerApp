@@ -1,16 +1,38 @@
+// lib/app/layout/main_layout.dart
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/app/layout/widgets/main_appbar.dart';
 import 'package:leave_manager/app/layout/widgets/main_bottom_nav_bar.dart';
-import 'package:leave_manager/features/leaves/presentation/widgets/show_add_leave_bottomsheet.dart';
-import 'package:leave_manager/shared/themes/app_colors.dart';
-import 'package:leave_manager/shared/widgets/add_leave_button.dart';
+import 'package:leave_manager/shared/widgets/show_toast.dart'; // تمت الإضافة لعرض التنبيه
 
-class MainLayout extends StatelessWidget {
+class MainLayout extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
-
   const MainLayout({super.key, required this.navigationShell});
+
+  @override
+  State<MainLayout> createState() => _MainLayoutState();
+}
+
+class _MainLayoutState extends State<MainLayout> {
+  // متغير لحفظ وقت آخر ضغطة على زر الرجوع
+  DateTime? _currentBackPressTime;
+
+  /// دالة معالجة حدث الرجوع
+  void _onPopInvoked(bool didPop, dynamic result) {
+    if (didPop) return;
+
+    final now = DateTime.now();
+    // إذا لم يضغط من قبل، أو مر أكثر من ثانيتين على آخر ضغطة
+    if (_currentBackPressTime == null ||
+        now.difference(_currentBackPressTime!) > const Duration(seconds: 2)) {
+      _currentBackPressTime = now;
+      AppToast.showWarning(context, 'اضغط مرة أخرى للخروج من التطبيق');
+    } else {
+      // إغلاق التطبيق في حال الضغط مرتين متتاليتين خلال ثانيتين
+      SystemNavigator.pop();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -22,45 +44,30 @@ class MainLayout extends StatelessWidget {
             ? Brightness.light
             : Brightness.dark,
       ),
-      child: Scaffold(
-        appBar: const PreferredSize(
-          preferredSize: Size.fromHeight(kToolbarHeight),
-          child: MainAppBar(),
-        ),
-        body: SafeArea(
-          child: navigationShell,
-        ),
-        floatingActionButton: _buildFloatingActionButton(context),
-        bottomNavigationBar: SafeArea(
-          bottom: true,
-          child: MainBottomNavBar(
-            currentIndex: navigationShell.currentIndex,
-            onTabChanged: (index) {
-              navigationShell.goBranch(
-                index,
-                initialLocation: index == navigationShell.currentIndex,
-              );
-            },
+      // استخدام PopScope لاعتراض زر الرجوع في النظام
+      child: PopScope(
+        canPop: false, // نمنع الخروج التلقائي لمعالجته يدوياً
+        onPopInvokedWithResult: _onPopInvoked,
+        child: Scaffold(
+          appBar: const PreferredSize(
+            preferredSize: Size.fromHeight(kToolbarHeight),
+            child: MainAppBar(),
+          ),
+          body: SafeArea(child: widget.navigationShell),
+          bottomNavigationBar: SafeArea(
+            bottom: true,
+            child: MainBottomNavBar(
+              currentIndex: widget.navigationShell.currentIndex,
+              onTabChanged: (index) {
+                widget.navigationShell.goBranch(
+                  index,
+                  initialLocation: index == widget.navigationShell.currentIndex,
+                );
+              },
+            ),
           ),
         ),
       ),
-    );
-  }
-
-  Widget? _buildFloatingActionButton(BuildContext context) {
-    final currentIndex = navigationShell.currentIndex;
-    
-    // إخفاء الـ FAB في شاشة بدلات الراحة (2) والإعدادات (3)
-    if (currentIndex >= 2) {
-      return null;
-    }
-    
-    return AddLeaveButton(
-      onTap: () => showAddLeaveBottomSheet(context),
-      label: const Text('إجازة جديدة'),
-      icon: const Icon(Icons.add),
-      backgroundColor: AppColors.primaryTeal,
-      foregroundColor: Colors.white,
     );
   }
 }

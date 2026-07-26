@@ -24,27 +24,28 @@ class LeaveManagerApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ScreenUtilInit(
-      designSize: const Size(390, 844), 
-      minTextAdapt: true,
-      splitScreenMode: true,
-      builder: (context, child) {
-        return MultiBlocProvider(
-          providers: [
-            BlocProvider(create: (_) => sl<SettingsBloc>()),
-            BlocProvider(create: (_) => sl<HomeCubit>()),
-            BlocProvider(create: (_) => sl<LeavesBloc>()),
-            BlocProvider(create: (_) => sl<ThemeCubit>()),
-            BlocProvider(
-              create: (_) => sl<HolidaysCubit>()..loadHolidays(),
-            ),
-            BlocProvider(create: (_) => sl<RestAllowancesBloc>()),
-          ],
-          child: BlocBuilder<ThemeCubit, ThemeMode>(
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(create: (_) => sl<SettingsBloc>()),
+        BlocProvider(create: (_) => sl<HomeCubit>()),
+        BlocProvider(create: (_) => sl<LeavesBloc>()),
+        BlocProvider(create: (_) => sl<ThemeCubit>()),
+        BlocProvider(
+          create: (_) => sl<HolidaysCubit>()..loadHolidays(),
+        ),
+        BlocProvider(create: (_) => sl<RestAllowancesBloc>()),
+      ],
+      child: ScreenUtilInit(
+        designSize: const Size(390, 844),
+        minTextAdapt: true,
+        splitScreenMode: true,
+        // 2. استخدام child بدلاً من وضع الكود مباشرة داخل الـ builder
+        builder: (context, child) {
+          return BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {
               return MaterialApp.router(
                 debugShowCheckedModeBanner: false,
-                title: 'مدير اجازاتى',
+                title: 'مدير إجازاتي',
                 supportedLocales: const [Locale('ar', 'EG'), Locale('en', 'US')],
                 localizationsDelegates: const [
                   GlobalMaterialLocalizations.delegate,
@@ -58,9 +59,9 @@ class LeaveManagerApp extends StatelessWidget {
                 routerConfig: AppRouter.router,
               );
             },
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 @DataClassName('LeaveRecordModel')
+@TableIndex(name: 'idx_leave_dates', columns: {#startDate, #endDate})
 class LeaveRecordsTable extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get leaveType => integer()(); 

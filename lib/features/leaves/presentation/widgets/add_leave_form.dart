@@ -28,6 +28,9 @@ class AddLeaveFormState extends State<AddLeaveForm> {
   DateTime? _startDate;
   DateTime? _endDate;
   final TextEditingController _notesController = TextEditingController();
+  
+  // الاحتفاظ بالتواريخ المحجوزة في Set لضمان سرعة البحث O(1)
+  final Set<DateTime> _blockedDates = {};
 
   @override
   void dispose() {
@@ -35,62 +38,29 @@ class AddLeaveFormState extends State<AddLeaveForm> {
     super.dispose();
   }
 
-  /// التحقق من أن اليوم غير محجوز مسبقاً كعطلة أو كإجازة سابقة (تمنع النقر المباشر)
-  bool _isDaySelectable(
-      DateTime day, List<Holiday> holidays, List<LeaveRecord> existingLeaves) {
-    final dateToCheck = DateTime(day.year, day.month, day.day);
-
+  // دالة لحساب التواريخ المحجوزة مرة واحدة فقط
+  void _calculateBlockedDates(List<Holiday> holidays, List<LeaveRecord> existingLeaves) {
+    _blockedDates.clear();
+    
     for (final holiday in holidays) {
-      final start = DateTime(
-          holiday.startDate.year, holiday.startDate.month, holiday.startDate.day);
-      final end = DateTime(
-          holiday.endDate.year, holiday.endDate.month, holiday.endDate.day);
-
-      if ((dateToCheck.isAtSameMomentAs(start) || dateToCheck.isAfter(start)) &&
-          (dateToCheck.isAtSameMomentAs(end) || dateToCheck.isBefore(end))) {
-        return false;
+      for (DateTime d = holiday.startDate; !d.isAfter(holiday.endDate); d = d.add(const Duration(days: 1))) {
+        _blockedDates.add(DateTime(d.year, d.month, d.day));
       }
     }
-
+    
     for (final leave in existingLeaves) {
-      final start = DateTime(
-          leave.startDate.year, leave.startDate.month, leave.startDate.day);
-      final end = DateTime(
-          leave.endDate.year, leave.endDate.month, leave.endDate.day);
-
-      if ((dateToCheck.isAtSameMomentAs(start) || dateToCheck.isAfter(start)) &&
-          (dateToCheck.isAtSameMomentAs(end) || dateToCheck.isBefore(end))) {
-        return false;
+      for (DateTime d = leave.startDate; !d.isAfter(leave.endDate); d = d.add(const Duration(days: 1))) {
+        _blockedDates.add(DateTime(d.year, d.month, d.day));
       }
     }
-
-    return true;
   }
 
-  /// التحقق من تداخل النطاق الزمني بالكامل مع أي عطلة أو إجازة سابقة (تمنع التحديد الممتد)
-  bool _hasOverlap(DateTime start, DateTime end, List<Holiday> holidays, List<LeaveRecord> existingLeaves) {
-    final rangeStart = DateTime(start.year, start.month, start.day);
-    final rangeEnd = DateTime(end.year, end.month, end.day);
-
-    // 1. التحقق من التقاطع مع العطلات الرسمية
-    for (final holiday in holidays) {
-      final hStart = DateTime(holiday.startDate.year, holiday.startDate.month, holiday.startDate.day);
-      final hEnd = DateTime(holiday.endDate.year, holiday.endDate.month, holiday.endDate.day);
-      // إذا كان النطاق يتقاطع مع العطلة
-      if (!rangeStart.isAfter(hEnd) && !rangeEnd.isBefore(hStart)) return true;
+  bool _hasOverlap(DateTime start, DateTime end) {
+    for (DateTime d = start; !d.isAfter(end); d = d.add(const Duration(days: 1))) {
+      if (_blockedDates.contains(DateTime(d.year, d.month, d.day))) return true;
     }
-
-    // 2. التحقق من التقاطع مع الإجازات السابقة
-    for (final leave in existingLeaves) {
-      final lStart = DateTime(leave.startDate.year, leave.startDate.month, leave.startDate.day);
-      final lEnd = DateTime(leave.endDate.year, leave.endDate.month, leave.endDate.day);
-      // إذا كان النطاق يتقاطع مع إجازة سابقة
-      if (!rangeStart.isAfter(lEnd) && !rangeEnd.isBefore(lStart)) return true;
-    }
-
     return false;
   }
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -99,16 +69,13 @@ class AddLeaveFormState extends State<AddLeaveForm> {
     final fillColor = isDark ? Colors.black12 : Colors.grey.shade50;
 
     final holidaysState = context.watch<HolidaysCubit>().state;
-    List<Holiday> holidays = [];
-    if (holidaysState is HolidaysLoaded) {
-      holidays = holidaysState.financialYearHolidays;
-    }
+    List<Holiday> holidays = holidaysState is HolidaysLoaded ? holidaysState.financialYearHolidays : [];
 
     final leavesState = context.watch<LeavesBloc>().state;
-    List<LeaveRecord> existingLeaves = [];
-    if (leavesState is LeavesLoaded) {
-      existingLeaves = leavesState.currentYearLeaves;
-    }
+    List<LeaveRecord> existingLeaves = leavesState is LeavesLoaded ? leavesState.currentYearLeaves : [];
+
+    // حساب التواريخ المحجوزة قبل رسم دالة التقويم
+    _calculateBlockedDates(holidays, existingLeaves);
 
     return BlocListener<LeavesBloc, LeavesState>(
       bloc: context.read<LeavesBloc>(),
@@ -183,8 +150,10 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             hintText: 'اختر تاريخ الإجازة',
             firstDate: FinancialYearCalculator.currentFinancialYearStart,
             lastDate: DateTime(DateTime.now().year + 10),
-            selectableDayPredicate: (day) =>
-                _isDaySelectable(day, holidays, existingLeaves),
+            selectableDayPredicate: (day) {
+               final dateToCheck = DateTime(day.year, day.month, day.day);
+               return !_blockedDates.contains(dateToCheck);
+            },
             onDateSelected: (DateTimeRange? pickedRange) {
               if (pickedRange != null) {
                 setState(() {
@@ -223,7 +192,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                         if (_startDate != null && _endDate != null) {
                           
                           // التحقق من تداخل النطاق المختار مع أي عطلة أو إجازة
-                          if (_hasOverlap(_startDate!, _endDate!, holidays, existingLeaves)) {
+                          if (_hasOverlap(_startDate!, _endDate!)) {
                             AppToast.showError(
                               context, 
                               'الفترة المحددة تتخللها عطلة رسمية أو إجازة سابقة. يرجى تقسيم الإجازة.'

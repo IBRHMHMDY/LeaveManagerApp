@@ -1,6 +1,7 @@
 import 'package:drift/drift.dart';
 
 @DataClassName('RestAllowanceModel')
+@TableIndex(name: 'idx_rest_dates', columns: {#startDate, #endDate})
 class RestAllowancesTable extends Table {
   IntColumn get id => integer().autoIncrement()();
   IntColumn get type => integer()(); // نوع الحركة: 0 = بدل مكتسب (Earned)، 1 = استهلاك (Consumed)

@@ -6,6 +6,8 @@ import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
@@ -95,6 +97,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         } else if (state is SettingsSavedSuccess) {
           context.read<SettingsBloc>().add(LoadSettingsEvent());
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
+          context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
           AppToast.showSuccess(context, 'تم حفظ الإعدادات بنجاح');
           
           if (_isFirstTime) {

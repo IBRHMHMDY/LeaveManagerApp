@@ -68,8 +68,8 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
               children: [
                 RestAllowanceTabs(
                   showEarned: _showEarned,
-                  earnedCount: state.earnedAllowances.length,
-                  consumedCount: state.consumedAllowances.length,
+                  earnedCount: state.totalAvailableDays,
+                  consumedCount: state.totalConsumedDays,
                   onChanged: (isEarned) {
                     setState(() {
                       _showEarned = isEarned;

@@ -1594,6 +1594,18 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $HolidaysTableTable holidaysTable = $HolidaysTableTable(this);
   late final $RestAllowancesTableTable restAllowancesTable =
       $RestAllowancesTableTable(this);
+  late final Index idxLeaveDates = Index(
+    'idx_leave_dates',
+    'CREATE INDEX idx_leave_dates ON leave_records_table (start_date, end_date)',
+  );
+  late final Index idxHolidayDates = Index(
+    'idx_holiday_dates',
+    'CREATE INDEX idx_holiday_dates ON holidays_table (start_date, end_date)',
+  );
+  late final Index idxRestDates = Index(
+    'idx_rest_dates',
+    'CREATE INDEX idx_rest_dates ON rest_allowances_table (start_date, end_date)',
+  );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -1603,6 +1615,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     leaveRecordsTable,
     holidaysTable,
     restAllowancesTable,
+    idxLeaveDates,
+    idxHolidayDates,
+    idxRestDates,
   ];
 }
 

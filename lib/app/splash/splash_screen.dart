@@ -7,6 +7,8 @@ import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/app/splash/widgets/custom_app_logo.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/shared/widgets/current_version.dart';
@@ -79,6 +81,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
         if (state is SettingsExists) {
           context.read<SettingsBloc>().add(LoadSettingsEvent());
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
+          context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
           context.go(AppRouter.home);
         } else if (state is SettingsNotFound) {
           // التوجيه إلى مسار الإعداد المستقل

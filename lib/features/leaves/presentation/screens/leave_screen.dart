@@ -6,6 +6,9 @@ import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/build_filter_chips.dart';
+import 'package:leave_manager/features/leaves/presentation/widgets/show_add_leave_bottomsheet.dart';
+import 'package:leave_manager/shared/themes/app_colors.dart';
+import 'package:leave_manager/shared/widgets/add_leave_button.dart';
 import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
@@ -85,6 +88,16 @@ class _LeaveScreenState extends State<LeaveScreen> {
           ],
         ),
       ),
+      floatingActionButton: AddLeaveButton(
+      onTap: () => showAddLeaveBottomSheet(context),
+      label: const Text('إجازة جديدة'),
+      icon: const Icon(Icons.add),
+      backgroundColor: AppColors.primaryTeal,
+      foregroundColor: Colors.white,
+    )
     );
   }
 }
+  
+
+
