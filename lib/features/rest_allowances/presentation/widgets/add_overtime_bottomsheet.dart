@@ -1,4 +1,4 @@
-// lib/features/rest_allowances/presentation/widgets/add_earned_rest_bottomsheet.dart
+// lib/features/rest_allowances/presentation/widgets/add_overtime_bottomsheet.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -20,7 +20,7 @@ import 'package:leave_manager/shared/widgets/show_toast.dart';
 void showAddOvertimeBottomSheet(BuildContext context) {
   ShowBottomSheet.show(
     context: context,
-    title: 'تسجيل أيام عمل إضافي / عطلة',
+    title: 'تسجيل عمل إضافي / عطلة',
     icon: Icons.add_circle_outline_rounded,
     isScrollControlled: true,
     child: const _AddOvertimeForm(),
@@ -38,13 +38,13 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
   DateTime? _startDate;
   DateTime? _endDate;
   WorkReason _selectedReason = WorkReason.holiday;
-  
-  Holiday? _selectedHoliday; 
+  Holiday? _selectedHoliday;
   
   final TextEditingController _notesController = TextEditingController();
 
   @override
   void dispose() {
+    // تنظيف الـ Controller لمنع Memory Leaks
     _notesController.dispose();
     super.dispose();
   }
@@ -53,22 +53,13 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final blockedDates = context.getBlockedDates(includeHolidays: false);
-    // final now = DateTime.now();
-    // final effectiveLastDate = now.isBefore(FinancialYearCalculator.currentFinancialYearEnd)
-    //     ? now
-    //     : FinancialYearCalculator.currentFinancialYearEnd;
-
-    // DateTime effectiveFirstDate = FinancialYearCalculator.currentFinancialYearStart;
-    // if (_selectedReason == WorkReason.holiday && _selectedHoliday != null) {
-    //   effectiveFirstDate = _selectedHoliday!.startDate;
-    // }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'قم بتسجيل أيام العمل الإضافية أو العطلات التي عملت بها لتحويلها إلى رصيد بدلات راحة.',
+          'قم بتسجيل أيام العمل الإضافي أو العطلات الرسمية التي عملت بها لإضافتها إلى رصيدك.',
           style: TextStyle(fontSize: 14.sp, color: colorScheme.onSurface.withAlpha(150)),
         ),
         SizedBox(height: 16.h),
@@ -82,8 +73,8 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
           ),
           items: const [
-            DropdownMenuItem(value: WorkReason.holiday, child: Text('يوم عطلة رسمية')),
-            DropdownMenuItem(value: WorkReason.overtime, child: Text('عمل إضافي عادي')),
+            DropdownMenuItem(value: WorkReason.holiday, child: Text('عطلة رسمية')),
+            DropdownMenuItem(value: WorkReason.overtime, child: Text('عمل إضافي (Overtime)')),
           ],
           onChanged: (val) {
             if (val != null) {
@@ -98,12 +89,12 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
           },
         ),
         SizedBox(height: 16.h),
-
+        
         if (_selectedReason == WorkReason.holiday) ...[
           BlocBuilder<HolidaysCubit, HolidaysState>(
             builder: (context, state) {
               if (state is HolidaysLoaded) {
-                // 1. قراءة حالة العمل الإضافي لمعرفة العطلات المسجلة مسبقاً
+                // تصفية العطلات المتاحة للعرض فقط (UI Logic)
                 final restState = context.read<RestAllowancesBloc>().state;
                 List<int> registeredHolidayIds = [];
                 
@@ -114,12 +105,10 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
                       .toList();
                 }
 
-                // 2. تصفية العطلات لإظهار غير المسجلة فقط (تطبيق Filter)
                 final availableHolidays = state.financialYearHolidays
                     .where((holiday) => !registeredHolidayIds.contains(holiday.id))
                     .toList();
 
-                // 3. معالجة حالة عدم وجود عطلات متاحة
                 if (availableHolidays.isEmpty) {
                   return Container(
                     padding: EdgeInsets.all(16.w),
@@ -134,7 +123,7 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
                         SizedBox(width: 8.w),
                         Expanded(
                           child: Text(
-                            'لا توجد عطلات متاحة (تم تسجيل جميع العطلات لهذه السنه).',
+                            'لا توجد عطلات رسمية متاحة (تم تسجيل جميع العطلات أو لا توجد عطلات في السنة المالية الحالية).',
                             style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13.sp),
                           ),
                         ),
@@ -143,12 +132,11 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
                   );
                 }
 
-                // 4. عرض القائمة المنسدلة للعطلات المتاحة فقط
                 return DropdownButtonFormField<Holiday>(
                   value: _selectedHoliday,
                   dropdownColor: colorScheme.surface,
                   decoration: InputDecoration(
-                    labelText: 'اختر العطلة',
+                    labelText: 'اختر العطلة الرسمية',
                     prefixIcon: Icon(Icons.celebration_rounded, color: colorScheme.primary),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
@@ -164,8 +152,7 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
                         _selectedHoliday = val;
                         _startDate = val.startDate;
                         _endDate = val.endDate;
-                        
-                        _notesController.text = 'عمل إضافي لعطلة: ${val.name}';
+                        _notesController.text = 'بدل راحة عن: ${val.name}';
                       });
                     }
                   },
@@ -176,11 +163,11 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
           ),
           SizedBox(height: 16.h),
         ],
-
+        
         CustomDateRangePickerField(
           startDate: _startDate,
           endDate: _endDate,
-          hintText: _selectedReason == WorkReason.holiday ? 'تاريخ العمل الفعلي' : 'تاريخ العمل الإضافي',
+          hintText: _selectedReason == WorkReason.holiday ? 'تاريخ العطلة' : 'فترة العمل الإضافي',
           firstDate: FinancialYearCalculator.currentFinancialYearStart,
           lastDate: FinancialYearCalculator.currentFinancialYearEnd,
           selectableDayPredicate: (day) {
@@ -195,10 +182,10 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
             }
           },
         ),
-          
         SizedBox(height: 16.h),
+        
         CustomTextField(
-          label: 'ملاحظات',
+          label: 'ملاحظات (اختياري)',
           icon: Icons.notes_rounded,
           controller: _notesController,
         ),
@@ -217,22 +204,24 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
               onPressed: isLoading
                   ? null
                   : () {
+                      // UI Validation فقط
                       if (_selectedReason == WorkReason.holiday && _selectedHoliday == null) {
-                        AppToast.showError(context, 'يرجى اختيار العطلة الرسمية أولاً.');
+                        AppToast.showError(context, 'يرجى اختيار العطلة الرسمية.');
                         return;
                       }
                       if (_startDate == null || _endDate == null) {
-                        AppToast.showError(context, 'يرجى تحديد تاريخ العمل الفعلي.');
+                        AppToast.showError(context, 'يرجى تحديد التاريخ بشكل صحيح.');
                         return;
                       }
                       
+                      // تفويض الـ Business Logic إلى الـ BLoC
                       context.read<RestAllowancesBloc>().add(
                         AddEarnedRestEvent(
                           startDate: _startDate!,
                           endDate: _endDate!,
                           workReason: _selectedReason,
                           notes: _notesController.text.trim(),
-                          holidayId: _selectedReason == WorkReason.holiday ? _selectedHoliday?.id : null, 
+                          holidayId: _selectedReason == WorkReason.holiday ? _selectedHoliday?.id : null,
                         ),
                       );
                       context.pop();
@@ -243,7 +232,7 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
                       width: 24.h,
                       child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2),
                     )
-                  : Text('إضافة الرصيد', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                  : Text('إضافة للرصيد', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
             );
           },
         ),

@@ -3,26 +3,35 @@ import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/overtime_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
 import 'package:leave_manager/features/rest_allowances/domain/usecases/add_overtime_usecase.dart';
 import 'package:leave_manager/features/rest_allowances/domain/usecases/add_rest_usecase.dart';
-import 'package:leave_manager/features/rest_allowances/domain/repositories/rest_allowances_repository.dart';
-
+import 'package:leave_manager/features/rest_allowances/domain/usecases/get_overtime_records_usecase.dart';
+import 'package:leave_manager/features/rest_allowances/domain/usecases/get_rest_allowances_usecase.dart';
+import 'package:leave_manager/features/rest_allowances/domain/usecases/delete_overtime_usecase.dart';
+import 'package:leave_manager/features/rest_allowances/domain/usecases/delete_rest_allowance_usecase.dart';
 import 'rest_allowances_event.dart';
 import 'rest_allowances_state.dart';
 
 @injectable
 class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> {
+  // 1. حقن الـ UseCases بدلاً من الـ Repository
   final AddOvertimeUseCase addOvertime;
   final AddRestUseCase addRest;
-
-  final RestAllowancesRepository repository;
+  final GetOvertimeRecordsUseCase getOvertimeRecords;
+  final GetRestAllowancesUseCase getRestAllowances;
+  final DeleteOvertimeUseCase deleteOvertime;
+  final DeleteRestAllowanceUseCase deleteRestAllowance;
 
   RestAllowancesBloc({
     required this.addOvertime,
     required this.addRest,
-    required this.repository,
+    required this.getOvertimeRecords,
+    required this.getRestAllowances,
+    required this.deleteOvertime,
+    required this.deleteRestAllowance,
   }) : super(RestAllowancesInitial()) {
     on<LoadRestAllowancesEvent>(_onLoadRestAllowances);
     on<AddEarnedRestEvent>(_onAddOverTime);
@@ -35,13 +44,12 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
       LoadRestAllowancesEvent event, Emitter<RestAllowancesState> emit) async {
     emit(RestAllowancesLoading());
 
-    // جلب بيانات العمل الإضافي وبدلات الراحة بالتوازي
+    // 2. استخدام Future.wait لجلب البيانات بشكل متوازٍ لتحسين الأداء
     final results = await Future.wait([
-      repository.getOvertimeRecords(),
-      repository.getRestAllowances(),
+      getOvertimeRecords(const NoParams()),
+      getRestAllowances(const NoParams()),
     ]);
 
-    // تحديد النوع الصريح لكل نتيجة بدلاً من استخدام dynamic
     final overtimesResult = results[0] as Either<Failure, List<OvertimeRecord>>;
     final restsResult = results[1] as Either<Failure, List<RestAllowance>>;
 
@@ -51,7 +59,7 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
         restsResult.fold(
           (failure) => emit(RestAllowancesError(failure.message)),
           (rests) {
-            // الآن يتعرف Dart على overtimes و rests كقوائم صحيحة
+            // حساب الأرصدة
             final totalEarnedDays = overtimes.fold<int>(0, (sum, e) => sum + e.daysCount);
             final totalConsumedDays = rests.fold<int>(0, (sum, e) => sum + e.daysCount);
             final totalAvailableDays = totalEarnedDays - totalConsumedDays;
@@ -71,13 +79,13 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
   Future<void> _onAddOverTime(
       AddEarnedRestEvent event, Emitter<RestAllowancesState> emit) async {
     emit(RestAllowancesLoading());
-
+    
     final result = await addOvertime(AddOvertimeParams(
       startDate: event.startDate,
       endDate: event.endDate,
       workReason: event.workReason,
       notes: event.notes,
-      holidayId: event.holidayId
+      holidayId: event.holidayId,
     ));
 
     result.fold(
@@ -86,7 +94,7 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
         add(LoadRestAllowancesEvent());
       },
       (_) {
-        emit(const RestAllowanceActionSuccess('تم تسجيل العمل الإضافي/العطلة بنجاح.'));
+        emit(const RestAllowanceActionSuccess('تم إضافة رصيد الراحة بنجاح.'));
         add(LoadRestAllowancesEvent());
       },
     );
@@ -117,7 +125,7 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
         add(LoadRestAllowancesEvent());
       },
       (_) {
-        emit(const RestAllowanceActionSuccess('تم تسجيل بدل الراحة بنجاح.'));
+        emit(const RestAllowanceActionSuccess('تم استهلاك الراحة بنجاح.'));
         add(LoadRestAllowancesEvent());
       },
     );
@@ -126,7 +134,9 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
   Future<void> _onDeleteOvertime(
       DeleteOvertimeEvent event, Emitter<RestAllowancesState> emit) async {
     emit(RestAllowancesLoading());
-    final result = await repository.deleteOvertimeRecord(event.id);
+    // 3. التخاطب مع UseCase حصرياً وليس Repository
+    final result = await deleteOvertime(event.id);
+
     result.fold(
       (failure) => emit(RestAllowancesError(failure.message)),
       (_) {
@@ -139,11 +149,13 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
   Future<void> _onDeleteRestAllowance(
       DeleteRestEvent event, Emitter<RestAllowancesState> emit) async {
     emit(RestAllowancesLoading());
-    final result = await repository.deleteRestAllowance(event.id);
+    // 3. التخاطب مع UseCase حصرياً
+    final result = await deleteRestAllowance(event.id);
+
     result.fold(
       (failure) => emit(RestAllowancesError(failure.message)),
       (_) {
-        emit(const RestAllowanceActionSuccess('تم حذف بدل الراحة بنجاح.'));
+        emit(const RestAllowanceActionSuccess('تم حذف الراحة المستهلكة بنجاح.'));
         add(LoadRestAllowancesEvent());
       },
     );

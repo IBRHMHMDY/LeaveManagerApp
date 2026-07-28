@@ -52,8 +52,12 @@ import '../../features/rest_allowances/domain/usecases/add_overtime_usecase.dart
     as _i426;
 import '../../features/rest_allowances/domain/usecases/add_rest_usecase.dart'
     as _i486;
+import '../../features/rest_allowances/domain/usecases/delete_overtime_usecase.dart'
+    as _i236;
 import '../../features/rest_allowances/domain/usecases/delete_rest_allowance_usecase.dart'
     as _i399;
+import '../../features/rest_allowances/domain/usecases/get_overtime_records_usecase.dart'
+    as _i538;
 import '../../features/rest_allowances/domain/usecases/get_rest_allowances_usecase.dart'
     as _i285;
 import '../../features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart'
@@ -140,10 +144,17 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1053.GetFinancialYearHolidaysUseCase>(),
       ),
     );
+    gh.lazySingleton<_i236.DeleteOvertimeUseCase>(
+      () => _i236.DeleteOvertimeUseCase(gh<_i314.RestAllowancesRepository>()),
+    );
     gh.lazySingleton<_i399.DeleteRestAllowanceUseCase>(
       () => _i399.DeleteRestAllowanceUseCase(
         gh<_i314.RestAllowancesRepository>(),
       ),
+    );
+    gh.lazySingleton<_i538.GetOvertimeRecordsUseCase>(
+      () =>
+          _i538.GetOvertimeRecordsUseCase(gh<_i314.RestAllowancesRepository>()),
     );
     gh.lazySingleton<_i285.GetRestAllowancesUseCase>(
       () =>
@@ -190,18 +201,21 @@ extension GetItInjectableX on _i174.GetIt {
         saveSettings: gh<_i109.SaveSettingsUseCase>(),
       ),
     );
+    gh.factory<_i673.RestAllowancesBloc>(
+      () => _i673.RestAllowancesBloc(
+        addOvertime: gh<_i426.AddOvertimeUseCase>(),
+        addRest: gh<_i486.AddRestUseCase>(),
+        getOvertimeRecords: gh<_i538.GetOvertimeRecordsUseCase>(),
+        getRestAllowances: gh<_i285.GetRestAllowancesUseCase>(),
+        deleteOvertime: gh<_i236.DeleteOvertimeUseCase>(),
+        deleteRestAllowance: gh<_i399.DeleteRestAllowanceUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i501.DeleteLeaveUseCase>(
       () => _i501.DeleteLeaveUseCase(gh<_i388.LeaveRepository>()),
     );
     gh.lazySingleton<_i972.GetCurrentYearLeavesUseCase>(
       () => _i972.GetCurrentYearLeavesUseCase(gh<_i388.LeaveRepository>()),
-    );
-    gh.factory<_i673.RestAllowancesBloc>(
-      () => _i673.RestAllowancesBloc(
-        addOvertime: gh<_i426.AddOvertimeUseCase>(),
-        addRest: gh<_i486.AddRestUseCase>(),
-        repository: gh<_i314.RestAllowancesRepository>(),
-      ),
     );
     gh.lazySingleton<_i952.CalculateBalancesUseCase>(
       () => _i952.CalculateBalancesUseCase(

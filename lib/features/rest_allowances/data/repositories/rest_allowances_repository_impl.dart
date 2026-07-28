@@ -20,7 +20,7 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
   RestAllowancesRepositoryImpl(this.localDataSource);
 
   // ==========================================
-  // 1. عمليات العمل الإضافي (Overtime Records)
+  // 1. سجلات العمل الإضافي (Overtime Records)
   // ==========================================
 
   @override
@@ -33,14 +33,17 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
         daysCount: Value(record.daysCount),
         holidayId: Value(record.holidayId),
         isConsumed: Value(record.isConsumed),
-        notes: record.notes != null && record.notes!.isNotEmpty 
-            ? Value(record.notes) 
+        notes: record.notes != null && record.notes!.isNotEmpty
+            ? Value(record.notes)
             : const Value.absent(),
       );
+
       await localDataSource.addOvertimeRecord(companion);
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
+    } catch (e, stackTrace) {
+      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
     }
   }
 
@@ -52,6 +55,8 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
       return Right(domainEntities);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
+    } catch (e, stackTrace) {
+      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
     }
   }
 
@@ -62,6 +67,8 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
+    } catch (e, stackTrace) {
+      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
     }
   }
 
@@ -72,31 +79,35 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
+    } catch (e, stackTrace) {
+      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
     }
   }
 
   // ==========================================
-  // 2. عمليات بدلات الراحة (Rest Allowances)
+  // 2. أرصدة الراحة (Rest Allowances)
   // ==========================================
 
   @override
   Future<Either<Failure, Unit>> addRestAllowance(RestAllowance allowance) async {
     try {
       final companion = RestAllowancesTableCompanion(
-        // تحويل الـ Enum إلى Integer
         workReason: Value(allowance.workReason == WorkReason.holiday ? 0 : 1),
         overtimeId: Value(allowance.overtimeId),
         startDate: Value(allowance.startDate),
         endDate: Value(allowance.endDate),
         daysCount: Value(allowance.daysCount),
-        notes: allowance.notes != null && allowance.notes!.isNotEmpty 
-            ? Value(allowance.notes) 
+        notes: allowance.notes != null && allowance.notes!.isNotEmpty
+            ? Value(allowance.notes)
             : const Value.absent(),
       );
+
       await localDataSource.addRestAllowance(companion);
       return const Right(unit);
     } on DatabaseException catch (e) {
-      return Left(DatabaseFailure(e.message)); // استخدام dartz لمعالجة الأخطاء
+      return Left(DatabaseFailure(e.message)); 
+    } catch (e, stackTrace) {
+      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
     }
   }
 
@@ -108,6 +119,8 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
       return Right(domainEntities);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
+    } catch (e, stackTrace) {
+      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
     }
   }
 
@@ -118,6 +131,8 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
+    } catch (e, stackTrace) {
+      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
     }
   }
 }

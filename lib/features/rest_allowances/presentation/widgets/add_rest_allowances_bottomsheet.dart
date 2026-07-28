@@ -1,4 +1,4 @@
-// lib/features/rest_allowances/presentation/widgets/consume_rest_bottomsheet.dart
+// lib/features/rest_allowances/presentation/widgets/add_rest_allowances_bottomsheet.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -19,7 +19,7 @@ import 'package:leave_manager/core/utils/enums/work_reason.dart';
 void showRestAllowancesBottomSheet(BuildContext context) {
   ShowBottomSheet.show(
     context: context,
-    title: 'تسجيل بدل راحة',
+    title: 'استهلاك بدل راحة',
     icon: Icons.event_available_rounded,
     isScrollControlled: true,
     child: const _AddRestAllowancesForm(),
@@ -37,6 +37,7 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
   DateTime? _startDate;
   DateTime? _endDate;
   OvertimeRecord? _selectedOvertime;
+  
   final TextEditingController _notesController = TextEditingController();
 
   @override
@@ -49,10 +50,9 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final blockedDates = context.getBlockedDates();
-    DateTime effectiveFirstDate =
-        FinancialYearCalculator.currentFinancialYearStart;
-    if (_selectedOvertime != null &&
-        _selectedOvertime!.startDate.isAfter(effectiveFirstDate)) {
+
+    DateTime effectiveFirstDate = FinancialYearCalculator.currentFinancialYearStart;
+    if (_selectedOvertime != null && _selectedOvertime!.startDate.isAfter(effectiveFirstDate)) {
       effectiveFirstDate = _selectedOvertime!.startDate;
     }
 
@@ -61,22 +61,19 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
         Text(
-          'اختر يوم العمل الإضافي المتاح لخصم بدل الراحة منه.',
+          'قم باختيار رصيد العمل الإضافي المتاح لتحويله إلى أيام إجازة (بدل راحة).',
           style: TextStyle(
             fontSize: 14.sp,
             color: colorScheme.onSurface.withAlpha(150),
           ),
         ),
         SizedBox(height: 16.h),
-
+        
         BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
           builder: (context, state) {
             if (state is RestAllowancesLoaded) {
-              // تصفية الأرصدة المتاحة التي لم يتم استهلاكها بعد
-              final availableOvertimes = state.earnedAllowances
-                  .where((ot) => !ot.isConsumed)
-                  .toList();
-
+              final availableOvertimes = state.earnedAllowances.where((ot) => !ot.isConsumed).toList();
+              
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -84,19 +81,12 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                     value: _selectedOvertime,
                     dropdownColor: colorScheme.surface,
                     decoration: InputDecoration(
-                      labelText: 'اختر الرصيد الأساسي',
-                      prefixIcon: Icon(
-                        Icons.link_rounded,
-                        color: colorScheme.primary,
-                      ),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
+                      labelText: 'اختر الرصيد المتاح (ارتباط بـ)',
+                      prefixIcon: Icon(Icons.link_rounded, color: colorScheme.primary),
+                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
                     items: availableOvertimes.map((ot) {
-                      final title = ot.workReason == WorkReason.holiday
-                          ? 'عن عطلة'
-                          : 'عن إضافي';
+                      final title = ot.workReason == WorkReason.holiday ? 'عطلة رسمية' : 'عمل إضافي';
                       final date = ot.startDate.isAtSameMomentAs(ot.endDate)
                           ? ot.startDate.toFormatCurrentLocale()
                           : '${ot.startDate.toFormatCurrentLocale()} - ${ot.endDate.toFormatCurrentLocale()}';
@@ -108,36 +98,27 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                     onChanged: (val) {
                       setState(() {
                         _selectedOvertime = val;
-
-                        if (_startDate != null &&
-                            val != null &&
-                            _startDate!.isBefore(val.startDate)) {
+                        if (_startDate != null && val != null && _startDate!.isBefore(val.startDate)) {
                           _startDate = null;
                           _endDate = null;
                         }
-
                         if (val != null) {
-                          final reasonLabel =
-                              val.workReason == WorkReason.holiday
-                              ? 'عطلة رسمية'
-                              : 'يوم عمل إضافي';
-                          _notesController.text = 'بدل راحة عن $reasonLabel';
+                          final reasonLabel = val.workReason == WorkReason.holiday ? 'عطلة رسمية' : 'عمل إضافي';
+                          _notesController.text = 'بدل راحة مقابل $reasonLabel';
                         }
                       });
                     },
                   ),
                   SizedBox(height: 16.h),
-
+                  
                   CustomDateRangePickerField(
                     startDate: _startDate,
                     endDate: _endDate,
-                    hintText: 'تاريخ بدل الراحة',
+                    hintText: 'تاريخ الإجازة (بدل الراحة)',
                     firstDate: effectiveFirstDate,
                     lastDate: FinancialYearCalculator.currentFinancialYearEnd,
                     selectableDayPredicate: (day) {
-                      return !blockedDates.contains(
-                        DateTime(day.year, day.month, day.day),
-                      );
+                      return !blockedDates.contains(DateTime(day.year, day.month, day.day));
                     },
                     onDateSelected: (pickedRange) {
                       if (pickedRange != null) {
@@ -149,33 +130,28 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                     },
                   ),
                   SizedBox(height: 16.h),
-
+                  
                   CustomTextField(
                     label: 'ملاحظات',
                     icon: Icons.notes_rounded,
                     controller: _notesController,
                   ),
                   SizedBox(height: 24.h),
-
+                  
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.orange.shade600,
                       padding: EdgeInsets.symmetric(vertical: 16.h),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12.r),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
                     onPressed: () {
-                      if (_selectedOvertime == null ||
-                          _startDate == null ||
-                          _endDate == null) {
-                        AppToast.showError(
-                          context,
-                          'يرجى إكمال الحقول المطلوبة.',
-                        );
+                      // UI Validation فقط
+                      if (_selectedOvertime == null || _startDate == null || _endDate == null) {
+                        AppToast.showError(context, 'يرجى تعبئة جميع الحقول بشكل صحيح.');
                         return;
                       }
-
+                      
+                      // تمرير الحدث للـ BLoC للتعامل مع الـ Business Logic
                       context.read<RestAllowancesBloc>().add(
                         ConsumeRestEvent(
                           startDate: _startDate!,
@@ -189,12 +165,8 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                       context.pop();
                     },
                     child: Text(
-                      'حفظ بدل الراحة',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                      ),
+                      'استهلاك كبدل راحة',
+                      style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.bold),
                     ),
                   ),
                 ],

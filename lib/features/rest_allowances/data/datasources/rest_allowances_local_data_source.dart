@@ -5,13 +5,11 @@ import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
 
 abstract class RestAllowancesLocalDataSource {
-  // عمليات العمل الإضافي
   Future<void> addOvertimeRecord(OvertimeRecordsTableCompanion companion);
   Future<List<OvertimeRecordModel>> getOvertimeRecords();
   Future<void> updateOvertimeConsumedStatus(int id, bool isConsumed);
   Future<void> deleteOvertimeRecord(int id);
-
-  // عمليات بدلات الراحة
+  
   Future<void> addRestAllowance(RestAllowancesTableCompanion companion);
   Future<List<RestAllowanceModel>> getRestAllowances();
   Future<void> deleteRestAllowance(int id);
@@ -27,8 +25,8 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
   Future<void> addOvertimeRecord(OvertimeRecordsTableCompanion companion) async {
     try {
       await db.into(db.overtimeRecordsTable).insert(companion);
-    } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء إضافة سجل العمل الإضافي.');
+    } catch (e, stackTrace) {
+      throw DatabaseException('فشل إضافة سجل العمل الإضافي.');
     }
   }
 
@@ -38,8 +36,8 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
       return await (db.select(db.overtimeRecordsTable)
             ..orderBy([(t) => OrderingTerm.desc(t.startDate)]))
           .get();
-    } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء جلب سجلات العمل الإضافي.');
+    } catch (e, stackTrace) {
+      throw DatabaseException('فشل استرجاع سجلات العمل الإضافي.');
     }
   }
 
@@ -48,8 +46,8 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
     try {
       await (db.update(db.overtimeRecordsTable)..where((tbl) => tbl.id.equals(id)))
           .write(OvertimeRecordsTableCompanion(isConsumed: Value(isConsumed)));
-    } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء تحديث حالة العمل الإضافي.');
+    } catch (e, stackTrace) {
+      throw DatabaseException('فشل تحديث حالة استهلاك العمل الإضافي.');
     }
   }
 
@@ -57,9 +55,8 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
   Future<void> deleteOvertimeRecord(int id) async {
     try {
       await (db.delete(db.overtimeRecordsTable)..where((tbl) => tbl.id.equals(id))).go();
-      // ملاحظة: سيتم حذف بدلات الراحة المرتبطة تلقائياً إذا كان مفعل الكاسكيد في قاعدة البيانات أو يجب حذفها برمجياً
-    } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء حذف سجل العمل الإضافي.');
+    } catch (e, stackTrace) {
+      throw DatabaseException('فشل حذف سجل العمل الإضافي.');
     }
   }
 
@@ -67,8 +64,8 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
   Future<void> addRestAllowance(RestAllowancesTableCompanion companion) async {
     try {
       await db.into(db.restAllowancesTable).insert(companion);
-    } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء إضافة بدل الراحة.');
+    } catch (e, stackTrace) {
+      throw DatabaseException('فشل إضافة رصيد الراحة المستهلك.');
     }
   }
 
@@ -78,8 +75,8 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
       return await (db.select(db.restAllowancesTable)
             ..orderBy([(t) => OrderingTerm.desc(t.startDate)]))
           .get();
-    } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء جلب سجلات بدلات الراحة.');
+    } catch (e, stackTrace) {
+      throw DatabaseException('فشل استرجاع أرصدة الراحة المستهلكة.');
     }
   }
 
@@ -87,8 +84,8 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
   Future<void> deleteRestAllowance(int id) async {
     try {
       await (db.delete(db.restAllowancesTable)..where((tbl) => tbl.id.equals(id))).go();
-    } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء حذف بدل الراحة.');
+    } catch (e, stackTrace) {
+      throw DatabaseException('فشل حذف رصيد الراحة المستهلك.');
     }
   }
 }
