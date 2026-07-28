@@ -15,7 +15,7 @@ class ThemeSelectionSection extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'المظهر',
+          'اعدادات النظام والتفضيلات',
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 12.h),
@@ -31,13 +31,13 @@ class ThemeSelectionSection extends StatelessWidget {
               
               return SwitchListTile(
                 title: Text(
-                  'الوضع الداكن',
+                  'الوضع الليلى',
                   style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
                   isCurrentDark 
-                      ? 'مفعل حالياً' 
-                      : 'غير مفعل',
+                      ? 'تفعيل المظهر الداكن للراحه البصريه' 
+                      : 'تفعيل المظهر الفاتح لسطوع اوضح',
                   style: TextStyle(fontSize: 12.sp, color: colorScheme.onSurface.withAlpha(140)),
                 ),
                 secondary: Icon(
