@@ -16,6 +16,7 @@ import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await configureDependencies();
+  
   runApp(const LeaveManagerApp());
 }
 
@@ -30,23 +31,23 @@ class LeaveManagerApp extends StatelessWidget {
         BlocProvider(create: (_) => sl<HomeCubit>()),
         BlocProvider(create: (_) => sl<LeavesBloc>()),
         BlocProvider(create: (_) => sl<ThemeCubit>()),
-        BlocProvider(
-          create: (_) => sl<HolidaysCubit>()..loadHolidays(),
-        ),
+        BlocProvider(create: (_) => sl<HolidaysCubit>()..loadHolidays()),
         BlocProvider(create: (_) => sl<RestAllowancesBloc>()),
       ],
       child: ScreenUtilInit(
         designSize: const Size(390, 844),
         minTextAdapt: true,
         splitScreenMode: true,
-        // 2. استخدام child بدلاً من وضع الكود مباشرة داخل الـ builder
         builder: (context, child) {
           return BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {
               return MaterialApp.router(
                 debugShowCheckedModeBanner: false,
                 title: 'مدير إجازاتي',
-                supportedLocales: const [Locale('ar', 'EG'), Locale('en', 'US')],
+                supportedLocales: const [
+                  Locale('ar', 'EG'),
+                  Locale('en', 'US'),
+                ],
                 localizationsDelegates: const [
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,

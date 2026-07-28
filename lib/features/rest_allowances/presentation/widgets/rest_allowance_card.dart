@@ -1,8 +1,10 @@
+// lib/features/rest_allowances/presentation/widgets/rest_allowance_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
+import 'package:leave_manager/core/utils/enums/work_reason.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
@@ -16,21 +18,21 @@ class RestAllowanceCard extends StatelessWidget {
     required this.allowance,
   });
 
-  
-
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
 
-    final isEarned = allowance.isEarned;
-    final Color color = isEarned ?  Colors.orange.shade700: Colors.deepPurpleAccent;
-    final String typeLabel = isEarned ? 'يوم عمل اضافى' : 'بدل راحة';
+    // الكيان RestAllowance يمثل دائماً بدلات الراحة (الرصيد المستهلك)
+    final Color color = Colors.orange.shade700;
+    final String typeLabel = allowance.workReason == WorkReason.holiday 
+        ? 'بدل راحة (عن عطلة)' 
+        : 'بدل راحة (عن إضافي)';
 
     return Dismissible(
       key: ValueKey('rest_allowance_${allowance.id}'),
       direction: DismissDirection.endToStart,
-      background: _DismissibleBackground(),
+      background: const _DismissibleBackground(), // تم استخدام const لتحسين الأداء
       confirmDismiss: (direction) async {
         bool confirm = false;
         await showDialog(
@@ -120,31 +122,7 @@ class RestAllowanceCard extends StatelessWidget {
                                 ),
                               ],
                             ),
-                            if (allowance.isConsumed && allowance.linkedEarnedDate != null) ...[
-                              SizedBox(height: 8.h),
-                              Container(
-                                padding: EdgeInsets.symmetric(horizontal: 8.w, vertical: 4.h),
-                                decoration: BoxDecoration(
-                                  color: Colors.blue.withAlpha(20),
-                                  borderRadius: BorderRadius.circular(8.r),
-                                ),
-                                child: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.link_rounded, size: 14.w, color: Colors.blue.shade700),
-                                    SizedBox(width: 6.w),
-                                    Text(
-                                      allowance.linkedEarnedDate!.toFormatCurrentLocale(),
-                                      style: TextStyle(
-                                        fontSize: 12.sp,
-                                        color: Colors.blue.shade700,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
+                            // تم إزالة الكود القديم الخاص بـ isConsumed لعدم الحاجة إليه هنا
                             if (allowance.notes != null && allowance.notes!.isNotEmpty) ...[
                               SizedBox(height: 10.h),
                               Container(
@@ -218,6 +196,8 @@ class RestAllowanceCard extends StatelessWidget {
 }
 
 class _DismissibleBackground extends StatelessWidget {
+  const _DismissibleBackground(); // استخدام const لتقليل إعادة البناء (Rebuilds)
+
   @override
   Widget build(BuildContext context) {
     return Container(

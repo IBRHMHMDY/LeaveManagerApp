@@ -1,20 +1,20 @@
-// lib/features/rest_allowances/data/models/rest_allowance_mapper.dart
+// lib/features/rest_allowances/data/models/overtime_record_mapper.dart
 import 'package:leave_manager/core/database/app_database.dart';
-import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/overtime_record_entity.dart';
 import 'package:leave_manager/core/utils/enums/work_reason.dart';
 
-extension RestAllowanceMapper on RestAllowanceModel {
+extension OvertimeRecordMapper on OvertimeRecordModel {
   /// تحويل نموذج قاعدة البيانات إلى كيان المجال (Domain Entity)
-  RestAllowance toDomain() {
-    return RestAllowance(
+  OvertimeRecord toDomain() {
+    return OvertimeRecord(
       id: id,
-      // تحويل القيمة الرقمية إلى Enum
       workReason: workReason == 0 ? WorkReason.holiday : WorkReason.overtime,
-      overtimeId: overtimeId,
       startDate: startDate,
       endDate: endDate,
       daysCount: daysCount,
+      isConsumed: isConsumed,
       notes: notes,
+      holidayId: holidayId,
     );
   }
 }

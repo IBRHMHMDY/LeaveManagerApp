@@ -1,10 +1,19 @@
+// lib/features/home/presentation/cubit/home_cubit.dart
+import 'package:dartz/dartz.dart'; // 👈 ضروري لعمل Either
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:leave_manager/core/errors/failures.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/get_current_year_leaves_usecase.dart';
 import 'package:leave_manager/features/rest_allowances/domain/usecases/get_rest_allowances_usecase.dart';
 import 'package:leave_manager/features/settings/domain/usecases/get_settings_usecase.dart';
+
+// 👈 استيراد الكيانات لتحديد الأنواع بصرامة
+import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
+import 'package:leave_manager/features/leaves/domain/entities/leave_balance_entity.dart';
+import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
 import 'home_state.dart';
 
 @injectable
@@ -31,10 +40,11 @@ class HomeCubit extends Cubit<HomeState> {
       getRestAllowances(const NoParams()), 
     ]);
 
-    final settingsResult = results[0] as dynamic;
-    final balanceResult = results[1] as dynamic;
-    final leavesResult = results[2] as dynamic;
-    final restAllowancesResult = results[3] as dynamic;
+    // 👈 تحديد الأنواع صراحة بدلاً من dynamic
+    final settingsResult = results[0] as Either<Failure, Settings>;
+    final balanceResult = results[1] as Either<Failure, LeaveBalance>;
+    final leavesResult = results[2] as Either<Failure, List<LeaveRecord>>;
+    final restAllowancesResult = results[3] as Either<Failure, List<RestAllowance>>;
 
     settingsResult.fold(
       (failure) => emit(HomeError(failure.message)),
@@ -55,13 +65,8 @@ class HomeCubit extends Cubit<HomeState> {
                     final monthLeaves = leaves.where((leave) =>
                         leave.startDate.month == currentMonth &&
                         leave.startDate.year == currentYear).toList();
-
-                    // التحديث هنا: استخدام الهيكلية الجديدة لفلترة الاستهلاك
+                    
                     final monthRestAllowances = allowances.where((allowance) {
-                      // استبعاد بدلات الراحة المكتسبة (نريد المستهلكة فقط في هذه القائمة)
-                      if (allowance.isEarned) return false;
-                      
-                      // الاعتماد على startDate بدلاً من consumedDate المحذوف
                       return allowance.startDate.month == currentMonth &&
                              allowance.startDate.year == currentYear;
                     }).toList();

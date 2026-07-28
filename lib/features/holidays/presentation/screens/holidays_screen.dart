@@ -17,14 +17,14 @@ class HolidaysScreen extends StatelessWidget {
           if (state is HolidaysLoading || state is HolidaysInitial) {
             return const Center(child: CircularProgressIndicator());
           }
-
+    
           if (state is HolidaysError) {
             return Center(child: Text(state.message));
           }
-
+    
           if (state is HolidaysLoaded) {
             final holidays = state.financialYearHolidays;
-
+    
             if (holidays.isEmpty) {
               return Center(
                 child: Text(
@@ -33,19 +33,19 @@ class HolidaysScreen extends StatelessWidget {
                 ),
               );
             }
-
+    
             return ListView.builder(
               padding: EdgeInsets.all(16.w),
               itemCount: holidays.length,
               itemBuilder: (context, index) {
                 final holiday = holidays[index];
                 final isPast = holiday.endDate.isBefore(DateTime.now());
-
+    
                 return _buildHolidayCard(context, holiday, isPast);
               },
             );
           }
-
+    
           return const SizedBox.shrink();
         },
       ),

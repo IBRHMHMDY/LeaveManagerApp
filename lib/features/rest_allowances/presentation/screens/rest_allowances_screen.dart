@@ -1,3 +1,4 @@
+// lib/features/rest_allowances/presentation/screens/rest_allowances_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -6,6 +7,7 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_tabs.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_card.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/overtime_record_card.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_action_buttons.dart';
 import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
@@ -18,7 +20,7 @@ class RestAllowancesScreen extends StatefulWidget {
 }
 
 class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
-  bool _showEarned = true;
+  bool _showEarned = true; // true = الرصيد المتاح (العمل الإضافي), false = الرصيد المستهلك (بدلات الراحة)
 
   @override
   void initState() {
@@ -32,19 +34,12 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Column(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.workspace_premium_outlined, color: colorScheme.primary),
-                SizedBox(width: 8.w),
-                Text(
-                  'بدلات الراحة',
-                  style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold),
-                ),
-              ],
-            ),
+            Icon(Icons.workspace_premium_outlined, color: colorScheme.primary),
+            SizedBox(width: 8.w),
+            Text('بدلات الراحه', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -62,7 +57,6 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
             return const Center(child: CircularProgressIndicator());
           }
           if (state is RestAllowancesLoaded) {
-            final listToDisplay = _showEarned ? state.earnedAllowances : state.consumedAllowances;
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
@@ -77,17 +71,9 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
                   },
                 ),
                 Expanded(
-                  child: listToDisplay.isEmpty
-                      ? const CustomEmptyState(titleEmpty: 'لا يوجد رصيد متاح!', contentEmpty: 'عليك تسجيل يوم عمل اضافى أولاً .')
-                      : ListView.builder(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-                          itemCount: listToDisplay.length,
-                          itemBuilder: (context, index) {
-                            return RestAllowanceCard(
-                              allowance: listToDisplay[index],
-                            );
-                          },
-                        ),
+                  child: _showEarned
+                      ? _buildEarnedList(state.earnedAllowances)
+                      : _buildConsumedList(state.consumedAllowances),
                 ),
               ],
             );
@@ -96,6 +82,32 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
         },
       ),
       bottomNavigationBar: const RestActionButtons(),
+    );
+  }
+
+  Widget _buildEarnedList(List dynamicList) {
+    if (dynamicList.isEmpty) {
+      return const CustomEmptyState(titleEmpty: 'لا يوجد رصيد إضافي', contentEmpty: 'لم تقم بتسجيل أي أيام عمل إضافية.');
+    }
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      itemCount: dynamicList.length,
+      itemBuilder: (context, index) {
+        return OvertimeRecordCard(record: dynamicList[index]);
+      },
+    );
+  }
+
+  Widget _buildConsumedList(List dynamicList) {
+    if (dynamicList.isEmpty) {
+      return const CustomEmptyState(titleEmpty: 'لا توجد بدلات مستهلكة', contentEmpty: 'لم تقم باستهلاك أي بدلات راحة بعد.');
+    }
+    return ListView.builder(
+      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      itemCount: dynamicList.length,
+      itemBuilder: (context, index) {
+        return RestAllowanceCard(allowance: dynamicList[index]);
+      },
     );
   }
 }

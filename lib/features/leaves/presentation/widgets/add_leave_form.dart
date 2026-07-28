@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/utils/extenstions/blocked_dates_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
-import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
-import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
-import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
+
 import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 import 'package:leave_manager/shared/widgets/custom_date_range_picker_field.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
@@ -28,9 +27,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
   DateTime? _startDate;
   DateTime? _endDate;
   final TextEditingController _notesController = TextEditingController();
-  
-  // الاحتفاظ بالتواريخ المحجوزة في Set لضمان سرعة البحث O(1)
-  final Set<DateTime> _blockedDates = {};
+
 
   @override
   void dispose() {
@@ -38,44 +35,61 @@ class AddLeaveFormState extends State<AddLeaveForm> {
     super.dispose();
   }
 
-  // دالة لحساب التواريخ المحجوزة مرة واحدة فقط
-  void _calculateBlockedDates(List<Holiday> holidays, List<LeaveRecord> existingLeaves) {
-    _blockedDates.clear();
-    
-    for (final holiday in holidays) {
-      for (DateTime d = holiday.startDate; !d.isAfter(holiday.endDate); d = d.add(const Duration(days: 1))) {
-        _blockedDates.add(DateTime(d.year, d.month, d.day));
-      }
-    }
-    
-    for (final leave in existingLeaves) {
-      for (DateTime d = leave.startDate; !d.isAfter(leave.endDate); d = d.add(const Duration(days: 1))) {
-        _blockedDates.add(DateTime(d.year, d.month, d.day));
-      }
-    }
-  }
+  // // دالة لحساب التواريخ المحجوزة مرة واحدة فقط
+  // void _calculateBlockedDates(
+  //   List<Holiday> holidays,
+  //   List<LeaveRecord> existingLeaves,
+  // ) {
+  //   _blockedDates.clear();
 
-  bool _hasOverlap(DateTime start, DateTime end) {
-    for (DateTime d = start; !d.isAfter(end); d = d.add(const Duration(days: 1))) {
-      if (_blockedDates.contains(DateTime(d.year, d.month, d.day))) return true;
-    }
-    return false;
-  }
+  //   for (final holiday in holidays) {
+  //     for (
+  //       DateTime d = holiday.startDate;
+  //       !d.isAfter(holiday.endDate);
+  //       d = d.add(const Duration(days: 1))
+  //     ) {
+  //       _blockedDates.add(DateTime(d.year, d.month, d.day));
+  //     }
+  //   }
+
+  //   for (final leave in existingLeaves) {
+  //     for (
+  //       DateTime d = leave.startDate;
+  //       !d.isAfter(leave.endDate);
+  //       d = d.add(const Duration(days: 1))
+  //     ) {
+  //       _blockedDates.add(DateTime(d.year, d.month, d.day));
+  //     }
+  //   }
+  // }
+
+  // bool _hasOverlap(DateTime start, DateTime end) {
+  //   for (
+  //     DateTime d = start;
+  //     !d.isAfter(end);
+  //     d = d.add(const Duration(days: 1))
+  //   ) {
+  //     if (_blockedDates.contains(DateTime(d.year, d.month, d.day))) return true;
+  //   }
+  //   return false;
+  // }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
     final borderColor = isDark ? Colors.white24 : Colors.grey.shade300;
     final fillColor = isDark ? Colors.black12 : Colors.grey.shade50;
+    final blockedDates = context.getBlockedDates();
 
-    final holidaysState = context.watch<HolidaysCubit>().state;
-    List<Holiday> holidays = holidaysState is HolidaysLoaded ? holidaysState.financialYearHolidays : [];
+    // final holidaysState = context.watch<HolidaysCubit>().state;
+    // List<Holiday> holidays = holidaysState is HolidaysLoaded ? holidaysState.financialYearHolidays : [];
 
-    final leavesState = context.watch<LeavesBloc>().state;
-    List<LeaveRecord> existingLeaves = leavesState is LeavesLoaded ? leavesState.currentYearLeaves : [];
+    // final leavesState = context.watch<LeavesBloc>().state;
+    // List<LeaveRecord> existingLeaves = leavesState is LeavesLoaded ? leavesState.currentYearLeaves : [];
 
-    // حساب التواريخ المحجوزة قبل رسم دالة التقويم
-    _calculateBlockedDates(holidays, existingLeaves);
+    // // حساب التواريخ المحجوزة قبل رسم دالة التقويم
+    // _calculateBlockedDates(holidays, existingLeaves);
 
     return BlocListener<LeavesBloc, LeavesState>(
       bloc: context.read<LeavesBloc>(),
@@ -95,10 +109,11 @@ class AddLeaveFormState extends State<AddLeaveForm> {
             initialValue: _selectedType,
             dropdownColor: colorScheme.surface,
             style: TextStyle(
-                color: colorScheme.onSurface,
-                fontSize: 16.sp,
-                fontFamily: 'Cairo',
-                fontWeight: FontWeight.bold),
+              color: colorScheme.onSurface,
+              fontSize: 16.sp,
+              fontFamily: 'Cairo',
+              fontWeight: FontWeight.bold,
+            ),
             decoration: InputDecoration(
               labelText: 'نوع الإجازة',
               labelStyle: TextStyle(
@@ -147,12 +162,12 @@ class AddLeaveFormState extends State<AddLeaveForm> {
           CustomDateRangePickerField(
             startDate: _startDate,
             endDate: _endDate,
-            hintText: 'اختر تاريخ الإجازة',
+            hintText: 'حدد فترة الإجازة',
             firstDate: FinancialYearCalculator.currentFinancialYearStart,
             lastDate: DateTime(DateTime.now().year + 10),
             selectableDayPredicate: (day) {
-               final dateToCheck = DateTime(day.year, day.month, day.day);
-               return !_blockedDates.contains(dateToCheck);
+              final dateToCheck = DateTime(day.year, day.month, day.day);
+              return !blockedDates.contains(dateToCheck);
             },
             onDateSelected: (DateTimeRange? pickedRange) {
               if (pickedRange != null) {
@@ -190,15 +205,14 @@ class AddLeaveFormState extends State<AddLeaveForm> {
                     ? null
                     : () {
                         if (_startDate != null && _endDate != null) {
-                          
-                          // التحقق من تداخل النطاق المختار مع أي عطلة أو إجازة
-                          if (_hasOverlap(_startDate!, _endDate!)) {
-                            AppToast.showError(
-                              context, 
-                              'الفترة المحددة تتخللها عطلة رسمية أو إجازة سابقة. يرجى تقسيم الإجازة.'
-                            );
-                            return;
-                          }
+                          // // التحقق من تداخل النطاق المختار مع أي عطلة أو إجازة
+                          // if (_hasOverlap(_startDate!, _endDate!)) {
+                          //   AppToast.showError(
+                          //     context,
+                          //     'الفترة المحددة تتخللها عطلة رسمية أو إجازة سابقة. يرجى تقسيم الإجازة.',
+                          //   );
+                          //   return;
+                          // }
 
                           final daysCount =
                               _endDate!.difference(_startDate!).inDays + 1;

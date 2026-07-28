@@ -46,7 +46,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
                 });
               },
             ),
-
+    
             Expanded(
               child: BlocBuilder<LeavesBloc, LeavesState>(
                 builder: (context, state) {
@@ -80,7 +80,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
                       },
                     );
                   }
-
+    
                   return const LeaveListShimmer();
                 },
               ),

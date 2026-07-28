@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 
-/// ويدجت تمثل الـ AppBar الثابت أعلى التطبيق وتتصل بثيم التطبيق المخصص
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});
 

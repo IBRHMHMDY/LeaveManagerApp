@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_earned_rest_bottomsheet.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/consume_rest_bottomsheet.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_overtime_bottomsheet.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_rest_allowances_bottomsheet.dart';
 
 class RestActionButtons extends StatelessWidget {
   const RestActionButtons({super.key});
@@ -23,7 +23,7 @@ class RestActionButtons extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 14.h),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                 ),
-                onPressed: () => showAddEarnedRestBottomSheet(context),
+                onPressed: () => showAddOvertimeBottomSheet(context),
                 icon: const Icon(Icons.add),
                 label: Text('يوم عمل اضافى', style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold)),
               ),
@@ -37,7 +37,7 @@ class RestActionButtons extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 14.h),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                 ),
-                onPressed: () => showConsumeRestBottomSheet(context),
+                onPressed: () => showRestAllowancesBottomSheet(context),
                 icon: const Icon(Icons.add),
                 label: Text('بدل راحه', style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold)),
               ),

@@ -1,87 +1,83 @@
+// lib/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart
+import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
-import 'package:leave_manager/core/usecases/base_usecase.dart';
-import 'package:leave_manager/core/utils/financial_year_calculator.dart';
-import 'package:leave_manager/features/rest_allowances/domain/usecases/add_earned_rest_usecase.dart';
-import 'package:leave_manager/features/rest_allowances/domain/usecases/consume_rest_usecase.dart';
-import 'package:leave_manager/features/rest_allowances/domain/usecases/delete_rest_allowance_usecase.dart';
-import 'package:leave_manager/features/rest_allowances/domain/usecases/get_rest_allowances_usecase.dart';
-import 'package:leave_manager/features/leaves/domain/usecases/get_current_year_leaves_usecase.dart';
-import 'package:leave_manager/features/holidays/domain/usecases/get_financial_year_holidays_usecase.dart';
+import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/overtime_record_entity.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
+import 'package:leave_manager/features/rest_allowances/domain/usecases/add_overtime_usecase.dart';
+import 'package:leave_manager/features/rest_allowances/domain/usecases/add_rest_usecase.dart';
+import 'package:leave_manager/features/rest_allowances/domain/repositories/rest_allowances_repository.dart';
+
 import 'rest_allowances_event.dart';
 import 'rest_allowances_state.dart';
 
 @injectable
 class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> {
-  final GetRestAllowancesUseCase getRestAllowances;
-  final AddEarnedRestUseCase addEarnedRest;
-  final ConsumeRestUseCase consumeRest;
-  final DeleteRestAllowanceUseCase deleteRestAllowance;
-  final GetCurrentYearLeavesUseCase getLeaves;
-  final GetFinancialYearHolidaysUseCase getHolidays;
+  final AddOvertimeUseCase addOvertime;
+  final AddRestUseCase addRest;
+
+  final RestAllowancesRepository repository;
 
   RestAllowancesBloc({
-    required this.getRestAllowances,
-    required this.addEarnedRest,
-    required this.consumeRest,
-    required this.deleteRestAllowance,
-    required this.getLeaves,
-    required this.getHolidays,
+    required this.addOvertime,
+    required this.addRest,
+    required this.repository,
   }) : super(RestAllowancesInitial()) {
     on<LoadRestAllowancesEvent>(_onLoadRestAllowances);
-    on<AddEarnedRestEvent>(_onAddEarnedRest);
+    on<AddEarnedRestEvent>(_onAddOverTime);
     on<ConsumeRestEvent>(_onConsumeRest);
-    on<DeleteRestEvent>(_onDeleteRest);
+    on<DeleteOvertimeEvent>(_onDeleteOvertime);
+    on<DeleteRestEvent>(_onDeleteRestAllowance);
   }
 
   Future<void> _onLoadRestAllowances(
       LoadRestAllowancesEvent event, Emitter<RestAllowancesState> emit) async {
     emit(RestAllowancesLoading());
-    final result = await getRestAllowances(const NoParams());
-    
-    result.fold(
+
+    // جلب بيانات العمل الإضافي وبدلات الراحة بالتوازي
+    final results = await Future.wait([
+      repository.getOvertimeRecords(),
+      repository.getRestAllowances(),
+    ]);
+
+    // تحديد النوع الصريح لكل نتيجة بدلاً من استخدام dynamic
+    final overtimesResult = results[0] as Either<Failure, List<OvertimeRecord>>;
+    final restsResult = results[1] as Either<Failure, List<RestAllowance>>;
+
+    overtimesResult.fold(
       (failure) => emit(RestAllowancesError(failure.message)),
-      (allowances) {
-        final earned = allowances.where((e) => e.isEarned).toList();
-        final consumed = allowances.where((e) => e.isConsumed).toList();
-        
-        final totalEarnedDays = earned.fold<int>(0, (sum, e) => sum + e.daysCount);
-        final totalConsumedDays = consumed.fold<int>(0, (sum, e) => sum + e.daysCount);
-        final totalAvailableDays = totalEarnedDays - totalConsumedDays;
-        
-        emit(RestAllowancesLoaded(
-          earnedAllowances: earned,
-          consumedAllowances: consumed,
-          totalAvailableDays: totalAvailableDays,
-          totalConsumedDays: totalConsumedDays,
-        ));
+      (overtimes) {
+        restsResult.fold(
+          (failure) => emit(RestAllowancesError(failure.message)),
+          (rests) {
+            // الآن يتعرف Dart على overtimes و rests كقوائم صحيحة
+            final totalEarnedDays = overtimes.fold<int>(0, (sum, e) => sum + e.daysCount);
+            final totalConsumedDays = rests.fold<int>(0, (sum, e) => sum + e.daysCount);
+            final totalAvailableDays = totalEarnedDays - totalConsumedDays;
+
+            emit(RestAllowancesLoaded(
+              earnedAllowances: overtimes,
+              consumedAllowances: rests,
+              totalAvailableDays: totalAvailableDays < 0 ? 0 : totalAvailableDays,
+              totalConsumedDays: totalConsumedDays,
+            ));
+          },
+        );
       },
     );
   }
 
-  Future<void> _onAddEarnedRest(
+  Future<void> _onAddOverTime(
       AddEarnedRestEvent event, Emitter<RestAllowancesState> emit) async {
-    
-    if (!_isValidFinancialYear(event.startDate, event.endDate)) {
-      emit(const RestAllowancesError('عفواً، التواريخ المحددة خارج السنة المالية الحالية.'));
-      add(LoadRestAllowancesEvent());
-      return;
-    }
-
     emit(RestAllowancesLoading());
-    
-    // استثناء العطلات من فحص التداخل لأن العمل الإضافي يتم في العطلات
-    final hasOverlap = await _isOverlapping(event.startDate, event.endDate, isEarned: true);
-    if (hasOverlap) {
-      emit(const RestAllowancesError('يوجد تداخل مع إجازة أو عمل إضافي مسجل مسبقاً.'));
-      add(LoadRestAllowancesEvent());
-      return;
-    }
 
-    final result = await addEarnedRest(AddEarnedRestParams(
+    final result = await addOvertime(AddOvertimeParams(
       startDate: event.startDate,
       endDate: event.endDate,
+      workReason: event.workReason,
       notes: event.notes,
+      holidayId: event.holidayId
     ));
 
     result.fold(
@@ -90,7 +86,7 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
         add(LoadRestAllowancesEvent());
       },
       (_) {
-        emit(const RestAllowanceActionSuccess('تمت إضافة أيام العمل الإضافي بنجاح.'));
+        emit(const RestAllowanceActionSuccess('تم تسجيل العمل الإضافي/العطلة بنجاح.'));
         add(LoadRestAllowancesEvent());
       },
     );
@@ -98,56 +94,21 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
 
   Future<void> _onConsumeRest(
       ConsumeRestEvent event, Emitter<RestAllowancesState> emit) async {
-    
-    if (!_isValidFinancialYear(event.startDate, event.endDate)) {
-      emit(const RestAllowancesError('عفواً، التواريخ المحددة خارج السنة المالية الحالية.'));
-      add(LoadRestAllowancesEvent());
-      return;
-    }
-
-    // منطق حماية لضمان أن تاريخ الاستهلاك لا يسبق تاريخ اكتساب الرصيد
-    final startOnly = DateTime(event.startDate.year, event.startDate.month, event.startDate.day);
-    final linkedOnly = DateTime(event.linkedEarnedDate.year, event.linkedEarnedDate.month, event.linkedEarnedDate.day);
-    
-    if (startOnly.isBefore(linkedOnly)) {
-      emit(const RestAllowancesError('لا يمكن أن يكون تاريخ استهلاك الراحة قبل تاريخ العمل الإضافي المرتبط به.'));
-      add(LoadRestAllowancesEvent());
-      return;
-    }
-
     emit(RestAllowancesLoading());
-    
-    final restsRes = await getRestAllowances(const NoParams());
-    int availableDays = 0;
-    restsRes.fold(
-      (l) => null,
-      (allowances) {
-        final earned = allowances.where((e) => e.isEarned).fold<int>(0, (sum, e) => sum + e.daysCount);
-        final consumed = allowances.where((e) => e.isConsumed).fold<int>(0, (sum, e) => sum + e.daysCount);
-        availableDays = earned - consumed;
-      }
-    );
 
-    final daysToConsume = event.endDate.difference(event.startDate).inDays + 1;
-    if (daysToConsume > availableDays) {
-      emit(const RestAllowancesError('عفواً، رصيد بدلات الراحة المتاح لا يكفي.'));
-      add(LoadRestAllowancesEvent());
-      return;
-    }
-
-    // تفعيل الفحص الشامل (بما فيه العطلات) عند الاستهلاك
-    final hasOverlap = await _isOverlapping(event.startDate, event.endDate, isEarned: false);
-    if (hasOverlap) {
-      emit(const RestAllowancesError('يوجد تداخل مع إجازة أو عطلة مسجلة مسبقاً.'));
-      add(LoadRestAllowancesEvent());
-      return;
-    }
-
-    final result = await consumeRest(ConsumeRestParams(
+    final allowance = RestAllowance(
+      id: 0,
+      workReason: event.workReason,
+      overtimeId: event.overtimeId,
       startDate: event.startDate,
       endDate: event.endDate,
+      daysCount: event.endDate.difference(event.startDate).inDays + 1,
       notes: event.notes,
-      linkedEarnedDate: event.linkedEarnedDate,
+    );
+
+    final result = await addRest(AddRestParams(
+      allowance: allowance,
+      linkedOvertimeStartDate: event.linkedOvertimeStartDate,
     ));
 
     result.fold(
@@ -156,21 +117,18 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
         add(LoadRestAllowancesEvent());
       },
       (_) {
-        emit(const RestAllowanceActionSuccess('تم استهلاك بدل الراحة بنجاح.'));
+        emit(const RestAllowanceActionSuccess('تم تسجيل بدل الراحة بنجاح.'));
         add(LoadRestAllowancesEvent());
       },
     );
   }
 
-  Future<void> _onDeleteRest(
-      DeleteRestEvent event, Emitter<RestAllowancesState> emit) async {
+  Future<void> _onDeleteOvertime(
+      DeleteOvertimeEvent event, Emitter<RestAllowancesState> emit) async {
     emit(RestAllowancesLoading());
-    final result = await deleteRestAllowance(event.id);
+    final result = await repository.deleteOvertimeRecord(event.id);
     result.fold(
-      (failure) {
-        emit(RestAllowancesError(failure.message));
-        add(LoadRestAllowancesEvent());
-      },
+      (failure) => emit(RestAllowancesError(failure.message)),
       (_) {
         emit(const RestAllowanceActionSuccess('تم حذف السجل بنجاح.'));
         add(LoadRestAllowancesEvent());
@@ -178,72 +136,16 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
     );
   }
 
-  bool _isValidFinancialYear(DateTime start, DateTime end) {
-    return FinancialYearCalculator.isDateInCurrentFinancialYear(start) &&
-           FinancialYearCalculator.isDateInCurrentFinancialYear(end);
-  }
-
-  /// فحص التداخل الزمني مع تمرير متغير يحدد نوع العملية
-  Future<bool> _isOverlapping(DateTime start, DateTime end, {required bool isEarned}) async {
-    final startOnly = DateTime(start.year, start.month, start.day);
-    final endOnly = DateTime(end.year, end.month, end.day);
-    bool hasOverlap = false;
-
-    // 1. التحقق من الإجازات (سارٍ على الاكتساب والاستهلاك)
-    final leavesRes = await getLeaves(const NoParams());
-    leavesRes.fold(
-      (l) => null,
-      (leaves) {
-        for (var l in leaves) {
-          final lStart = DateTime(l.startDate.year, l.startDate.month, l.startDate.day);
-          final lEnd = DateTime(l.endDate.year, l.endDate.month, l.endDate.day);
-          if (!startOnly.isAfter(lEnd) && !endOnly.isBefore(lStart)) {
-            hasOverlap = true;
-            break;
-          }
-        }
+  Future<void> _onDeleteRestAllowance(
+      DeleteRestEvent event, Emitter<RestAllowancesState> emit) async {
+    emit(RestAllowancesLoading());
+    final result = await repository.deleteRestAllowance(event.id);
+    result.fold(
+      (failure) => emit(RestAllowancesError(failure.message)),
+      (_) {
+        emit(const RestAllowanceActionSuccess('تم حذف بدل الراحة بنجاح.'));
+        add(LoadRestAllowancesEvent());
       },
     );
-    if (hasOverlap) return true;
-
-    // 2. التحقق من العطلات (ممنوع الاستهلاك أيام العطلات، ولكن مسموح الاكتساب)
-    if (!isEarned) {
-      final holidaysRes = await getHolidays(DateRangeParams(
-        start: FinancialYearCalculator.currentFinancialYearStart,
-        end: FinancialYearCalculator.currentFinancialYearEnd,
-      ));
-      holidaysRes.fold(
-        (l) => null,
-        (holidays) {
-          for (var h in holidays) {
-            final hStart = DateTime(h.startDate.year, h.startDate.month, h.startDate.day);
-            final hEnd = DateTime(h.endDate.year, h.endDate.month, h.endDate.day);
-            if (!startOnly.isAfter(hEnd) && !endOnly.isBefore(hStart)) {
-              hasOverlap = true;
-              break;
-            }
-          }
-        },
-      );
-      if (hasOverlap) return true;
-    }
-
-    // 3. التحقق من بدلات الراحة السابقة (سارٍ على الاثنين)
-    final restsRes = await getRestAllowances(const NoParams());
-    restsRes.fold(
-      (l) => null,
-      (rests) {
-        for (var r in rests) {
-          final rStart = DateTime(r.startDate.year, r.startDate.month, r.startDate.day);
-          final rEnd = DateTime(r.endDate.year, r.endDate.month, r.endDate.day);
-          if (!startOnly.isAfter(rEnd) && !endOnly.isBefore(rStart)) {
-            hasOverlap = true;
-            break;
-          }
-        }
-      },
-    );
-
-    return hasOverlap;
   }
 }

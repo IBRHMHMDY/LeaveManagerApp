@@ -1,5 +1,6 @@
 // lib/shared/themes/app_theme.dart
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // استيراد المكتبة
 import 'app_colors.dart';
 
@@ -10,21 +11,57 @@ class AppTheme {
   // قمنا بفصلها لسهولة إعادة الاستخدام في الوضعين الفاتح والمظلم
   static TextTheme _buildResponsiveTextTheme(Color textColor) {
     return TextTheme(
-      headlineLarge: TextStyle(fontSize: 32.sp, fontWeight: FontWeight.bold, color: textColor),
-      headlineMedium: TextStyle(fontSize: 28.sp, fontWeight: FontWeight.bold, color: textColor),
-      headlineSmall: TextStyle(fontSize: 24.sp, fontWeight: FontWeight.bold, color: textColor),
-      
-      titleLarge: TextStyle(fontSize: 22.sp, fontWeight: FontWeight.w600, color: textColor),
-      titleMedium: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.w600, color: textColor),
-      titleSmall: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w600, color: textColor),
-      
+      headlineLarge: TextStyle(
+        fontSize: 32.sp,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+      headlineMedium: TextStyle(
+        fontSize: 28.sp,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+      headlineSmall: TextStyle(
+        fontSize: 24.sp,
+        fontWeight: FontWeight.bold,
+        color: textColor,
+      ),
+
+      titleLarge: TextStyle(
+        fontSize: 22.sp,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      ),
+      titleMedium: TextStyle(
+        fontSize: 16.sp,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      ),
+      titleSmall: TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w600,
+        color: textColor,
+      ),
+
       bodyLarge: TextStyle(fontSize: 16.sp, color: textColor),
       bodyMedium: TextStyle(fontSize: 14.sp, color: textColor),
       bodySmall: TextStyle(fontSize: 12.sp, color: textColor.withAlpha(180)),
-      
-      labelLarge: TextStyle(fontSize: 14.sp, fontWeight: FontWeight.w500, color: textColor),
-      labelMedium: TextStyle(fontSize: 12.sp, fontWeight: FontWeight.w500, color: textColor),
-      labelSmall: TextStyle(fontSize: 11.sp, fontWeight: FontWeight.w500, color: textColor.withAlpha(150)),
+
+      labelLarge: TextStyle(
+        fontSize: 14.sp,
+        fontWeight: FontWeight.w500,
+        color: textColor,
+      ),
+      labelMedium: TextStyle(
+        fontSize: 12.sp,
+        fontWeight: FontWeight.w500,
+        color: textColor,
+      ),
+      labelSmall: TextStyle(
+        fontSize: 11.sp,
+        fontWeight: FontWeight.w500,
+        color: textColor.withAlpha(150),
+      ),
     ).apply(fontFamily: fontFamily); // تطبيق الخط الافتراضي على كافة النصوص
   }
 
@@ -44,10 +81,15 @@ class AppTheme {
       ),
       // حقن النصوص المتجاوبة هنا
       textTheme: _buildResponsiveTextTheme(AppColors.lightText),
-      
+
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.lightBackground,
         elevation: 0,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.dark, // أيقونات سوداء
+          statusBarBrightness: Brightness.light, // للـ iOS
+        ),
         centerTitle: false,
         iconTheme: const IconThemeData(color: AppColors.lightText),
         titleTextStyle: TextStyle(
@@ -57,7 +99,7 @@ class AppTheme {
           fontFamily: fontFamily,
         ),
       ),
-      
+
       // إعدادات الأزرار الافتراضية
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
@@ -65,16 +107,21 @@ class AppTheme {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r), // حواف متجاوبة
           ),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, fontFamily: fontFamily),
+          textStyle: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            fontFamily: fontFamily,
+          ),
         ),
       ),
-      
+
       // إعدادات حقول الإدخال الافتراضية
       inputDecorationTheme: InputDecorationTheme(
-        contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h), // مسافات متجاوبة
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
+        contentPadding: EdgeInsets.symmetric(
+          horizontal: 16.w,
+          vertical: 16.h,
+        ), // مسافات متجاوبة
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: BorderSide(color: Colors.grey.shade300),
@@ -124,10 +171,16 @@ class AppTheme {
       ),
       // حقن النصوص المتجاوبة هنا
       textTheme: _buildResponsiveTextTheme(AppColors.darkText),
-      
+
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.darkBackground,
         elevation: 0,
+        systemOverlayStyle: const SystemUiOverlayStyle(
+          statusBarColor: Colors.transparent,
+          statusBarIconBrightness: Brightness.light, // أيقونات بيضاء
+          statusBarBrightness: Brightness.dark,
+
+        ),
         centerTitle: false,
         iconTheme: const IconThemeData(color: AppColors.darkText),
         titleTextStyle: TextStyle(
@@ -138,23 +191,25 @@ class AppTheme {
         ),
       ),
 
-       // إعدادات الأزرار الافتراضية للوضع الليلي
+      // إعدادات الأزرار الافتراضية للوضع الليلي
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           minimumSize: Size(double.infinity, 50.h),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12.r),
           ),
-          textStyle: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold, fontFamily: fontFamily),
+          textStyle: TextStyle(
+            fontSize: 16.sp,
+            fontWeight: FontWeight.bold,
+            fontFamily: fontFamily,
+          ),
         ),
       ),
-      
+
       // إعدادات حقول الإدخال للوضع الليلي
       inputDecorationTheme: InputDecorationTheme(
         contentPadding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 16.h),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(12.r),
-        ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12.r),
           borderSide: const BorderSide(color: Colors.white24),

@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/app/layout/widgets/main_appbar.dart';
 import 'package:leave_manager/app/layout/widgets/main_bottom_nav_bar.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart'; // تمت الإضافة لعرض التنبيه
+import 'package:leave_manager/shared/widgets/show_toast.dart';
 
 class MainLayout extends StatefulWidget {
   final StatefulNavigationShell navigationShell;
@@ -46,25 +46,22 @@ class _MainLayoutState extends State<MainLayout> {
       ),
       // استخدام PopScope لاعتراض زر الرجوع في النظام
       child: PopScope(
-        canPop: false, // نمنع الخروج التلقائي لمعالجته يدوياً
+        canPop: false,
         onPopInvokedWithResult: _onPopInvoked,
         child: Scaffold(
           appBar: const PreferredSize(
             preferredSize: Size.fromHeight(kToolbarHeight),
             child: MainAppBar(),
           ),
-          body: SafeArea(child: widget.navigationShell),
-          bottomNavigationBar: SafeArea(
-            bottom: true,
-            child: MainBottomNavBar(
-              currentIndex: widget.navigationShell.currentIndex,
-              onTabChanged: (index) {
-                widget.navigationShell.goBranch(
-                  index,
-                  initialLocation: index == widget.navigationShell.currentIndex,
-                );
-              },
-            ),
+          body: widget.navigationShell,
+          bottomNavigationBar: MainBottomNavBar(
+            currentIndex: widget.navigationShell.currentIndex,
+            onTabChanged: (index) {
+              widget.navigationShell.goBranch(
+                index,
+                initialLocation: index == widget.navigationShell.currentIndex,
+              );
+            },
           ),
         ),
       ),

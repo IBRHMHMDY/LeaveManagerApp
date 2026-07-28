@@ -1,8 +1,10 @@
+// lib/features/leaves/domain/usecases/add_leave_usecase.dart
 import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/errors/failures.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
+import 'package:leave_manager/core/usecases/check_date_overlap_usecase.dart'; // تمت إضافة الاستدعاء
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
@@ -12,70 +14,52 @@ import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances
 class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
   final LeaveRepository repository;
   final CalculateBalancesUseCase calculateBalances;
+  final CheckDateOverlapUseCase checkDateOverlap; // حقن حالة الاستخدام الجديدة
 
   AddLeaveUseCase({
     required this.repository,
     required this.calculateBalances,
+    required this.checkDateOverlap,
   });
 
   @override
   Future<Either<Failure, Unit>> call(LeaveRecord leave) async {
-    // 1. جلب الأرصدة الحالية والتحقق منها أولاً بشكل وظيفي (Functional)
+    // 1. التحقق من الرصيد (Functional)
     final balanceResult = await calculateBalances(const NoParams());
     
-    // نستخدم fold للتعامل مع النتيجة مباشرة دون الحاجة لرمي استثناءات
     return balanceResult.fold(
-      (failure) async => Left(failure), // تمرير الخطأ كما هو للطبقة العليا
+      (failure) async => Left(failure),
       (balance) async {
-        // --- تطبيق قيود العمل (Business Rules) ---
-        
-        // القيد الأساسي: منع التسجيل إذا كان مجموع الأرصدة يساوي 0 أو أقل
+        // --- تطبيق قواعد الأعمال (Business Rules) ---
         if ((balance.remainingRegular + balance.remainingCasual) == 0) {
-          return const Left(ValidationFailure('عفواً، لا يمكنك تسجيل إجازة جديدة. لقد استنفدت كافة أرصدتك السنوية.'));
+          return const Left(ValidationFailure('لا يوجد رصيد إجازات كافٍ.'));
         }
-
-        // التحقق من أن الرصيد الخاص بالنوع المختار يكفي لعدد الأيام المطلوبة
+        
         if (leave.leaveType == LeaveType.regular && balance.remainingRegular < leave.daysCount) {
-          return Left(ValidationFailure('رصيدك المتبقي من الإجازات الاعتيادية (${balance.remainingRegular} يوم) لا يكفي لتسجيل ${leave.daysCount} أيام.'));
+          return Left(ValidationFailure('رصيد الاعتيادي لا يكفي (المتبقي: ${balance.remainingRegular} أيام، المطلوب: ${leave.daysCount} أيام).'));
         }
-
+        
         if (leave.leaveType == LeaveType.casual && balance.remainingCasual < leave.daysCount) {
-          return Left(ValidationFailure('رصيدك المتبقي من الإجازات العارضة (${balance.remainingCasual} يوم) لا يكفي لتسجيل ${leave.daysCount} أيام.'));
+          return Left(ValidationFailure('رصيد العارضة لا يكفي (المتبقي: ${balance.remainingCasual} أيام، المطلوب: ${leave.daysCount} أيام).'));
         }
 
-        // 2. التحقق من أن الإجازة تقع ضمن السنة المالية الحالية
+        // 2. التحقق من السنة المالية
         if (!FinancialYearCalculator.isDateInCurrentFinancialYear(leave.startDate) ||
             !FinancialYearCalculator.isDateInCurrentFinancialYear(leave.endDate)) {
-          return const Left(ValidationFailure('يبدو أن التاريخ المختار خارج النطاق. يرجى التأكد من أن الإجازة تقع ضمن السنة المالية الحالية.'));
+          return const Left(ValidationFailure('تاريخ الإجازة يجب أن يكون ضمن السنة المالية الحالية.'));
         }
 
-        // 3. جلب إجازات السنة المالية الحالية للتحقق من عدم وجود تداخل
-        final startFinYear = FinancialYearCalculator.currentFinancialYearStart;
-        final endFinYear = FinancialYearCalculator.currentFinancialYearEnd;
-        
-        final existingLeavesResult = await repository.getLeavesBetweenDates(startFinYear, endFinYear);
-        
-        return existingLeavesResult.fold(
-          (failure) async => Left(failure),
-          (existingLeaves) async {
-            // فحص التقاطع (Overlap) مع الإجازات الموجودة مسبقاً
-            for (var existingLeave in existingLeaves) {
-              final newStart = DateTime(leave.startDate.year, leave.startDate.month, leave.startDate.day);
-              final newEnd = DateTime(leave.endDate.year, leave.endDate.month, leave.endDate.day);
-              final oldStart = DateTime(existingLeave.startDate.year, existingLeave.startDate.month, existingLeave.startDate.day);
-              final oldEnd = DateTime(existingLeave.endDate.year, existingLeave.endDate.month, existingLeave.endDate.day);
+        // 3. التحقق من التداخل الزمني الشامل باستخدام CheckDateOverlapUseCase
+        final overlapCheck = await checkDateOverlap(
+          DateRangeParams(startDate: leave.startDate, endDate: leave.endDate)
+        );
 
-              final isOverlapping = !newStart.isAfter(oldEnd) && !newEnd.isBefore(oldStart);
-
-              if (isOverlapping) {
-                // final leaveTypeName = existingLeave.leaveType == LeaveType.regular ? 'اعتيادية' : 'عارضة';
-                return const Left(ValidationFailure('تم تسجيل اجازه  او عطله رسميه فى هذا التاريخ او هذه الفتره ، يرجى مراجعة هذا التاريخ بالسجل.'));
-              }
-            }
-
-            // 4. إذا اجتازت جميع التحققات، يتم الحفظ
-            return await repository.addLeave(leave);
-          },
+        return overlapCheck.fold(
+          (failure) async => Left(failure), // سيُرجع رسالة الخطأ إذا كان هناك تداخل
+          (_) async {
+             // 4. حفظ الإجازة إذا اجتازت جميع القيود
+             return await repository.addLeave(leave);
+          }
         );
       },
     );

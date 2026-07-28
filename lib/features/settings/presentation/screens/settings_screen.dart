@@ -32,13 +32,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
 
-  // ✅ 1. تعريف متغير حالة محلي قابل للتعديل
   late bool _isFirstTime;
 
   @override
   void initState() {
     super.initState();
-    // ✅ 2. تهيئة المتغير بالقيمة القادمة من الـ Router عند بناء الشاشة لأول مرة
     _isFirstTime = widget.isFirstTime;
     _loadInitialData();
   }
@@ -133,13 +131,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   regularLeavesController: _regularLeavesController,
                   casualLeavesController: _casualLeavesController,
                 ),
-
+      
                 SizedBox(height: 24.w),
-
+      
                 const ThemeSelectionSection(),
-
+      
                 SizedBox(height: 32.h),
-
+      
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
                     final isLoading = state is SettingsLoading;
@@ -173,9 +171,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                 ),
-
+      
                 if (!_isFirstTime) const DangerZoneSection(),
-
+      
                 SizedBox(height: 32.h),
               ],
             ),

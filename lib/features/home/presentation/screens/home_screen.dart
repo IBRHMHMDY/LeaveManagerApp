@@ -140,12 +140,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     SizedBox(height: 24.h),
-
+    
                     BuildCurrentMonthLeaves(
                       leaves: state.currentMonthLeaves,
                       restAllowances: state.currentMonthRestAllowances,
                     ),
-                    SizedBox(height: 80.h),
                   ],
                 ),
               );
