@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/build_rest_allowance_shortcut_card.dart';
+import 'package:leave_manager/features/home/presentation/widgets/rest_allowances_button.dart';
 
 class RestAllowanceStatsCard extends StatelessWidget {
   final int totalAvailableDays;
@@ -52,7 +52,7 @@ class RestAllowanceStatsCard extends StatelessWidget {
               _StatItem(
                 title: 'الرصيد المتاح',
                 value: totalAvailableDays,
-                color: Colors.deepPurpleAccent,
+                color: const Color(0xFF7C4DFF),
               ),
               _buildDivider(colorScheme),
               _StatItem(
@@ -64,8 +64,8 @@ class RestAllowanceStatsCard extends StatelessWidget {
           ),
           SizedBox(height: 16.h),
           const Padding(
-            padding: EdgeInsets.all(12.0),
-            child: BuildRestAllowanceShortcutCard(),
+            padding: EdgeInsets.only(top: 12,left: 20,right: 20,bottom: 0),
+            child: RestAllowancesButton(),
           ),
         ],
       ),
@@ -74,7 +74,7 @@ class RestAllowanceStatsCard extends StatelessWidget {
 
   Widget _buildDivider(ColorScheme colorScheme) {
     return Container(
-      height: 40.h,
+      height: 60.h,
       width: 1.w,
       color: colorScheme.onSurface.withAlpha(30),
     );

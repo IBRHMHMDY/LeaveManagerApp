@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 
-class BuildRestAllowanceShortcutCard extends StatelessWidget {
-  const BuildRestAllowanceShortcutCard({super.key});
+class RestAllowancesButton extends StatelessWidget {
+  const RestAllowancesButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +13,6 @@ class BuildRestAllowanceShortcutCard extends StatelessWidget {
 
     return InkWell(
       onTap: () {
-        // الانتقال إلى شاشة بدلات الراحة (والتي برمجناها مسبقاً في GoRouter)
         context.go(AppRouter.restAllowances);
       },
       borderRadius: BorderRadius.circular(16.r),

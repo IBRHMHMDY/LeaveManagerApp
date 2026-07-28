@@ -12,7 +12,6 @@ import 'package:leave_manager/features/settings/domain/entities/settings_entity.
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/danger_zone_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_form_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/theme_selection_section.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
@@ -172,7 +171,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
       
-                if (!_isFirstTime) const DangerZoneSection(),
+                // if (!_isFirstTime) const DangerZoneSection(),
       
                 SizedBox(height: 32.h),
               ],

@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 class AppColors {
   // الألوان الأساسية
   static const Color primaryTeal = Color(0xFF008080); // أزرق محيطي هادئ
-  static const Color accentCoral = Color(0xFFFF7F50); // برتقالي دافئ للتنبيهات والأزرار
+  static const Color accentCoral = Color(0xFFC8633F); // برتقالي دافئ للتنبيهات والأزرار
 
   // ألوان الوضع النهاري (Light Mode)
   static const Color lightBackground = Color(0xFFF8F9FA); // رمادي فاتح جداً
@@ -18,4 +18,5 @@ class AppColors {
   // ألوان الإجازات
   static const Color regularLeaveColor = Color(0xFF4CAF50); // لون الإجازة الاعتيادية (أخضر)
   static const Color casualLeaveColor = Color(0xFFFFA000); // لون الإجازة العارضة (أصفر/برتقالي)
+  static const Color restAllowances = Color(0xFF7C4DFF); // لون بدلات الراحه
 }

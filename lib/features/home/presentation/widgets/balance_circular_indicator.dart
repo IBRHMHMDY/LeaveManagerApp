@@ -30,7 +30,6 @@ class BalanceCircularIndicator extends StatelessWidget {
           color: isDark ? color.withAlpha(100) : color,
           width: 1.w,
         ),
-        // استخدام .r للزوايا الدائرية
         borderRadius: BorderRadius.circular(20.r), 
       ),
       child: Padding(
@@ -41,7 +40,6 @@ class BalanceCircularIndicator extends StatelessWidget {
               title,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
-                // نستخدم .sp هنا لأن هذا النص لا يعتمد على الـ Theme الافتراضي بالكامل
                 fontSize: 18.sp, 
                 color: Theme.of(context).colorScheme.onSurface,
               ),
@@ -51,7 +49,6 @@ class BalanceCircularIndicator extends StatelessWidget {
               alignment: Alignment.center,
               children: [
                 SizedBox(
-                  // استخدام .w للحفاظ على التناسب الدائري (دائماً نستخدم نفس المحور للقطر)
                   width: 110.w,
                   height: 110.w,
                   child: CircularProgressIndicator(
@@ -68,7 +65,7 @@ class BalanceCircularIndicator extends StatelessWidget {
                     Text(
                       '$remaining',
                       style: TextStyle(
-                        fontSize: 28.sp, // أحجام النصوص متجاوبة
+                        fontSize: 28.sp,
                         fontWeight: FontWeight.w900,
                         color: color,
                       ),

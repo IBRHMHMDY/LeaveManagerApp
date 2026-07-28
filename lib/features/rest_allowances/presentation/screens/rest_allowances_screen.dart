@@ -7,7 +7,7 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_tabs.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/extra_work_card.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_action_buttons.dart';
 import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
@@ -85,16 +85,16 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
     );
   }
 
-  Widget _buildList(List<ExtraWorkRecord> records) {
-    if (records.isEmpty) {
+  Widget _buildList(List<ExtraWorkRecord> extrawork) {
+    if (extrawork.isEmpty) {
       return const CustomEmptyState(titleEmpty: 'لا توجد بيانات', contentEmpty: 'لا توجد سجلات لعرضها هنا.');
     }
 
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: records.length,
+      itemCount: extrawork.length,
       itemBuilder: (context, index) {
-        return ExtraWorkCard(record: records[index]);
+        return RestAllowancesCard(extrawork: extrawork[index]);
       },
     );
   }

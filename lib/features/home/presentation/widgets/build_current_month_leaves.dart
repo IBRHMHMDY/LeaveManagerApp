@@ -4,7 +4,7 @@ import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/extra_work_card.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
 import 'package:leave_manager/shared/themes/app_colors.dart';
 
 class BuildCurrentMonthLeaves extends StatelessWidget {
@@ -53,9 +53,9 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
         
         // عرض بدلات الراحة المستهلكة أو العمل المكتسب في هذا الشهر
         ...restAllowances.map((allowance) {
-          return ExtraWorkCard(
+          return RestAllowancesCard(
             key: ValueKey('extra_${allowance.id}'),
-            record: allowance,
+            extrawork: allowance,
           );
         }),
       ],
