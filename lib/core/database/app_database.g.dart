@@ -1122,518 +1122,6 @@ class HolidaysTableCompanion extends UpdateCompanion<HolidayModel> {
   }
 }
 
-class $OvertimeRecordsTableTable extends OvertimeRecordsTable
-    with TableInfo<$OvertimeRecordsTableTable, OvertimeRecordModel> {
-  @override
-  final GeneratedDatabase attachedDatabase;
-  final String? _alias;
-  $OvertimeRecordsTableTable(this.attachedDatabase, [this._alias]);
-  static const VerificationMeta _idMeta = const VerificationMeta('id');
-  @override
-  late final GeneratedColumn<int> id = GeneratedColumn<int>(
-    'id',
-    aliasedName,
-    false,
-    hasAutoIncrement: true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'PRIMARY KEY AUTOINCREMENT',
-    ),
-  );
-  static const VerificationMeta _workReasonMeta = const VerificationMeta(
-    'workReason',
-  );
-  @override
-  late final GeneratedColumn<int> workReason = GeneratedColumn<int>(
-    'work_reason',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _startDateMeta = const VerificationMeta(
-    'startDate',
-  );
-  @override
-  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
-    'start_date',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _endDateMeta = const VerificationMeta(
-    'endDate',
-  );
-  @override
-  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
-    'end_date',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _daysCountMeta = const VerificationMeta(
-    'daysCount',
-  );
-  @override
-  late final GeneratedColumn<int> daysCount = GeneratedColumn<int>(
-    'days_count',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _holidayIdMeta = const VerificationMeta(
-    'holidayId',
-  );
-  @override
-  late final GeneratedColumn<int> holidayId = GeneratedColumn<int>(
-    'holiday_id',
-    aliasedName,
-    true,
-    type: DriftSqlType.int,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES holidays_table (id)',
-    ),
-  );
-  static const VerificationMeta _isConsumedMeta = const VerificationMeta(
-    'isConsumed',
-  );
-  @override
-  late final GeneratedColumn<bool> isConsumed = GeneratedColumn<bool>(
-    'is_consumed',
-    aliasedName,
-    false,
-    type: DriftSqlType.bool,
-    requiredDuringInsert: false,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'CHECK ("is_consumed" IN (0, 1))',
-    ),
-    defaultValue: const Constant(false),
-  );
-  static const VerificationMeta _notesMeta = const VerificationMeta('notes');
-  @override
-  late final GeneratedColumn<String> notes = GeneratedColumn<String>(
-    'notes',
-    aliasedName,
-    true,
-    type: DriftSqlType.string,
-    requiredDuringInsert: false,
-  );
-  @override
-  List<GeneratedColumn> get $columns => [
-    id,
-    workReason,
-    startDate,
-    endDate,
-    daysCount,
-    holidayId,
-    isConsumed,
-    notes,
-  ];
-  @override
-  String get aliasedName => _alias ?? actualTableName;
-  @override
-  String get actualTableName => $name;
-  static const String $name = 'overtime_records_table';
-  @override
-  VerificationContext validateIntegrity(
-    Insertable<OvertimeRecordModel> instance, {
-    bool isInserting = false,
-  }) {
-    final context = VerificationContext();
-    final data = instance.toColumns(true);
-    if (data.containsKey('id')) {
-      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
-    }
-    if (data.containsKey('work_reason')) {
-      context.handle(
-        _workReasonMeta,
-        workReason.isAcceptableOrUnknown(data['work_reason']!, _workReasonMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_workReasonMeta);
-    }
-    if (data.containsKey('start_date')) {
-      context.handle(
-        _startDateMeta,
-        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_startDateMeta);
-    }
-    if (data.containsKey('end_date')) {
-      context.handle(
-        _endDateMeta,
-        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_endDateMeta);
-    }
-    if (data.containsKey('days_count')) {
-      context.handle(
-        _daysCountMeta,
-        daysCount.isAcceptableOrUnknown(data['days_count']!, _daysCountMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_daysCountMeta);
-    }
-    if (data.containsKey('holiday_id')) {
-      context.handle(
-        _holidayIdMeta,
-        holidayId.isAcceptableOrUnknown(data['holiday_id']!, _holidayIdMeta),
-      );
-    }
-    if (data.containsKey('is_consumed')) {
-      context.handle(
-        _isConsumedMeta,
-        isConsumed.isAcceptableOrUnknown(data['is_consumed']!, _isConsumedMeta),
-      );
-    }
-    if (data.containsKey('notes')) {
-      context.handle(
-        _notesMeta,
-        notes.isAcceptableOrUnknown(data['notes']!, _notesMeta),
-      );
-    }
-    return context;
-  }
-
-  @override
-  Set<GeneratedColumn> get $primaryKey => {id};
-  @override
-  OvertimeRecordModel map(Map<String, dynamic> data, {String? tablePrefix}) {
-    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
-    return OvertimeRecordModel(
-      id: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}id'],
-      )!,
-      workReason: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}work_reason'],
-      )!,
-      startDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}start_date'],
-      )!,
-      endDate: attachedDatabase.typeMapping.read(
-        DriftSqlType.dateTime,
-        data['${effectivePrefix}end_date'],
-      )!,
-      daysCount: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}days_count'],
-      )!,
-      holidayId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}holiday_id'],
-      ),
-      isConsumed: attachedDatabase.typeMapping.read(
-        DriftSqlType.bool,
-        data['${effectivePrefix}is_consumed'],
-      )!,
-      notes: attachedDatabase.typeMapping.read(
-        DriftSqlType.string,
-        data['${effectivePrefix}notes'],
-      ),
-    );
-  }
-
-  @override
-  $OvertimeRecordsTableTable createAlias(String alias) {
-    return $OvertimeRecordsTableTable(attachedDatabase, alias);
-  }
-}
-
-class OvertimeRecordModel extends DataClass
-    implements Insertable<OvertimeRecordModel> {
-  final int id;
-  final int workReason;
-  final DateTime startDate;
-  final DateTime endDate;
-  final int daysCount;
-  final int? holidayId;
-  final bool isConsumed;
-  final String? notes;
-  const OvertimeRecordModel({
-    required this.id,
-    required this.workReason,
-    required this.startDate,
-    required this.endDate,
-    required this.daysCount,
-    this.holidayId,
-    required this.isConsumed,
-    this.notes,
-  });
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    map['id'] = Variable<int>(id);
-    map['work_reason'] = Variable<int>(workReason);
-    map['start_date'] = Variable<DateTime>(startDate);
-    map['end_date'] = Variable<DateTime>(endDate);
-    map['days_count'] = Variable<int>(daysCount);
-    if (!nullToAbsent || holidayId != null) {
-      map['holiday_id'] = Variable<int>(holidayId);
-    }
-    map['is_consumed'] = Variable<bool>(isConsumed);
-    if (!nullToAbsent || notes != null) {
-      map['notes'] = Variable<String>(notes);
-    }
-    return map;
-  }
-
-  OvertimeRecordsTableCompanion toCompanion(bool nullToAbsent) {
-    return OvertimeRecordsTableCompanion(
-      id: Value(id),
-      workReason: Value(workReason),
-      startDate: Value(startDate),
-      endDate: Value(endDate),
-      daysCount: Value(daysCount),
-      holidayId: holidayId == null && nullToAbsent
-          ? const Value.absent()
-          : Value(holidayId),
-      isConsumed: Value(isConsumed),
-      notes: notes == null && nullToAbsent
-          ? const Value.absent()
-          : Value(notes),
-    );
-  }
-
-  factory OvertimeRecordModel.fromJson(
-    Map<String, dynamic> json, {
-    ValueSerializer? serializer,
-  }) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return OvertimeRecordModel(
-      id: serializer.fromJson<int>(json['id']),
-      workReason: serializer.fromJson<int>(json['workReason']),
-      startDate: serializer.fromJson<DateTime>(json['startDate']),
-      endDate: serializer.fromJson<DateTime>(json['endDate']),
-      daysCount: serializer.fromJson<int>(json['daysCount']),
-      holidayId: serializer.fromJson<int?>(json['holidayId']),
-      isConsumed: serializer.fromJson<bool>(json['isConsumed']),
-      notes: serializer.fromJson<String?>(json['notes']),
-    );
-  }
-  @override
-  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
-    serializer ??= driftRuntimeOptions.defaultSerializer;
-    return <String, dynamic>{
-      'id': serializer.toJson<int>(id),
-      'workReason': serializer.toJson<int>(workReason),
-      'startDate': serializer.toJson<DateTime>(startDate),
-      'endDate': serializer.toJson<DateTime>(endDate),
-      'daysCount': serializer.toJson<int>(daysCount),
-      'holidayId': serializer.toJson<int?>(holidayId),
-      'isConsumed': serializer.toJson<bool>(isConsumed),
-      'notes': serializer.toJson<String?>(notes),
-    };
-  }
-
-  OvertimeRecordModel copyWith({
-    int? id,
-    int? workReason,
-    DateTime? startDate,
-    DateTime? endDate,
-    int? daysCount,
-    Value<int?> holidayId = const Value.absent(),
-    bool? isConsumed,
-    Value<String?> notes = const Value.absent(),
-  }) => OvertimeRecordModel(
-    id: id ?? this.id,
-    workReason: workReason ?? this.workReason,
-    startDate: startDate ?? this.startDate,
-    endDate: endDate ?? this.endDate,
-    daysCount: daysCount ?? this.daysCount,
-    holidayId: holidayId.present ? holidayId.value : this.holidayId,
-    isConsumed: isConsumed ?? this.isConsumed,
-    notes: notes.present ? notes.value : this.notes,
-  );
-  OvertimeRecordModel copyWithCompanion(OvertimeRecordsTableCompanion data) {
-    return OvertimeRecordModel(
-      id: data.id.present ? data.id.value : this.id,
-      workReason: data.workReason.present
-          ? data.workReason.value
-          : this.workReason,
-      startDate: data.startDate.present ? data.startDate.value : this.startDate,
-      endDate: data.endDate.present ? data.endDate.value : this.endDate,
-      daysCount: data.daysCount.present ? data.daysCount.value : this.daysCount,
-      holidayId: data.holidayId.present ? data.holidayId.value : this.holidayId,
-      isConsumed: data.isConsumed.present
-          ? data.isConsumed.value
-          : this.isConsumed,
-      notes: data.notes.present ? data.notes.value : this.notes,
-    );
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('OvertimeRecordModel(')
-          ..write('id: $id, ')
-          ..write('workReason: $workReason, ')
-          ..write('startDate: $startDate, ')
-          ..write('endDate: $endDate, ')
-          ..write('daysCount: $daysCount, ')
-          ..write('holidayId: $holidayId, ')
-          ..write('isConsumed: $isConsumed, ')
-          ..write('notes: $notes')
-          ..write(')'))
-        .toString();
-  }
-
-  @override
-  int get hashCode => Object.hash(
-    id,
-    workReason,
-    startDate,
-    endDate,
-    daysCount,
-    holidayId,
-    isConsumed,
-    notes,
-  );
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      (other is OvertimeRecordModel &&
-          other.id == this.id &&
-          other.workReason == this.workReason &&
-          other.startDate == this.startDate &&
-          other.endDate == this.endDate &&
-          other.daysCount == this.daysCount &&
-          other.holidayId == this.holidayId &&
-          other.isConsumed == this.isConsumed &&
-          other.notes == this.notes);
-}
-
-class OvertimeRecordsTableCompanion
-    extends UpdateCompanion<OvertimeRecordModel> {
-  final Value<int> id;
-  final Value<int> workReason;
-  final Value<DateTime> startDate;
-  final Value<DateTime> endDate;
-  final Value<int> daysCount;
-  final Value<int?> holidayId;
-  final Value<bool> isConsumed;
-  final Value<String?> notes;
-  const OvertimeRecordsTableCompanion({
-    this.id = const Value.absent(),
-    this.workReason = const Value.absent(),
-    this.startDate = const Value.absent(),
-    this.endDate = const Value.absent(),
-    this.daysCount = const Value.absent(),
-    this.holidayId = const Value.absent(),
-    this.isConsumed = const Value.absent(),
-    this.notes = const Value.absent(),
-  });
-  OvertimeRecordsTableCompanion.insert({
-    this.id = const Value.absent(),
-    required int workReason,
-    required DateTime startDate,
-    required DateTime endDate,
-    required int daysCount,
-    this.holidayId = const Value.absent(),
-    this.isConsumed = const Value.absent(),
-    this.notes = const Value.absent(),
-  }) : workReason = Value(workReason),
-       startDate = Value(startDate),
-       endDate = Value(endDate),
-       daysCount = Value(daysCount);
-  static Insertable<OvertimeRecordModel> custom({
-    Expression<int>? id,
-    Expression<int>? workReason,
-    Expression<DateTime>? startDate,
-    Expression<DateTime>? endDate,
-    Expression<int>? daysCount,
-    Expression<int>? holidayId,
-    Expression<bool>? isConsumed,
-    Expression<String>? notes,
-  }) {
-    return RawValuesInsertable({
-      if (id != null) 'id': id,
-      if (workReason != null) 'work_reason': workReason,
-      if (startDate != null) 'start_date': startDate,
-      if (endDate != null) 'end_date': endDate,
-      if (daysCount != null) 'days_count': daysCount,
-      if (holidayId != null) 'holiday_id': holidayId,
-      if (isConsumed != null) 'is_consumed': isConsumed,
-      if (notes != null) 'notes': notes,
-    });
-  }
-
-  OvertimeRecordsTableCompanion copyWith({
-    Value<int>? id,
-    Value<int>? workReason,
-    Value<DateTime>? startDate,
-    Value<DateTime>? endDate,
-    Value<int>? daysCount,
-    Value<int?>? holidayId,
-    Value<bool>? isConsumed,
-    Value<String?>? notes,
-  }) {
-    return OvertimeRecordsTableCompanion(
-      id: id ?? this.id,
-      workReason: workReason ?? this.workReason,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
-      daysCount: daysCount ?? this.daysCount,
-      holidayId: holidayId ?? this.holidayId,
-      isConsumed: isConsumed ?? this.isConsumed,
-      notes: notes ?? this.notes,
-    );
-  }
-
-  @override
-  Map<String, Expression> toColumns(bool nullToAbsent) {
-    final map = <String, Expression>{};
-    if (id.present) {
-      map['id'] = Variable<int>(id.value);
-    }
-    if (workReason.present) {
-      map['work_reason'] = Variable<int>(workReason.value);
-    }
-    if (startDate.present) {
-      map['start_date'] = Variable<DateTime>(startDate.value);
-    }
-    if (endDate.present) {
-      map['end_date'] = Variable<DateTime>(endDate.value);
-    }
-    if (daysCount.present) {
-      map['days_count'] = Variable<int>(daysCount.value);
-    }
-    if (holidayId.present) {
-      map['holiday_id'] = Variable<int>(holidayId.value);
-    }
-    if (isConsumed.present) {
-      map['is_consumed'] = Variable<bool>(isConsumed.value);
-    }
-    if (notes.present) {
-      map['notes'] = Variable<String>(notes.value);
-    }
-    return map;
-  }
-
-  @override
-  String toString() {
-    return (StringBuffer('OvertimeRecordsTableCompanion(')
-          ..write('id: $id, ')
-          ..write('workReason: $workReason, ')
-          ..write('startDate: $startDate, ')
-          ..write('endDate: $endDate, ')
-          ..write('daysCount: $daysCount, ')
-          ..write('holidayId: $holidayId, ')
-          ..write('isConsumed: $isConsumed, ')
-          ..write('notes: $notes')
-          ..write(')'))
-        .toString();
-  }
-}
-
 class $RestAllowancesTableTable extends RestAllowancesTable
     with TableInfo<$RestAllowancesTableTable, RestAllowanceModel> {
   @override
@@ -1664,37 +1152,24 @@ class $RestAllowancesTableTable extends RestAllowancesTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
-  static const VerificationMeta _overtimeIdMeta = const VerificationMeta(
-    'overtimeId',
+  static const VerificationMeta _workStartDateMeta = const VerificationMeta(
+    'workStartDate',
   );
   @override
-  late final GeneratedColumn<int> overtimeId = GeneratedColumn<int>(
-    'overtime_id',
-    aliasedName,
-    false,
-    type: DriftSqlType.int,
-    requiredDuringInsert: true,
-    defaultConstraints: GeneratedColumn.constraintIsAlways(
-      'REFERENCES overtime_records_table (id)',
-    ),
-  );
-  static const VerificationMeta _startDateMeta = const VerificationMeta(
-    'startDate',
+  late final GeneratedColumn<DateTime> workStartDate =
+      GeneratedColumn<DateTime>(
+        'work_start_date',
+        aliasedName,
+        false,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: true,
+      );
+  static const VerificationMeta _workEndDateMeta = const VerificationMeta(
+    'workEndDate',
   );
   @override
-  late final GeneratedColumn<DateTime> startDate = GeneratedColumn<DateTime>(
-    'start_date',
-    aliasedName,
-    false,
-    type: DriftSqlType.dateTime,
-    requiredDuringInsert: true,
-  );
-  static const VerificationMeta _endDateMeta = const VerificationMeta(
-    'endDate',
-  );
-  @override
-  late final GeneratedColumn<DateTime> endDate = GeneratedColumn<DateTime>(
-    'end_date',
+  late final GeneratedColumn<DateTime> workEndDate = GeneratedColumn<DateTime>(
+    'work_end_date',
     aliasedName,
     false,
     type: DriftSqlType.dateTime,
@@ -1711,6 +1186,56 @@ class $RestAllowancesTableTable extends RestAllowancesTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _isUsedMeta = const VerificationMeta('isUsed');
+  @override
+  late final GeneratedColumn<bool> isUsed = GeneratedColumn<bool>(
+    'is_used',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_used" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _restStartDateMeta = const VerificationMeta(
+    'restStartDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> restStartDate =
+      GeneratedColumn<DateTime>(
+        'rest_start_date',
+        aliasedName,
+        true,
+        type: DriftSqlType.dateTime,
+        requiredDuringInsert: false,
+      );
+  static const VerificationMeta _restEndDateMeta = const VerificationMeta(
+    'restEndDate',
+  );
+  @override
+  late final GeneratedColumn<DateTime> restEndDate = GeneratedColumn<DateTime>(
+    'rest_end_date',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _holidayIdMeta = const VerificationMeta(
+    'holidayId',
+  );
+  @override
+  late final GeneratedColumn<int> holidayId = GeneratedColumn<int>(
+    'holiday_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'REFERENCES holidays_table (id)',
+    ),
+  );
   static const VerificationMeta _notesMeta = const VerificationMeta('notes');
   @override
   late final GeneratedColumn<String> notes = GeneratedColumn<String>(
@@ -1724,10 +1249,13 @@ class $RestAllowancesTableTable extends RestAllowancesTable
   List<GeneratedColumn> get $columns => [
     id,
     workReason,
-    overtimeId,
-    startDate,
-    endDate,
+    workStartDate,
+    workEndDate,
     daysCount,
+    isUsed,
+    restStartDate,
+    restEndDate,
+    holidayId,
     notes,
   ];
   @override
@@ -1753,29 +1281,27 @@ class $RestAllowancesTableTable extends RestAllowancesTable
     } else if (isInserting) {
       context.missing(_workReasonMeta);
     }
-    if (data.containsKey('overtime_id')) {
+    if (data.containsKey('work_start_date')) {
       context.handle(
-        _overtimeIdMeta,
-        overtimeId.isAcceptableOrUnknown(data['overtime_id']!, _overtimeIdMeta),
+        _workStartDateMeta,
+        workStartDate.isAcceptableOrUnknown(
+          data['work_start_date']!,
+          _workStartDateMeta,
+        ),
       );
     } else if (isInserting) {
-      context.missing(_overtimeIdMeta);
+      context.missing(_workStartDateMeta);
     }
-    if (data.containsKey('start_date')) {
+    if (data.containsKey('work_end_date')) {
       context.handle(
-        _startDateMeta,
-        startDate.isAcceptableOrUnknown(data['start_date']!, _startDateMeta),
+        _workEndDateMeta,
+        workEndDate.isAcceptableOrUnknown(
+          data['work_end_date']!,
+          _workEndDateMeta,
+        ),
       );
     } else if (isInserting) {
-      context.missing(_startDateMeta);
-    }
-    if (data.containsKey('end_date')) {
-      context.handle(
-        _endDateMeta,
-        endDate.isAcceptableOrUnknown(data['end_date']!, _endDateMeta),
-      );
-    } else if (isInserting) {
-      context.missing(_endDateMeta);
+      context.missing(_workEndDateMeta);
     }
     if (data.containsKey('days_count')) {
       context.handle(
@@ -1784,6 +1310,36 @@ class $RestAllowancesTableTable extends RestAllowancesTable
       );
     } else if (isInserting) {
       context.missing(_daysCountMeta);
+    }
+    if (data.containsKey('is_used')) {
+      context.handle(
+        _isUsedMeta,
+        isUsed.isAcceptableOrUnknown(data['is_used']!, _isUsedMeta),
+      );
+    }
+    if (data.containsKey('rest_start_date')) {
+      context.handle(
+        _restStartDateMeta,
+        restStartDate.isAcceptableOrUnknown(
+          data['rest_start_date']!,
+          _restStartDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('rest_end_date')) {
+      context.handle(
+        _restEndDateMeta,
+        restEndDate.isAcceptableOrUnknown(
+          data['rest_end_date']!,
+          _restEndDateMeta,
+        ),
+      );
+    }
+    if (data.containsKey('holiday_id')) {
+      context.handle(
+        _holidayIdMeta,
+        holidayId.isAcceptableOrUnknown(data['holiday_id']!, _holidayIdMeta),
+      );
     }
     if (data.containsKey('notes')) {
       context.handle(
@@ -1808,22 +1364,34 @@ class $RestAllowancesTableTable extends RestAllowancesTable
         DriftSqlType.int,
         data['${effectivePrefix}work_reason'],
       )!,
-      overtimeId: attachedDatabase.typeMapping.read(
-        DriftSqlType.int,
-        data['${effectivePrefix}overtime_id'],
-      )!,
-      startDate: attachedDatabase.typeMapping.read(
+      workStartDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
-        data['${effectivePrefix}start_date'],
+        data['${effectivePrefix}work_start_date'],
       )!,
-      endDate: attachedDatabase.typeMapping.read(
+      workEndDate: attachedDatabase.typeMapping.read(
         DriftSqlType.dateTime,
-        data['${effectivePrefix}end_date'],
+        data['${effectivePrefix}work_end_date'],
       )!,
       daysCount: attachedDatabase.typeMapping.read(
         DriftSqlType.int,
         data['${effectivePrefix}days_count'],
       )!,
+      isUsed: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_used'],
+      )!,
+      restStartDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}rest_start_date'],
+      ),
+      restEndDate: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}rest_end_date'],
+      ),
+      holidayId: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}holiday_id'],
+      ),
       notes: attachedDatabase.typeMapping.read(
         DriftSqlType.string,
         data['${effectivePrefix}notes'],
@@ -1841,18 +1409,24 @@ class RestAllowanceModel extends DataClass
     implements Insertable<RestAllowanceModel> {
   final int id;
   final int workReason;
-  final int overtimeId;
-  final DateTime startDate;
-  final DateTime endDate;
+  final DateTime workStartDate;
+  final DateTime workEndDate;
   final int daysCount;
+  final bool isUsed;
+  final DateTime? restStartDate;
+  final DateTime? restEndDate;
+  final int? holidayId;
   final String? notes;
   const RestAllowanceModel({
     required this.id,
     required this.workReason,
-    required this.overtimeId,
-    required this.startDate,
-    required this.endDate,
+    required this.workStartDate,
+    required this.workEndDate,
     required this.daysCount,
+    required this.isUsed,
+    this.restStartDate,
+    this.restEndDate,
+    this.holidayId,
     this.notes,
   });
   @override
@@ -1860,10 +1434,19 @@ class RestAllowanceModel extends DataClass
     final map = <String, Expression>{};
     map['id'] = Variable<int>(id);
     map['work_reason'] = Variable<int>(workReason);
-    map['overtime_id'] = Variable<int>(overtimeId);
-    map['start_date'] = Variable<DateTime>(startDate);
-    map['end_date'] = Variable<DateTime>(endDate);
+    map['work_start_date'] = Variable<DateTime>(workStartDate);
+    map['work_end_date'] = Variable<DateTime>(workEndDate);
     map['days_count'] = Variable<int>(daysCount);
+    map['is_used'] = Variable<bool>(isUsed);
+    if (!nullToAbsent || restStartDate != null) {
+      map['rest_start_date'] = Variable<DateTime>(restStartDate);
+    }
+    if (!nullToAbsent || restEndDate != null) {
+      map['rest_end_date'] = Variable<DateTime>(restEndDate);
+    }
+    if (!nullToAbsent || holidayId != null) {
+      map['holiday_id'] = Variable<int>(holidayId);
+    }
     if (!nullToAbsent || notes != null) {
       map['notes'] = Variable<String>(notes);
     }
@@ -1874,10 +1457,19 @@ class RestAllowanceModel extends DataClass
     return RestAllowancesTableCompanion(
       id: Value(id),
       workReason: Value(workReason),
-      overtimeId: Value(overtimeId),
-      startDate: Value(startDate),
-      endDate: Value(endDate),
+      workStartDate: Value(workStartDate),
+      workEndDate: Value(workEndDate),
       daysCount: Value(daysCount),
+      isUsed: Value(isUsed),
+      restStartDate: restStartDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(restStartDate),
+      restEndDate: restEndDate == null && nullToAbsent
+          ? const Value.absent()
+          : Value(restEndDate),
+      holidayId: holidayId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(holidayId),
       notes: notes == null && nullToAbsent
           ? const Value.absent()
           : Value(notes),
@@ -1892,10 +1484,13 @@ class RestAllowanceModel extends DataClass
     return RestAllowanceModel(
       id: serializer.fromJson<int>(json['id']),
       workReason: serializer.fromJson<int>(json['workReason']),
-      overtimeId: serializer.fromJson<int>(json['overtimeId']),
-      startDate: serializer.fromJson<DateTime>(json['startDate']),
-      endDate: serializer.fromJson<DateTime>(json['endDate']),
+      workStartDate: serializer.fromJson<DateTime>(json['workStartDate']),
+      workEndDate: serializer.fromJson<DateTime>(json['workEndDate']),
       daysCount: serializer.fromJson<int>(json['daysCount']),
+      isUsed: serializer.fromJson<bool>(json['isUsed']),
+      restStartDate: serializer.fromJson<DateTime?>(json['restStartDate']),
+      restEndDate: serializer.fromJson<DateTime?>(json['restEndDate']),
+      holidayId: serializer.fromJson<int?>(json['holidayId']),
       notes: serializer.fromJson<String?>(json['notes']),
     );
   }
@@ -1905,10 +1500,13 @@ class RestAllowanceModel extends DataClass
     return <String, dynamic>{
       'id': serializer.toJson<int>(id),
       'workReason': serializer.toJson<int>(workReason),
-      'overtimeId': serializer.toJson<int>(overtimeId),
-      'startDate': serializer.toJson<DateTime>(startDate),
-      'endDate': serializer.toJson<DateTime>(endDate),
+      'workStartDate': serializer.toJson<DateTime>(workStartDate),
+      'workEndDate': serializer.toJson<DateTime>(workEndDate),
       'daysCount': serializer.toJson<int>(daysCount),
+      'isUsed': serializer.toJson<bool>(isUsed),
+      'restStartDate': serializer.toJson<DateTime?>(restStartDate),
+      'restEndDate': serializer.toJson<DateTime?>(restEndDate),
+      'holidayId': serializer.toJson<int?>(holidayId),
       'notes': serializer.toJson<String?>(notes),
     };
   }
@@ -1916,18 +1514,26 @@ class RestAllowanceModel extends DataClass
   RestAllowanceModel copyWith({
     int? id,
     int? workReason,
-    int? overtimeId,
-    DateTime? startDate,
-    DateTime? endDate,
+    DateTime? workStartDate,
+    DateTime? workEndDate,
     int? daysCount,
+    bool? isUsed,
+    Value<DateTime?> restStartDate = const Value.absent(),
+    Value<DateTime?> restEndDate = const Value.absent(),
+    Value<int?> holidayId = const Value.absent(),
     Value<String?> notes = const Value.absent(),
   }) => RestAllowanceModel(
     id: id ?? this.id,
     workReason: workReason ?? this.workReason,
-    overtimeId: overtimeId ?? this.overtimeId,
-    startDate: startDate ?? this.startDate,
-    endDate: endDate ?? this.endDate,
+    workStartDate: workStartDate ?? this.workStartDate,
+    workEndDate: workEndDate ?? this.workEndDate,
     daysCount: daysCount ?? this.daysCount,
+    isUsed: isUsed ?? this.isUsed,
+    restStartDate: restStartDate.present
+        ? restStartDate.value
+        : this.restStartDate,
+    restEndDate: restEndDate.present ? restEndDate.value : this.restEndDate,
+    holidayId: holidayId.present ? holidayId.value : this.holidayId,
     notes: notes.present ? notes.value : this.notes,
   );
   RestAllowanceModel copyWithCompanion(RestAllowancesTableCompanion data) {
@@ -1936,12 +1542,21 @@ class RestAllowanceModel extends DataClass
       workReason: data.workReason.present
           ? data.workReason.value
           : this.workReason,
-      overtimeId: data.overtimeId.present
-          ? data.overtimeId.value
-          : this.overtimeId,
-      startDate: data.startDate.present ? data.startDate.value : this.startDate,
-      endDate: data.endDate.present ? data.endDate.value : this.endDate,
+      workStartDate: data.workStartDate.present
+          ? data.workStartDate.value
+          : this.workStartDate,
+      workEndDate: data.workEndDate.present
+          ? data.workEndDate.value
+          : this.workEndDate,
       daysCount: data.daysCount.present ? data.daysCount.value : this.daysCount,
+      isUsed: data.isUsed.present ? data.isUsed.value : this.isUsed,
+      restStartDate: data.restStartDate.present
+          ? data.restStartDate.value
+          : this.restStartDate,
+      restEndDate: data.restEndDate.present
+          ? data.restEndDate.value
+          : this.restEndDate,
+      holidayId: data.holidayId.present ? data.holidayId.value : this.holidayId,
       notes: data.notes.present ? data.notes.value : this.notes,
     );
   }
@@ -1951,10 +1566,13 @@ class RestAllowanceModel extends DataClass
     return (StringBuffer('RestAllowanceModel(')
           ..write('id: $id, ')
           ..write('workReason: $workReason, ')
-          ..write('overtimeId: $overtimeId, ')
-          ..write('startDate: $startDate, ')
-          ..write('endDate: $endDate, ')
+          ..write('workStartDate: $workStartDate, ')
+          ..write('workEndDate: $workEndDate, ')
           ..write('daysCount: $daysCount, ')
+          ..write('isUsed: $isUsed, ')
+          ..write('restStartDate: $restStartDate, ')
+          ..write('restEndDate: $restEndDate, ')
+          ..write('holidayId: $holidayId, ')
           ..write('notes: $notes')
           ..write(')'))
         .toString();
@@ -1964,10 +1582,13 @@ class RestAllowanceModel extends DataClass
   int get hashCode => Object.hash(
     id,
     workReason,
-    overtimeId,
-    startDate,
-    endDate,
+    workStartDate,
+    workEndDate,
     daysCount,
+    isUsed,
+    restStartDate,
+    restEndDate,
+    holidayId,
     notes,
   );
   @override
@@ -1976,59 +1597,76 @@ class RestAllowanceModel extends DataClass
       (other is RestAllowanceModel &&
           other.id == this.id &&
           other.workReason == this.workReason &&
-          other.overtimeId == this.overtimeId &&
-          other.startDate == this.startDate &&
-          other.endDate == this.endDate &&
+          other.workStartDate == this.workStartDate &&
+          other.workEndDate == this.workEndDate &&
           other.daysCount == this.daysCount &&
+          other.isUsed == this.isUsed &&
+          other.restStartDate == this.restStartDate &&
+          other.restEndDate == this.restEndDate &&
+          other.holidayId == this.holidayId &&
           other.notes == this.notes);
 }
 
 class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
   final Value<int> id;
   final Value<int> workReason;
-  final Value<int> overtimeId;
-  final Value<DateTime> startDate;
-  final Value<DateTime> endDate;
+  final Value<DateTime> workStartDate;
+  final Value<DateTime> workEndDate;
   final Value<int> daysCount;
+  final Value<bool> isUsed;
+  final Value<DateTime?> restStartDate;
+  final Value<DateTime?> restEndDate;
+  final Value<int?> holidayId;
   final Value<String?> notes;
   const RestAllowancesTableCompanion({
     this.id = const Value.absent(),
     this.workReason = const Value.absent(),
-    this.overtimeId = const Value.absent(),
-    this.startDate = const Value.absent(),
-    this.endDate = const Value.absent(),
+    this.workStartDate = const Value.absent(),
+    this.workEndDate = const Value.absent(),
     this.daysCount = const Value.absent(),
+    this.isUsed = const Value.absent(),
+    this.restStartDate = const Value.absent(),
+    this.restEndDate = const Value.absent(),
+    this.holidayId = const Value.absent(),
     this.notes = const Value.absent(),
   });
   RestAllowancesTableCompanion.insert({
     this.id = const Value.absent(),
     required int workReason,
-    required int overtimeId,
-    required DateTime startDate,
-    required DateTime endDate,
+    required DateTime workStartDate,
+    required DateTime workEndDate,
     required int daysCount,
+    this.isUsed = const Value.absent(),
+    this.restStartDate = const Value.absent(),
+    this.restEndDate = const Value.absent(),
+    this.holidayId = const Value.absent(),
     this.notes = const Value.absent(),
   }) : workReason = Value(workReason),
-       overtimeId = Value(overtimeId),
-       startDate = Value(startDate),
-       endDate = Value(endDate),
+       workStartDate = Value(workStartDate),
+       workEndDate = Value(workEndDate),
        daysCount = Value(daysCount);
   static Insertable<RestAllowanceModel> custom({
     Expression<int>? id,
     Expression<int>? workReason,
-    Expression<int>? overtimeId,
-    Expression<DateTime>? startDate,
-    Expression<DateTime>? endDate,
+    Expression<DateTime>? workStartDate,
+    Expression<DateTime>? workEndDate,
     Expression<int>? daysCount,
+    Expression<bool>? isUsed,
+    Expression<DateTime>? restStartDate,
+    Expression<DateTime>? restEndDate,
+    Expression<int>? holidayId,
     Expression<String>? notes,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
       if (workReason != null) 'work_reason': workReason,
-      if (overtimeId != null) 'overtime_id': overtimeId,
-      if (startDate != null) 'start_date': startDate,
-      if (endDate != null) 'end_date': endDate,
+      if (workStartDate != null) 'work_start_date': workStartDate,
+      if (workEndDate != null) 'work_end_date': workEndDate,
       if (daysCount != null) 'days_count': daysCount,
+      if (isUsed != null) 'is_used': isUsed,
+      if (restStartDate != null) 'rest_start_date': restStartDate,
+      if (restEndDate != null) 'rest_end_date': restEndDate,
+      if (holidayId != null) 'holiday_id': holidayId,
       if (notes != null) 'notes': notes,
     });
   }
@@ -2036,19 +1674,25 @@ class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
   RestAllowancesTableCompanion copyWith({
     Value<int>? id,
     Value<int>? workReason,
-    Value<int>? overtimeId,
-    Value<DateTime>? startDate,
-    Value<DateTime>? endDate,
+    Value<DateTime>? workStartDate,
+    Value<DateTime>? workEndDate,
     Value<int>? daysCount,
+    Value<bool>? isUsed,
+    Value<DateTime?>? restStartDate,
+    Value<DateTime?>? restEndDate,
+    Value<int?>? holidayId,
     Value<String?>? notes,
   }) {
     return RestAllowancesTableCompanion(
       id: id ?? this.id,
       workReason: workReason ?? this.workReason,
-      overtimeId: overtimeId ?? this.overtimeId,
-      startDate: startDate ?? this.startDate,
-      endDate: endDate ?? this.endDate,
+      workStartDate: workStartDate ?? this.workStartDate,
+      workEndDate: workEndDate ?? this.workEndDate,
       daysCount: daysCount ?? this.daysCount,
+      isUsed: isUsed ?? this.isUsed,
+      restStartDate: restStartDate ?? this.restStartDate,
+      restEndDate: restEndDate ?? this.restEndDate,
+      holidayId: holidayId ?? this.holidayId,
       notes: notes ?? this.notes,
     );
   }
@@ -2062,17 +1706,26 @@ class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
     if (workReason.present) {
       map['work_reason'] = Variable<int>(workReason.value);
     }
-    if (overtimeId.present) {
-      map['overtime_id'] = Variable<int>(overtimeId.value);
+    if (workStartDate.present) {
+      map['work_start_date'] = Variable<DateTime>(workStartDate.value);
     }
-    if (startDate.present) {
-      map['start_date'] = Variable<DateTime>(startDate.value);
-    }
-    if (endDate.present) {
-      map['end_date'] = Variable<DateTime>(endDate.value);
+    if (workEndDate.present) {
+      map['work_end_date'] = Variable<DateTime>(workEndDate.value);
     }
     if (daysCount.present) {
       map['days_count'] = Variable<int>(daysCount.value);
+    }
+    if (isUsed.present) {
+      map['is_used'] = Variable<bool>(isUsed.value);
+    }
+    if (restStartDate.present) {
+      map['rest_start_date'] = Variable<DateTime>(restStartDate.value);
+    }
+    if (restEndDate.present) {
+      map['rest_end_date'] = Variable<DateTime>(restEndDate.value);
+    }
+    if (holidayId.present) {
+      map['holiday_id'] = Variable<int>(holidayId.value);
     }
     if (notes.present) {
       map['notes'] = Variable<String>(notes.value);
@@ -2085,10 +1738,13 @@ class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
     return (StringBuffer('RestAllowancesTableCompanion(')
           ..write('id: $id, ')
           ..write('workReason: $workReason, ')
-          ..write('overtimeId: $overtimeId, ')
-          ..write('startDate: $startDate, ')
-          ..write('endDate: $endDate, ')
+          ..write('workStartDate: $workStartDate, ')
+          ..write('workEndDate: $workEndDate, ')
           ..write('daysCount: $daysCount, ')
+          ..write('isUsed: $isUsed, ')
+          ..write('restStartDate: $restStartDate, ')
+          ..write('restEndDate: $restEndDate, ')
+          ..write('holidayId: $holidayId, ')
           ..write('notes: $notes')
           ..write(')'))
         .toString();
@@ -2102,8 +1758,6 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $LeaveRecordsTableTable leaveRecordsTable =
       $LeaveRecordsTableTable(this);
   late final $HolidaysTableTable holidaysTable = $HolidaysTableTable(this);
-  late final $OvertimeRecordsTableTable overtimeRecordsTable =
-      $OvertimeRecordsTableTable(this);
   late final $RestAllowancesTableTable restAllowancesTable =
       $RestAllowancesTableTable(this);
   late final Index idxLeaveDates = Index(
@@ -2114,13 +1768,9 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     'idx_holiday_dates',
     'CREATE INDEX idx_holiday_dates ON holidays_table (start_date, end_date)',
   );
-  late final Index idxRestDates = Index(
-    'idx_rest_dates',
-    'CREATE INDEX idx_rest_dates ON rest_allowances_table (start_date, end_date)',
-  );
-  late final Index idxOvertimeDates = Index(
-    'idx_overtime_dates',
-    'CREATE INDEX idx_overtime_dates ON overtime_records_table (start_date, end_date)',
+  late final Index idxExtraworkDates = Index(
+    'idx_extrawork_dates',
+    'CREATE INDEX idx_extrawork_dates ON rest_allowances_table (work_start_date, work_end_date)',
   );
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
@@ -2130,12 +1780,10 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     settingsTable,
     leaveRecordsTable,
     holidaysTable,
-    overtimeRecordsTable,
     restAllowancesTable,
     idxLeaveDates,
     idxHolidayDates,
-    idxRestDates,
-    idxOvertimeDates,
+    idxExtraworkDates,
   ];
 }
 
@@ -2591,27 +2239,26 @@ final class $$HolidaysTableTableReferences
   );
 
   static MultiTypedResultKey<
-    $OvertimeRecordsTableTable,
-    List<OvertimeRecordModel>
+    $RestAllowancesTableTable,
+    List<RestAllowanceModel>
   >
-  _overtimeRecordsTableRefsTable(_$AppDatabase db) =>
+  _restAllowancesTableRefsTable(_$AppDatabase db) =>
       MultiTypedResultKey.fromTable(
-        db.overtimeRecordsTable,
+        db.restAllowancesTable,
         aliasName: $_aliasNameGenerator(
           db.holidaysTable.id,
-          db.overtimeRecordsTable.holidayId,
+          db.restAllowancesTable.holidayId,
         ),
       );
 
-  $$OvertimeRecordsTableTableProcessedTableManager
-  get overtimeRecordsTableRefs {
-    final manager = $$OvertimeRecordsTableTableTableManager(
+  $$RestAllowancesTableTableProcessedTableManager get restAllowancesTableRefs {
+    final manager = $$RestAllowancesTableTableTableManager(
       $_db,
-      $_db.overtimeRecordsTable,
+      $_db.restAllowancesTable,
     ).filter((f) => f.holidayId.id.sqlEquals($_itemColumn<int>('id')!));
 
     final cache = $_typedResult.readTableOrNull(
-      _overtimeRecordsTableRefsTable($_db),
+      _restAllowancesTableRefsTable($_db),
     );
     return ProcessedTableManager(
       manager.$state.copyWith(prefetchedData: cache),
@@ -2653,22 +2300,22 @@ class $$HolidaysTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  Expression<bool> overtimeRecordsTableRefs(
-    Expression<bool> Function($$OvertimeRecordsTableTableFilterComposer f) f,
+  Expression<bool> restAllowancesTableRefs(
+    Expression<bool> Function($$RestAllowancesTableTableFilterComposer f) f,
   ) {
-    final $$OvertimeRecordsTableTableFilterComposer composer = $composerBuilder(
+    final $$RestAllowancesTableTableFilterComposer composer = $composerBuilder(
       composer: this,
       getCurrentColumn: (t) => t.id,
-      referencedTable: $db.overtimeRecordsTable,
+      referencedTable: $db.restAllowancesTable,
       getReferencedColumn: (t) => t.holidayId,
       builder:
           (
             joinBuilder, {
             $addJoinBuilderToRootComposer,
             $removeJoinBuilderFromRootComposer,
-          }) => $$OvertimeRecordsTableTableFilterComposer(
+          }) => $$RestAllowancesTableTableFilterComposer(
             $db: $db,
-            $table: $db.overtimeRecordsTable,
+            $table: $db.restAllowancesTable,
             $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
             joinBuilder: joinBuilder,
             $removeJoinBuilderFromRootComposer:
@@ -2738,23 +2385,23 @@ class $$HolidaysTableTableAnnotationComposer
   GeneratedColumn<int> get daysCount =>
       $composableBuilder(column: $table.daysCount, builder: (column) => column);
 
-  Expression<T> overtimeRecordsTableRefs<T extends Object>(
-    Expression<T> Function($$OvertimeRecordsTableTableAnnotationComposer a) f,
+  Expression<T> restAllowancesTableRefs<T extends Object>(
+    Expression<T> Function($$RestAllowancesTableTableAnnotationComposer a) f,
   ) {
-    final $$OvertimeRecordsTableTableAnnotationComposer composer =
+    final $$RestAllowancesTableTableAnnotationComposer composer =
         $composerBuilder(
           composer: this,
           getCurrentColumn: (t) => t.id,
-          referencedTable: $db.overtimeRecordsTable,
+          referencedTable: $db.restAllowancesTable,
           getReferencedColumn: (t) => t.holidayId,
           builder:
               (
                 joinBuilder, {
                 $addJoinBuilderToRootComposer,
                 $removeJoinBuilderFromRootComposer,
-              }) => $$OvertimeRecordsTableTableAnnotationComposer(
+              }) => $$RestAllowancesTableTableAnnotationComposer(
                 $db: $db,
-                $table: $db.overtimeRecordsTable,
+                $table: $db.restAllowancesTable,
                 $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
                 joinBuilder: joinBuilder,
                 $removeJoinBuilderFromRootComposer:
@@ -2778,7 +2425,7 @@ class $$HolidaysTableTableTableManager
           $$HolidaysTableTableUpdateCompanionBuilder,
           (HolidayModel, $$HolidaysTableTableReferences),
           HolidayModel,
-          PrefetchHooks Function({bool overtimeRecordsTableRefs})
+          PrefetchHooks Function({bool restAllowancesTableRefs})
         > {
   $$HolidaysTableTableTableManager(_$AppDatabase db, $HolidaysTableTable table)
     : super(
@@ -2827,30 +2474,30 @@ class $$HolidaysTableTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({overtimeRecordsTableRefs = false}) {
+          prefetchHooksCallback: ({restAllowancesTableRefs = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [
-                if (overtimeRecordsTableRefs) db.overtimeRecordsTable,
+                if (restAllowancesTableRefs) db.restAllowancesTable,
               ],
               addJoins: null,
               getPrefetchedDataCallback: (items) async {
                 return [
-                  if (overtimeRecordsTableRefs)
+                  if (restAllowancesTableRefs)
                     await $_getPrefetchedData<
                       HolidayModel,
                       $HolidaysTableTable,
-                      OvertimeRecordModel
+                      RestAllowanceModel
                     >(
                       currentTable: table,
                       referencedTable: $$HolidaysTableTableReferences
-                          ._overtimeRecordsTableRefsTable(db),
+                          ._restAllowancesTableRefsTable(db),
                       managerFromTypedResult: (p0) =>
                           $$HolidaysTableTableReferences(
                             db,
                             table,
                             p0,
-                          ).overtimeRecordsTableRefs,
+                          ).restAllowancesTableRefs,
                       referencedItemsForCurrentItem: (item, referencedItems) =>
                           referencedItems.where((e) => e.holidayId == item.id),
                       typedResults: items,
@@ -2875,39 +2522,43 @@ typedef $$HolidaysTableTableProcessedTableManager =
       $$HolidaysTableTableUpdateCompanionBuilder,
       (HolidayModel, $$HolidaysTableTableReferences),
       HolidayModel,
-      PrefetchHooks Function({bool overtimeRecordsTableRefs})
+      PrefetchHooks Function({bool restAllowancesTableRefs})
     >;
-typedef $$OvertimeRecordsTableTableCreateCompanionBuilder =
-    OvertimeRecordsTableCompanion Function({
+typedef $$RestAllowancesTableTableCreateCompanionBuilder =
+    RestAllowancesTableCompanion Function({
       Value<int> id,
       required int workReason,
-      required DateTime startDate,
-      required DateTime endDate,
+      required DateTime workStartDate,
+      required DateTime workEndDate,
       required int daysCount,
+      Value<bool> isUsed,
+      Value<DateTime?> restStartDate,
+      Value<DateTime?> restEndDate,
       Value<int?> holidayId,
-      Value<bool> isConsumed,
       Value<String?> notes,
     });
-typedef $$OvertimeRecordsTableTableUpdateCompanionBuilder =
-    OvertimeRecordsTableCompanion Function({
+typedef $$RestAllowancesTableTableUpdateCompanionBuilder =
+    RestAllowancesTableCompanion Function({
       Value<int> id,
       Value<int> workReason,
-      Value<DateTime> startDate,
-      Value<DateTime> endDate,
+      Value<DateTime> workStartDate,
+      Value<DateTime> workEndDate,
       Value<int> daysCount,
+      Value<bool> isUsed,
+      Value<DateTime?> restStartDate,
+      Value<DateTime?> restEndDate,
       Value<int?> holidayId,
-      Value<bool> isConsumed,
       Value<String?> notes,
     });
 
-final class $$OvertimeRecordsTableTableReferences
+final class $$RestAllowancesTableTableReferences
     extends
         BaseReferences<
           _$AppDatabase,
-          $OvertimeRecordsTableTable,
-          OvertimeRecordModel
+          $RestAllowancesTableTable,
+          RestAllowanceModel
         > {
-  $$OvertimeRecordsTableTableReferences(
+  $$RestAllowancesTableTableReferences(
     super.$_db,
     super.$_table,
     super.$_typedResult,
@@ -2916,7 +2567,7 @@ final class $$OvertimeRecordsTableTableReferences
   static $HolidaysTableTable _holidayIdTable(_$AppDatabase db) =>
       db.holidaysTable.createAlias(
         $_aliasNameGenerator(
-          db.overtimeRecordsTable.holidayId,
+          db.restAllowancesTable.holidayId,
           db.holidaysTable.id,
         ),
       );
@@ -2934,38 +2585,11 @@ final class $$OvertimeRecordsTableTableReferences
       manager.$state.copyWith(prefetchedData: [item]),
     );
   }
-
-  static MultiTypedResultKey<
-    $RestAllowancesTableTable,
-    List<RestAllowanceModel>
-  >
-  _restAllowancesTableRefsTable(_$AppDatabase db) =>
-      MultiTypedResultKey.fromTable(
-        db.restAllowancesTable,
-        aliasName: $_aliasNameGenerator(
-          db.overtimeRecordsTable.id,
-          db.restAllowancesTable.overtimeId,
-        ),
-      );
-
-  $$RestAllowancesTableTableProcessedTableManager get restAllowancesTableRefs {
-    final manager = $$RestAllowancesTableTableTableManager(
-      $_db,
-      $_db.restAllowancesTable,
-    ).filter((f) => f.overtimeId.id.sqlEquals($_itemColumn<int>('id')!));
-
-    final cache = $_typedResult.readTableOrNull(
-      _restAllowancesTableRefsTable($_db),
-    );
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: cache),
-    );
-  }
 }
 
-class $$OvertimeRecordsTableTableFilterComposer
-    extends Composer<_$AppDatabase, $OvertimeRecordsTableTable> {
-  $$OvertimeRecordsTableTableFilterComposer({
+class $$RestAllowancesTableTableFilterComposer
+    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
+  $$RestAllowancesTableTableFilterComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -2982,13 +2606,13 @@ class $$OvertimeRecordsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
+  ColumnFilters<DateTime> get workStartDate => $composableBuilder(
+    column: $table.workStartDate,
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
+  ColumnFilters<DateTime> get workEndDate => $composableBuilder(
+    column: $table.workEndDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -2997,8 +2621,18 @@ class $$OvertimeRecordsTableTableFilterComposer
     builder: (column) => ColumnFilters(column),
   );
 
-  ColumnFilters<bool> get isConsumed => $composableBuilder(
-    column: $table.isConsumed,
+  ColumnFilters<bool> get isUsed => $composableBuilder(
+    column: $table.isUsed,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get restStartDate => $composableBuilder(
+    column: $table.restStartDate,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get restEndDate => $composableBuilder(
+    column: $table.restEndDate,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -3029,36 +2663,11 @@ class $$OvertimeRecordsTableTableFilterComposer
     );
     return composer;
   }
-
-  Expression<bool> restAllowancesTableRefs(
-    Expression<bool> Function($$RestAllowancesTableTableFilterComposer f) f,
-  ) {
-    final $$RestAllowancesTableTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.id,
-      referencedTable: $db.restAllowancesTable,
-      getReferencedColumn: (t) => t.overtimeId,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$RestAllowancesTableTableFilterComposer(
-            $db: $db,
-            $table: $db.restAllowancesTable,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return f(composer);
-  }
 }
 
-class $$OvertimeRecordsTableTableOrderingComposer
-    extends Composer<_$AppDatabase, $OvertimeRecordsTableTable> {
-  $$OvertimeRecordsTableTableOrderingComposer({
+class $$RestAllowancesTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
+  $$RestAllowancesTableTableOrderingComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3075,13 +2684,13 @@ class $$OvertimeRecordsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
+  ColumnOrderings<DateTime> get workStartDate => $composableBuilder(
+    column: $table.workStartDate,
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
+  ColumnOrderings<DateTime> get workEndDate => $composableBuilder(
+    column: $table.workEndDate,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3090,8 +2699,18 @@ class $$OvertimeRecordsTableTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
-  ColumnOrderings<bool> get isConsumed => $composableBuilder(
-    column: $table.isConsumed,
+  ColumnOrderings<bool> get isUsed => $composableBuilder(
+    column: $table.isUsed,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get restStartDate => $composableBuilder(
+    column: $table.restStartDate,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get restEndDate => $composableBuilder(
+    column: $table.restEndDate,
     builder: (column) => ColumnOrderings(column),
   );
 
@@ -3124,9 +2743,9 @@ class $$OvertimeRecordsTableTableOrderingComposer
   }
 }
 
-class $$OvertimeRecordsTableTableAnnotationComposer
-    extends Composer<_$AppDatabase, $OvertimeRecordsTableTable> {
-  $$OvertimeRecordsTableTableAnnotationComposer({
+class $$RestAllowancesTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
+  $$RestAllowancesTableTableAnnotationComposer({
     required super.$db,
     required super.$table,
     super.joinBuilder,
@@ -3141,17 +2760,29 @@ class $$OvertimeRecordsTableTableAnnotationComposer
     builder: (column) => column,
   );
 
-  GeneratedColumn<DateTime> get startDate =>
-      $composableBuilder(column: $table.startDate, builder: (column) => column);
+  GeneratedColumn<DateTime> get workStartDate => $composableBuilder(
+    column: $table.workStartDate,
+    builder: (column) => column,
+  );
 
-  GeneratedColumn<DateTime> get endDate =>
-      $composableBuilder(column: $table.endDate, builder: (column) => column);
+  GeneratedColumn<DateTime> get workEndDate => $composableBuilder(
+    column: $table.workEndDate,
+    builder: (column) => column,
+  );
 
   GeneratedColumn<int> get daysCount =>
       $composableBuilder(column: $table.daysCount, builder: (column) => column);
 
-  GeneratedColumn<bool> get isConsumed => $composableBuilder(
-    column: $table.isConsumed,
+  GeneratedColumn<bool> get isUsed =>
+      $composableBuilder(column: $table.isUsed, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get restStartDate => $composableBuilder(
+    column: $table.restStartDate,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<DateTime> get restEndDate => $composableBuilder(
+    column: $table.restEndDate,
     builder: (column) => column,
   );
 
@@ -3180,438 +2811,6 @@ class $$OvertimeRecordsTableTableAnnotationComposer
     );
     return composer;
   }
-
-  Expression<T> restAllowancesTableRefs<T extends Object>(
-    Expression<T> Function($$RestAllowancesTableTableAnnotationComposer a) f,
-  ) {
-    final $$RestAllowancesTableTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.id,
-          referencedTable: $db.restAllowancesTable,
-          getReferencedColumn: (t) => t.overtimeId,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$RestAllowancesTableTableAnnotationComposer(
-                $db: $db,
-                $table: $db.restAllowancesTable,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return f(composer);
-  }
-}
-
-class $$OvertimeRecordsTableTableTableManager
-    extends
-        RootTableManager<
-          _$AppDatabase,
-          $OvertimeRecordsTableTable,
-          OvertimeRecordModel,
-          $$OvertimeRecordsTableTableFilterComposer,
-          $$OvertimeRecordsTableTableOrderingComposer,
-          $$OvertimeRecordsTableTableAnnotationComposer,
-          $$OvertimeRecordsTableTableCreateCompanionBuilder,
-          $$OvertimeRecordsTableTableUpdateCompanionBuilder,
-          (OvertimeRecordModel, $$OvertimeRecordsTableTableReferences),
-          OvertimeRecordModel,
-          PrefetchHooks Function({bool holidayId, bool restAllowancesTableRefs})
-        > {
-  $$OvertimeRecordsTableTableTableManager(
-    _$AppDatabase db,
-    $OvertimeRecordsTableTable table,
-  ) : super(
-        TableManagerState(
-          db: db,
-          table: table,
-          createFilteringComposer: () =>
-              $$OvertimeRecordsTableTableFilterComposer($db: db, $table: table),
-          createOrderingComposer: () =>
-              $$OvertimeRecordsTableTableOrderingComposer(
-                $db: db,
-                $table: table,
-              ),
-          createComputedFieldComposer: () =>
-              $$OvertimeRecordsTableTableAnnotationComposer(
-                $db: db,
-                $table: table,
-              ),
-          updateCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                Value<int> workReason = const Value.absent(),
-                Value<DateTime> startDate = const Value.absent(),
-                Value<DateTime> endDate = const Value.absent(),
-                Value<int> daysCount = const Value.absent(),
-                Value<int?> holidayId = const Value.absent(),
-                Value<bool> isConsumed = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
-              }) => OvertimeRecordsTableCompanion(
-                id: id,
-                workReason: workReason,
-                startDate: startDate,
-                endDate: endDate,
-                daysCount: daysCount,
-                holidayId: holidayId,
-                isConsumed: isConsumed,
-                notes: notes,
-              ),
-          createCompanionCallback:
-              ({
-                Value<int> id = const Value.absent(),
-                required int workReason,
-                required DateTime startDate,
-                required DateTime endDate,
-                required int daysCount,
-                Value<int?> holidayId = const Value.absent(),
-                Value<bool> isConsumed = const Value.absent(),
-                Value<String?> notes = const Value.absent(),
-              }) => OvertimeRecordsTableCompanion.insert(
-                id: id,
-                workReason: workReason,
-                startDate: startDate,
-                endDate: endDate,
-                daysCount: daysCount,
-                holidayId: holidayId,
-                isConsumed: isConsumed,
-                notes: notes,
-              ),
-          withReferenceMapper: (p0) => p0
-              .map(
-                (e) => (
-                  e.readTable(table),
-                  $$OvertimeRecordsTableTableReferences(db, table, e),
-                ),
-              )
-              .toList(),
-          prefetchHooksCallback:
-              ({holidayId = false, restAllowancesTableRefs = false}) {
-                return PrefetchHooks(
-                  db: db,
-                  explicitlyWatchedTables: [
-                    if (restAllowancesTableRefs) db.restAllowancesTable,
-                  ],
-                  addJoins:
-                      <
-                        T extends TableManagerState<
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic,
-                          dynamic
-                        >
-                      >(state) {
-                        if (holidayId) {
-                          state =
-                              state.withJoin(
-                                    currentTable: table,
-                                    currentColumn: table.holidayId,
-                                    referencedTable:
-                                        $$OvertimeRecordsTableTableReferences
-                                            ._holidayIdTable(db),
-                                    referencedColumn:
-                                        $$OvertimeRecordsTableTableReferences
-                                            ._holidayIdTable(db)
-                                            .id,
-                                  )
-                                  as T;
-                        }
-
-                        return state;
-                      },
-                  getPrefetchedDataCallback: (items) async {
-                    return [
-                      if (restAllowancesTableRefs)
-                        await $_getPrefetchedData<
-                          OvertimeRecordModel,
-                          $OvertimeRecordsTableTable,
-                          RestAllowanceModel
-                        >(
-                          currentTable: table,
-                          referencedTable: $$OvertimeRecordsTableTableReferences
-                              ._restAllowancesTableRefsTable(db),
-                          managerFromTypedResult: (p0) =>
-                              $$OvertimeRecordsTableTableReferences(
-                                db,
-                                table,
-                                p0,
-                              ).restAllowancesTableRefs,
-                          referencedItemsForCurrentItem:
-                              (item, referencedItems) => referencedItems.where(
-                                (e) => e.overtimeId == item.id,
-                              ),
-                          typedResults: items,
-                        ),
-                    ];
-                  },
-                );
-              },
-        ),
-      );
-}
-
-typedef $$OvertimeRecordsTableTableProcessedTableManager =
-    ProcessedTableManager<
-      _$AppDatabase,
-      $OvertimeRecordsTableTable,
-      OvertimeRecordModel,
-      $$OvertimeRecordsTableTableFilterComposer,
-      $$OvertimeRecordsTableTableOrderingComposer,
-      $$OvertimeRecordsTableTableAnnotationComposer,
-      $$OvertimeRecordsTableTableCreateCompanionBuilder,
-      $$OvertimeRecordsTableTableUpdateCompanionBuilder,
-      (OvertimeRecordModel, $$OvertimeRecordsTableTableReferences),
-      OvertimeRecordModel,
-      PrefetchHooks Function({bool holidayId, bool restAllowancesTableRefs})
-    >;
-typedef $$RestAllowancesTableTableCreateCompanionBuilder =
-    RestAllowancesTableCompanion Function({
-      Value<int> id,
-      required int workReason,
-      required int overtimeId,
-      required DateTime startDate,
-      required DateTime endDate,
-      required int daysCount,
-      Value<String?> notes,
-    });
-typedef $$RestAllowancesTableTableUpdateCompanionBuilder =
-    RestAllowancesTableCompanion Function({
-      Value<int> id,
-      Value<int> workReason,
-      Value<int> overtimeId,
-      Value<DateTime> startDate,
-      Value<DateTime> endDate,
-      Value<int> daysCount,
-      Value<String?> notes,
-    });
-
-final class $$RestAllowancesTableTableReferences
-    extends
-        BaseReferences<
-          _$AppDatabase,
-          $RestAllowancesTableTable,
-          RestAllowanceModel
-        > {
-  $$RestAllowancesTableTableReferences(
-    super.$_db,
-    super.$_table,
-    super.$_typedResult,
-  );
-
-  static $OvertimeRecordsTableTable _overtimeIdTable(_$AppDatabase db) =>
-      db.overtimeRecordsTable.createAlias(
-        $_aliasNameGenerator(
-          db.restAllowancesTable.overtimeId,
-          db.overtimeRecordsTable.id,
-        ),
-      );
-
-  $$OvertimeRecordsTableTableProcessedTableManager get overtimeId {
-    final $_column = $_itemColumn<int>('overtime_id')!;
-
-    final manager = $$OvertimeRecordsTableTableTableManager(
-      $_db,
-      $_db.overtimeRecordsTable,
-    ).filter((f) => f.id.sqlEquals($_column));
-    final item = $_typedResult.readTableOrNull(_overtimeIdTable($_db));
-    if (item == null) return manager;
-    return ProcessedTableManager(
-      manager.$state.copyWith(prefetchedData: [item]),
-    );
-  }
-}
-
-class $$RestAllowancesTableTableFilterComposer
-    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
-  $$RestAllowancesTableTableFilterComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnFilters<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get workReason => $composableBuilder(
-    column: $table.workReason,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<int> get daysCount => $composableBuilder(
-    column: $table.daysCount,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  ColumnFilters<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnFilters(column),
-  );
-
-  $$OvertimeRecordsTableTableFilterComposer get overtimeId {
-    final $$OvertimeRecordsTableTableFilterComposer composer = $composerBuilder(
-      composer: this,
-      getCurrentColumn: (t) => t.overtimeId,
-      referencedTable: $db.overtimeRecordsTable,
-      getReferencedColumn: (t) => t.id,
-      builder:
-          (
-            joinBuilder, {
-            $addJoinBuilderToRootComposer,
-            $removeJoinBuilderFromRootComposer,
-          }) => $$OvertimeRecordsTableTableFilterComposer(
-            $db: $db,
-            $table: $db.overtimeRecordsTable,
-            $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-            joinBuilder: joinBuilder,
-            $removeJoinBuilderFromRootComposer:
-                $removeJoinBuilderFromRootComposer,
-          ),
-    );
-    return composer;
-  }
-}
-
-class $$RestAllowancesTableTableOrderingComposer
-    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
-  $$RestAllowancesTableTableOrderingComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  ColumnOrderings<int> get id => $composableBuilder(
-    column: $table.id,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get workReason => $composableBuilder(
-    column: $table.workReason,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get startDate => $composableBuilder(
-    column: $table.startDate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<DateTime> get endDate => $composableBuilder(
-    column: $table.endDate,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<int> get daysCount => $composableBuilder(
-    column: $table.daysCount,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  ColumnOrderings<String> get notes => $composableBuilder(
-    column: $table.notes,
-    builder: (column) => ColumnOrderings(column),
-  );
-
-  $$OvertimeRecordsTableTableOrderingComposer get overtimeId {
-    final $$OvertimeRecordsTableTableOrderingComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.overtimeId,
-          referencedTable: $db.overtimeRecordsTable,
-          getReferencedColumn: (t) => t.id,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$OvertimeRecordsTableTableOrderingComposer(
-                $db: $db,
-                $table: $db.overtimeRecordsTable,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return composer;
-  }
-}
-
-class $$RestAllowancesTableTableAnnotationComposer
-    extends Composer<_$AppDatabase, $RestAllowancesTableTable> {
-  $$RestAllowancesTableTableAnnotationComposer({
-    required super.$db,
-    required super.$table,
-    super.joinBuilder,
-    super.$addJoinBuilderToRootComposer,
-    super.$removeJoinBuilderFromRootComposer,
-  });
-  GeneratedColumn<int> get id =>
-      $composableBuilder(column: $table.id, builder: (column) => column);
-
-  GeneratedColumn<int> get workReason => $composableBuilder(
-    column: $table.workReason,
-    builder: (column) => column,
-  );
-
-  GeneratedColumn<DateTime> get startDate =>
-      $composableBuilder(column: $table.startDate, builder: (column) => column);
-
-  GeneratedColumn<DateTime> get endDate =>
-      $composableBuilder(column: $table.endDate, builder: (column) => column);
-
-  GeneratedColumn<int> get daysCount =>
-      $composableBuilder(column: $table.daysCount, builder: (column) => column);
-
-  GeneratedColumn<String> get notes =>
-      $composableBuilder(column: $table.notes, builder: (column) => column);
-
-  $$OvertimeRecordsTableTableAnnotationComposer get overtimeId {
-    final $$OvertimeRecordsTableTableAnnotationComposer composer =
-        $composerBuilder(
-          composer: this,
-          getCurrentColumn: (t) => t.overtimeId,
-          referencedTable: $db.overtimeRecordsTable,
-          getReferencedColumn: (t) => t.id,
-          builder:
-              (
-                joinBuilder, {
-                $addJoinBuilderToRootComposer,
-                $removeJoinBuilderFromRootComposer,
-              }) => $$OvertimeRecordsTableTableAnnotationComposer(
-                $db: $db,
-                $table: $db.overtimeRecordsTable,
-                $addJoinBuilderToRootComposer: $addJoinBuilderToRootComposer,
-                joinBuilder: joinBuilder,
-                $removeJoinBuilderFromRootComposer:
-                    $removeJoinBuilderFromRootComposer,
-              ),
-        );
-    return composer;
-  }
 }
 
 class $$RestAllowancesTableTableTableManager
@@ -3627,7 +2826,7 @@ class $$RestAllowancesTableTableTableManager
           $$RestAllowancesTableTableUpdateCompanionBuilder,
           (RestAllowanceModel, $$RestAllowancesTableTableReferences),
           RestAllowanceModel,
-          PrefetchHooks Function({bool overtimeId})
+          PrefetchHooks Function({bool holidayId})
         > {
   $$RestAllowancesTableTableTableManager(
     _$AppDatabase db,
@@ -3652,36 +2851,48 @@ class $$RestAllowancesTableTableTableManager
               ({
                 Value<int> id = const Value.absent(),
                 Value<int> workReason = const Value.absent(),
-                Value<int> overtimeId = const Value.absent(),
-                Value<DateTime> startDate = const Value.absent(),
-                Value<DateTime> endDate = const Value.absent(),
+                Value<DateTime> workStartDate = const Value.absent(),
+                Value<DateTime> workEndDate = const Value.absent(),
                 Value<int> daysCount = const Value.absent(),
+                Value<bool> isUsed = const Value.absent(),
+                Value<DateTime?> restStartDate = const Value.absent(),
+                Value<DateTime?> restEndDate = const Value.absent(),
+                Value<int?> holidayId = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
               }) => RestAllowancesTableCompanion(
                 id: id,
                 workReason: workReason,
-                overtimeId: overtimeId,
-                startDate: startDate,
-                endDate: endDate,
+                workStartDate: workStartDate,
+                workEndDate: workEndDate,
                 daysCount: daysCount,
+                isUsed: isUsed,
+                restStartDate: restStartDate,
+                restEndDate: restEndDate,
+                holidayId: holidayId,
                 notes: notes,
               ),
           createCompanionCallback:
               ({
                 Value<int> id = const Value.absent(),
                 required int workReason,
-                required int overtimeId,
-                required DateTime startDate,
-                required DateTime endDate,
+                required DateTime workStartDate,
+                required DateTime workEndDate,
                 required int daysCount,
+                Value<bool> isUsed = const Value.absent(),
+                Value<DateTime?> restStartDate = const Value.absent(),
+                Value<DateTime?> restEndDate = const Value.absent(),
+                Value<int?> holidayId = const Value.absent(),
                 Value<String?> notes = const Value.absent(),
               }) => RestAllowancesTableCompanion.insert(
                 id: id,
                 workReason: workReason,
-                overtimeId: overtimeId,
-                startDate: startDate,
-                endDate: endDate,
+                workStartDate: workStartDate,
+                workEndDate: workEndDate,
                 daysCount: daysCount,
+                isUsed: isUsed,
+                restStartDate: restStartDate,
+                restEndDate: restEndDate,
+                holidayId: holidayId,
                 notes: notes,
               ),
           withReferenceMapper: (p0) => p0
@@ -3692,7 +2903,7 @@ class $$RestAllowancesTableTableTableManager
                 ),
               )
               .toList(),
-          prefetchHooksCallback: ({overtimeId = false}) {
+          prefetchHooksCallback: ({holidayId = false}) {
             return PrefetchHooks(
               db: db,
               explicitlyWatchedTables: [],
@@ -3712,17 +2923,17 @@ class $$RestAllowancesTableTableTableManager
                       dynamic
                     >
                   >(state) {
-                    if (overtimeId) {
+                    if (holidayId) {
                       state =
                           state.withJoin(
                                 currentTable: table,
-                                currentColumn: table.overtimeId,
+                                currentColumn: table.holidayId,
                                 referencedTable:
                                     $$RestAllowancesTableTableReferences
-                                        ._overtimeIdTable(db),
+                                        ._holidayIdTable(db),
                                 referencedColumn:
                                     $$RestAllowancesTableTableReferences
-                                        ._overtimeIdTable(db)
+                                        ._holidayIdTable(db)
                                         .id,
                               )
                               as T;
@@ -3751,7 +2962,7 @@ typedef $$RestAllowancesTableTableProcessedTableManager =
       $$RestAllowancesTableTableUpdateCompanionBuilder,
       (RestAllowanceModel, $$RestAllowancesTableTableReferences),
       RestAllowanceModel,
-      PrefetchHooks Function({bool overtimeId})
+      PrefetchHooks Function({bool holidayId})
     >;
 
 class $AppDatabaseManager {
@@ -3763,8 +2974,6 @@ class $AppDatabaseManager {
       $$LeaveRecordsTableTableTableManager(_db, _db.leaveRecordsTable);
   $$HolidaysTableTableTableManager get holidaysTable =>
       $$HolidaysTableTableTableManager(_db, _db.holidaysTable);
-  $$OvertimeRecordsTableTableTableManager get overtimeRecordsTable =>
-      $$OvertimeRecordsTableTableTableManager(_db, _db.overtimeRecordsTable);
   $$RestAllowancesTableTableTableManager get restAllowancesTable =>
       $$RestAllowancesTableTableTableManager(_db, _db.restAllowancesTable);
 }

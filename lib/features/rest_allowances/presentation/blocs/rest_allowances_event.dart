@@ -11,65 +11,51 @@ abstract class RestAllowancesEvent extends Equatable {
 
 class LoadRestAllowancesEvent extends RestAllowancesEvent {}
 
-class AddEarnedRestEvent extends RestAllowancesEvent {
-  final DateTime startDate;
-  final DateTime endDate;
+class AddExtraWorkEvent extends RestAllowancesEvent {
+  final DateTime workStartDate;
+  final DateTime workEndDate;
+  final int daysCount;
   final WorkReason workReason;
   final String? notes;
   final int? holidayId;
 
-  const AddEarnedRestEvent({
-    required this.startDate,
-    required this.endDate,
+  const AddExtraWorkEvent({
+    required this.workStartDate,
+    required this.workEndDate,
+    required this.daysCount,
     required this.workReason,
     this.notes,
-    this.holidayId
+    this.holidayId,
   });
 
   @override
-  List<Object?> get props => [startDate, endDate, workReason, notes,holidayId];
+  List<Object?> get props => [workStartDate, workEndDate, daysCount, workReason, notes, holidayId];
 }
 
 class ConsumeRestEvent extends RestAllowancesEvent {
-  final DateTime startDate;
-  final DateTime endDate;
-  final int overtimeId;
-  final DateTime linkedOvertimeStartDate;
-  final WorkReason workReason;
+  final int allowanceId;
+  final DateTime restStartDate;
+  final DateTime restEndDate;
+  final int usedDaysCount;
   final String? notes;
 
   const ConsumeRestEvent({
-    required this.startDate,
-    required this.endDate,
-    required this.overtimeId,
-    required this.linkedOvertimeStartDate,
-    required this.workReason,
+    required this.allowanceId,
+    required this.restStartDate,
+    required this.restEndDate,
+    required this.usedDaysCount,
     this.notes,
   });
 
   @override
-  List<Object?> get props => [
-        startDate, 
-        endDate, 
-        overtimeId, 
-        linkedOvertimeStartDate, 
-        workReason, 
-        notes
-      ];
+  List<Object?> get props => [allowanceId, restStartDate, restEndDate, usedDaysCount, notes];
 }
 
-class DeleteOvertimeEvent extends RestAllowancesEvent {
+class DeleteExtraWorkEvent extends RestAllowancesEvent {
   final int id;
-  const DeleteOvertimeEvent(this.id);
-  
-  @override
-  List<Object?> get props => [id];
-}
 
-class DeleteRestEvent extends RestAllowancesEvent {
-  final int id;
-  const DeleteRestEvent(this.id);
-  
+  const DeleteExtraWorkEvent(this.id);
+
   @override
   List<Object?> get props => [id];
 }

@@ -1,29 +1,34 @@
-// lib/features/rest_allowances/presentation/widgets/overtime_record_card.dart
+// lib/features/rest_allowances/presentation/widgets/extra_work_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
-import 'package:leave_manager/features/rest_allowances/domain/entities/overtime_record_entity.dart';
+import 'package:leave_manager/core/utils/enums/work_reason.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/shared/widgets/confirm_delete_dialog.dart';
-import 'package:leave_manager/core/utils/enums/work_reason.dart';
 
-class OvertimeRecordCard extends StatelessWidget {
-  final OvertimeRecord record;
-
-  const OvertimeRecordCard({super.key, required this.record});
+class ExtraWorkCard extends StatelessWidget {
+  final ExtraWorkRecord record;
+  const ExtraWorkCard({super.key, required this.record});
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;
-    const Color color = Colors.deepPurpleAccent;
-    final String typeLabel = record.workReason == WorkReason.holiday ? 'عمل في عطلة' : 'عمل إضافي';
+    
+    // الألوان تتغير بناءً على حالة السجل (متاح أم مستهلك)
+    final Color cardColor = record.isUsed ? Colors.orange.shade700 : Colors.deepPurpleAccent;
+    final String typeLabel = record.workReason == WorkReason.holiday ? 'عطلة رسمية' : 'عمل إضافي';
+    
+    // التواريخ المعروضة (إذا كان مستهلكاً نعرض تواريخ الراحة، وإلا تواريخ العمل)
+    final DateTime displayStart = record.isUsed && record.restStartDate != null ? record.restStartDate! : record.workStartDate;
+    final DateTime displayEnd = record.isUsed && record.restEndDate != null ? record.restEndDate! : record.workEndDate;
 
     return Dismissible(
-      key: ValueKey('overtime_${record.id}'),
+      key: ValueKey('extrawork_${record.id}'),
       direction: DismissDirection.endToStart,
       background: Container(
         margin: EdgeInsets.only(bottom: 14.h),
@@ -38,7 +43,7 @@ class OvertimeRecordCard extends StatelessWidget {
           context: context,
           builder: (ctx) => ConfirmDeleteDialog(
             titleDialog: 'تأكيد الحذف',
-            contentDialog: 'هل أنت متأكد من حذف هذا السجل؟',
+            contentDialog: 'هل أنت متأكد من حذف هذا السجل نهائياً؟',
             onPressedButton: () {
               confirm = true;
               ctx.pop();
@@ -48,7 +53,7 @@ class OvertimeRecordCard extends StatelessWidget {
         return confirm;
       },
       onDismissed: (direction) {
-        context.read<RestAllowancesBloc>().add(DeleteOvertimeEvent(record.id));
+        context.read<RestAllowancesBloc>().add(DeleteExtraWorkEvent(record.id));
       },
       child: Container(
         margin: EdgeInsets.only(bottom: 14.h),
@@ -65,7 +70,7 @@ class OvertimeRecordCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(width: 6.w, color: color),
+              Container(width: 6.w, color: cardColor),
               Expanded(
                 child: Padding(
                   padding: EdgeInsets.all(16.w),
@@ -78,8 +83,11 @@ class OvertimeRecordCard extends StatelessWidget {
                           children: [
                             Container(
                               padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                              decoration: BoxDecoration(color: color.withAlpha(20), borderRadius: BorderRadius.circular(20.r)),
-                              child: Text(typeLabel, style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 12.sp)),
+                              decoration: BoxDecoration(color: cardColor.withAlpha(20), borderRadius: BorderRadius.circular(20.r)),
+                              child: Text(
+                                record.isUsed ? 'بدل راحة ($typeLabel)' : typeLabel, 
+                                style: TextStyle(color: cardColor, fontWeight: FontWeight.bold, fontSize: 12.sp)
+                              ),
                             ),
                             SizedBox(height: 12.h),
                             Row(
@@ -88,15 +96,13 @@ class OvertimeRecordCard extends StatelessWidget {
                                 SizedBox(width: 8.w),
                                 Expanded(
                                   child: Text(
-                                    record.startDate.isAtSameMomentAs(record.endDate)
-                                        ? record.startDate.toFormatCurrentLocale()
-                                        : '${record.startDate.toFormatCurrentLocale()} - ${record.endDate.toFormatCurrentLocale()}',
+                                    displayStart.isAtSameMomentAs(displayEnd)
+                                        ? displayStart.toFormatCurrentLocale()
+                                        : '${displayStart.toFormatCurrentLocale()} - ${displayEnd.toFormatCurrentLocale()}',
                                     style: TextStyle(
                                       fontSize: 13.5.sp,
                                       color: colorScheme.onSurface,
                                       fontWeight: FontWeight.w600,
-                                      // تأثير الشطب إذا كان السجل مستهلكاً بالكامل
-                                      decoration: record.isConsumed ? TextDecoration.lineThrough : null,
                                     ),
                                   ),
                                 ),
@@ -111,12 +117,12 @@ class OvertimeRecordCard extends StatelessWidget {
                       ),
                       Container(
                         padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                        decoration: BoxDecoration(color: color.withAlpha(15), borderRadius: BorderRadius.circular(12.r)),
+                        decoration: BoxDecoration(color: cardColor.withAlpha(15), borderRadius: BorderRadius.circular(12.r)),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('${record.daysCount}', style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 20.sp)),
-                            Text('أيام', style: TextStyle(color: color, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                            Text('${record.daysCount}', style: TextStyle(color: cardColor, fontWeight: FontWeight.w900, fontSize: 20.sp)),
+                            Text('أيام', style: TextStyle(color: cardColor, fontSize: 10.sp, fontWeight: FontWeight.bold)),
                           ],
                         ),
                       ),

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_overtime_bottomsheet.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_extra_work_bottomsheet.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_rest_allowances_bottomsheet.dart';
 
 class RestActionButtons extends StatelessWidget {
@@ -23,9 +23,9 @@ class RestActionButtons extends StatelessWidget {
                   padding: EdgeInsets.symmetric(vertical: 14.h),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                 ),
-                onPressed: () => showAddOvertimeBottomSheet(context),
+                onPressed: () => showAddExtraWorkBottomSheet(context),
                 icon: const Icon(Icons.add),
-                label: Text('يوم عمل اضافى', style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold)),
+                label: Text('يوم اضافى', style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold)),
               ),
             ),
             SizedBox(width: 12.w),

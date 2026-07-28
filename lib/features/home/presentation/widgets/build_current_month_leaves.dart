@@ -1,14 +1,15 @@
+// lib/features/home/presentation/widgets/build_current_month_leaves.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
-import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_card.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/extra_work_card.dart';
 import 'package:leave_manager/shared/themes/app_colors.dart';
 
 class BuildCurrentMonthLeaves extends StatelessWidget {
   final List<LeaveRecord> leaves;
-  final List<RestAllowance> restAllowances;
+  final List<ExtraWorkRecord> restAllowances;
 
   const BuildCurrentMonthLeaves({
     super.key,
@@ -31,7 +32,7 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'إجازات الشهر الحالي',
+              'إجازات هذا الشهر',
               style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
             ),
             Text(
@@ -49,12 +50,12 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
         ...leaves.map((leave) {
           return CustomLeaveCard(key: ValueKey('leave_${leave.id}'), leave: leave);
         }),
-
-        // التحديث هنا: إزالة isEarnedTab والاعتماد على ذكاء الكارت
+        
+        // عرض بدلات الراحة المستهلكة أو العمل المكتسب في هذا الشهر
         ...restAllowances.map((allowance) {
-          return RestAllowanceCard(
-            key: ValueKey('rest_${allowance.id}'),
-            allowance: allowance,
+          return ExtraWorkCard(
+            key: ValueKey('extra_${allowance.id}'),
+            record: allowance,
           );
         }),
       ],

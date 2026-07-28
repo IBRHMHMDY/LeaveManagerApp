@@ -1,4 +1,4 @@
-// lib/features/rest_allowances/presentation/widgets/add_overtime_bottomsheet.dart
+// lib/features/rest_allowances/presentation/widgets/add_extra_work_bottomsheet.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -17,34 +17,32 @@ import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 import 'package:leave_manager/shared/widgets/show_bottom_sheet.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
 
-void showAddOvertimeBottomSheet(BuildContext context) {
+void showAddExtraWorkBottomSheet(BuildContext context) {
   ShowBottomSheet.show(
     context: context,
-    title: 'تسجيل عمل إضافي / عطلة',
+    title: 'إضافة عمل إضافي / عطلة',
     icon: Icons.add_circle_outline_rounded,
     isScrollControlled: true,
-    child: const _AddOvertimeForm(),
+    child: const _AddExtraWorkForm(),
   );
 }
 
-class _AddOvertimeForm extends StatefulWidget {
-  const _AddOvertimeForm();
+class _AddExtraWorkForm extends StatefulWidget {
+  const _AddExtraWorkForm();
 
   @override
-  State<_AddOvertimeForm> createState() => _AddOvertimeFormState();
+  State<_AddExtraWorkForm> createState() => _AddExtraWorkFormState();
 }
 
-class _AddOvertimeFormState extends State<_AddOvertimeForm> {
+class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
   DateTime? _startDate;
   DateTime? _endDate;
   WorkReason _selectedReason = WorkReason.holiday;
   Holiday? _selectedHoliday;
-  
   final TextEditingController _notesController = TextEditingController();
 
   @override
   void dispose() {
-    // تنظيف الـ Controller لمنع Memory Leaks
     _notesController.dispose();
     super.dispose();
   }
@@ -58,17 +56,11 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'قم بتسجيل أيام العمل الإضافي أو العطلات الرسمية التي عملت بها لإضافتها إلى رصيدك.',
-          style: TextStyle(fontSize: 14.sp, color: colorScheme.onSurface.withAlpha(150)),
-        ),
-        SizedBox(height: 16.h),
-        
         DropdownButtonFormField<WorkReason>(
           value: _selectedReason,
           dropdownColor: colorScheme.surface,
           decoration: InputDecoration(
-            labelText: 'سبب العمل',
+            labelText: 'نوع العمل',
             prefixIcon: Icon(Icons.work_history_rounded, color: colorScheme.primary),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
           ),
@@ -94,12 +86,11 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
           BlocBuilder<HolidaysCubit, HolidaysState>(
             builder: (context, state) {
               if (state is HolidaysLoaded) {
-                // تصفية العطلات المتاحة للعرض فقط (UI Logic)
                 final restState = context.read<RestAllowancesBloc>().state;
                 List<int> registeredHolidayIds = [];
                 
                 if (restState is RestAllowancesLoaded) {
-                  registeredHolidayIds = restState.earnedAllowances
+                  registeredHolidayIds = restState.extrawork
                       .where((ot) => ot.holidayId != null)
                       .map((ot) => ot.holidayId!)
                       .toList();
@@ -110,41 +101,19 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
                     .toList();
 
                 if (availableHolidays.isEmpty) {
-                  return Container(
-                    padding: EdgeInsets.all(16.w),
-                    decoration: BoxDecoration(
-                      color: colorScheme.surfaceContainerHighest.withAlpha(50),
-                      borderRadius: BorderRadius.circular(12.r),
-                      border: Border.all(color: colorScheme.outline.withAlpha(40)),
-                    ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.info_outline_rounded, color: colorScheme.onSurfaceVariant, size: 20.w),
-                        SizedBox(width: 8.w),
-                        Expanded(
-                          child: Text(
-                            'لا توجد عطلات رسمية متاحة (تم تسجيل جميع العطلات أو لا توجد عطلات في السنة المالية الحالية).',
-                            style: TextStyle(color: colorScheme.onSurfaceVariant, fontSize: 13.sp),
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
+                  return Text('لا توجد عطلات متاحة للتسجيل.', style: TextStyle(color: colorScheme.error));
                 }
 
                 return DropdownButtonFormField<Holiday>(
                   value: _selectedHoliday,
                   dropdownColor: colorScheme.surface,
                   decoration: InputDecoration(
-                    labelText: 'اختر العطلة الرسمية',
+                    labelText: 'اختر العطلة',
                     prefixIcon: Icon(Icons.celebration_rounded, color: colorScheme.primary),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                   items: availableHolidays.map((holiday) {
-                    return DropdownMenuItem(
-                      value: holiday,
-                      child: Text(holiday.name),
-                    );
+                    return DropdownMenuItem(value: holiday, child: Text(holiday.name));
                   }).toList(),
                   onChanged: (val) {
                     if (val != null) {
@@ -152,7 +121,7 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
                         _selectedHoliday = val;
                         _startDate = val.startDate;
                         _endDate = val.endDate;
-                        _notesController.text = 'بدل راحة عن: ${val.name}';
+                        _notesController.text = 'عطلة: ${val.name}';
                       });
                     }
                   },
@@ -167,7 +136,7 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
         CustomDateRangePickerField(
           startDate: _startDate,
           endDate: _endDate,
-          hintText: _selectedReason == WorkReason.holiday ? 'تاريخ العطلة' : 'فترة العمل الإضافي',
+          hintText: _selectedReason == WorkReason.holiday ? 'تواريخ العطلة' : 'تواريخ العمل الإضافي',
           firstDate: FinancialYearCalculator.currentFinancialYearStart,
           lastDate: FinancialYearCalculator.currentFinancialYearEnd,
           selectableDayPredicate: (day) {
@@ -201,38 +170,33 @@ class _AddOvertimeFormState extends State<_AddOvertimeForm> {
                 padding: EdgeInsets.symmetric(vertical: 16.h),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
               ),
-              onPressed: isLoading
-                  ? null
-                  : () {
-                      // UI Validation فقط
-                      if (_selectedReason == WorkReason.holiday && _selectedHoliday == null) {
-                        AppToast.showError(context, 'يرجى اختيار العطلة الرسمية.');
-                        return;
-                      }
-                      if (_startDate == null || _endDate == null) {
-                        AppToast.showError(context, 'يرجى تحديد التاريخ بشكل صحيح.');
-                        return;
-                      }
-                      
-                      // تفويض الـ Business Logic إلى الـ BLoC
-                      context.read<RestAllowancesBloc>().add(
-                        AddEarnedRestEvent(
-                          startDate: _startDate!,
-                          endDate: _endDate!,
-                          workReason: _selectedReason,
-                          notes: _notesController.text.trim(),
-                          holidayId: _selectedReason == WorkReason.holiday ? _selectedHoliday?.id : null,
-                        ),
-                      );
-                      context.pop();
-                    },
+              onPressed: isLoading ? null : () {
+                if (_selectedReason == WorkReason.holiday && _selectedHoliday == null) {
+                  AppToast.showError(context, 'يرجى اختيار العطلة.');
+                  return;
+                }
+                if (_startDate == null || _endDate == null) {
+                  AppToast.showError(context, 'يرجى تحديد التواريخ.');
+                  return;
+                }
+                
+                final daysCount = _endDate!.difference(_startDate!).inDays + 1;
+
+                context.read<RestAllowancesBloc>().add(
+                  AddExtraWorkEvent(
+                    workStartDate: _startDate!,
+                    workEndDate: _endDate!,
+                    daysCount: daysCount,
+                    workReason: _selectedReason,
+                    notes: _notesController.text.trim(),
+                    holidayId: _selectedReason == WorkReason.holiday ? _selectedHoliday?.id : null,
+                  ),
+                );
+                context.pop();
+              },
               child: isLoading
-                  ? SizedBox(
-                      height: 24.h,
-                      width: 24.h,
-                      child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2),
-                    )
-                  : Text('إضافة للرصيد', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                  ? SizedBox(height: 24.h, width: 24.h, child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2))
+                  : Text('حفظ', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
             );
           },
         ),

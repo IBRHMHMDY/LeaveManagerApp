@@ -8,14 +8,13 @@ import 'package:leave_manager/features/leaves/domain/repositories/leave_reposito
 import 'package:leave_manager/features/rest_allowances/domain/repositories/rest_allowances_repository.dart';
 import 'package:leave_manager/features/holidays/domain/repositories/holidays_repository.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
-import 'package:leave_manager/features/rest_allowances/domain/entities/overtime_record_entity.dart';
-import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 
 class DateRangeParams {
   final DateTime startDate;
   final DateTime endDate;
-  final bool allowHolidayOverlap; // 1. أضفنا هذا المتغير
+  final bool allowHolidayOverlap;
 
   DateRangeParams({
     required this.startDate, 
@@ -38,16 +37,17 @@ class CheckDateOverlapUseCase implements BaseUseCase<Unit, DateRangeParams> {
 
   @override
   Future<Either<Failure, Unit>> call(DateRangeParams params) async {
+    // 1. تقليل الاستدعاءات: دمجنا استدعاءات العمل الإضافي والراحة في استدعاء واحد
     final results = await Future.wait([
       leaveRepository.getLeavesBetweenDates(params.startDate, params.endDate),
-      restAllowancesRepository.getOvertimeRecords(),
-      restAllowancesRepository.getRestAllowances(),
+      restAllowancesRepository.getAllExtraWork(), // 👈 استدعاء موحد للكيان الجديد
       holidaysRepository.getFinancialYearHolidays(
         FinancialYearCalculator.currentFinancialYearStart,
         FinancialYearCalculator.currentFinancialYearEnd
       ),
     ]);
 
+    // فحص الإجازات
     final leavesRes = results[0] as Either<Failure, List<LeaveRecord>>;
     final leaves = leavesRes.getOrElse(() => <LeaveRecord>[]);
     for (var leave in leaves) {
@@ -56,25 +56,25 @@ class CheckDateOverlapUseCase implements BaseUseCase<Unit, DateRangeParams> {
       }
     }
 
-    final overtimesRes = results[1] as Either<Failure, List<OvertimeRecord>>;
-    final overtimes = overtimesRes.getOrElse(() => <OvertimeRecord>[]);
-    for (var overtime in overtimes) {
-      if (_isOverlapping(params.startDate, params.endDate, overtime.startDate, overtime.endDate)) {
+    // فحص العمل الإضافي وبدلات الراحة المدمجة
+    final extraWorkRes = results[1] as Either<Failure, List<ExtraWorkRecord>>;
+    final extraWorks = extraWorkRes.getOrElse(() => <ExtraWorkRecord>[]);
+    for (var record in extraWorks) {
+      // فحص أيام العمل الإضافي/العطلة نفسها
+      if (_isOverlapping(params.startDate, params.endDate, record.workStartDate, record.workEndDate)) {
         return const Left(ValidationFailure('تاريخ البداية أو النهاية يتقاطع مع رصيد عمل إضافي مسجل.'));
       }
-    }
-
-    final restsRes = results[2] as Either<Failure, List<RestAllowance>>;
-    final rests = restsRes.getOrElse(() => <RestAllowance>[]);
-    for (var rest in rests) {
-      if (_isOverlapping(params.startDate, params.endDate, rest.startDate, rest.endDate)) {
-        return const Left(ValidationFailure('تاريخ البداية أو النهاية يتقاطع مع بدل راحة مسجل.'));
+      // فحص أيام الاستهلاك (بدل الراحة) إذا كان السجل مستخدماً
+      if (record.isUsed && record.restStartDate != null && record.restEndDate != null) {
+        if (_isOverlapping(params.startDate, params.endDate, record.restStartDate!, record.restEndDate!)) {
+          return const Left(ValidationFailure('تاريخ البداية أو النهاية يتقاطع مع بدل راحة مسجل ومستهلك.'));
+        }
       }
     }
 
-    // 2. التحقق من العطلات فقط إذا لم يُسمح بالتداخل
+    // فحص العطلات
     if (!params.allowHolidayOverlap) {
-      final holidaysRes = results[3] as Either<Failure, List<Holiday>>;
+      final holidaysRes = results[2] as Either<Failure, List<Holiday>>;
       final holidays = holidaysRes.getOrElse(() => <Holiday>[]);
       for (var holiday in holidays) {
         if (_isOverlapping(params.startDate, params.endDate, holiday.startDate, holiday.endDate)) {

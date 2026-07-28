@@ -1,17 +1,18 @@
+// lib/features/rest_allowances/presentation/widgets/rest_allowance_tabs.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class RestAllowanceTabs extends StatelessWidget {
-  final bool showEarned;
-  final int earnedCount;
-  final int consumedCount;
+  final bool showAvailables;
+  final int availablesCount;
+  final int usageCount;
   final ValueChanged<bool> onChanged;
 
   const RestAllowanceTabs({
     super.key,
-    required this.showEarned,
-    required this.earnedCount,
-    required this.consumedCount,
+    required this.showAvailables,
+    required this.availablesCount,
+    required this.usageCount,
     required this.onChanged,
   });
 
@@ -23,20 +24,19 @@ class RestAllowanceTabs extends StatelessWidget {
         children: [
           Expanded(
             child: _TabButton(
-              title: 'ايام العمل الإضافى ($earnedCount)',
-              isActive: showEarned,
+              title: 'متاح ($availablesCount)',
+              isActive: showAvailables,
               onTap: () => onChanged(true),
             ),
           ),
           SizedBox(width: 12.w),
           Expanded(
             child: _TabButton(
-              title: 'بدلات الراحه ($consumedCount)',
-              isActive: !showEarned,
+              title: 'مستهلك ($usageCount)',
+              isActive: !showAvailables,
               onTap: () => onChanged(false),
             ),
           ),
-          
         ],
       ),
     );

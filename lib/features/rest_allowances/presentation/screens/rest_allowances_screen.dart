@@ -2,12 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_tabs.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_card.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/overtime_record_card.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/extra_work_card.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_action_buttons.dart';
 import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
@@ -20,7 +20,7 @@ class RestAllowancesScreen extends StatefulWidget {
 }
 
 class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
-  bool _showEarned = true; // true = الرصيد المتاح (العمل الإضافي), false = الرصيد المستهلك (بدلات الراحة)
+  bool _showAvailables = true; 
 
   @override
   void initState() {
@@ -39,7 +39,7 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
           children: [
             Icon(Icons.workspace_premium_outlined, color: colorScheme.primary),
             SizedBox(width: 8.w),
-            Text('بدلات الراحه', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+            Text('بدلات الراحة', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
           ],
         ),
       ),
@@ -56,28 +56,28 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
           if (state is RestAllowancesLoading || state is RestAllowancesInitial) {
             return const Center(child: CircularProgressIndicator());
           }
+
           if (state is RestAllowancesLoaded) {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 RestAllowanceTabs(
-                  showEarned: _showEarned,
-                  earnedCount: state.totalAvailableDays,
-                  consumedCount: state.totalConsumedDays,
-                  onChanged: (isEarned) {
+                  showAvailables: _showAvailables,
+                  availablesCount: state.availables,
+                  usageCount: state.usage,
+                  onChanged: (isAvailable) {
                     setState(() {
-                      _showEarned = isEarned;
+                      _showAvailables = isAvailable;
                     });
                   },
                 ),
                 Expanded(
-                  child: _showEarned
-                      ? _buildEarnedList(state.earnedAllowances)
-                      : _buildConsumedList(state.consumedAllowances),
+                  child: _buildList(_showAvailables ? state.extrawork : state.rest),
                 ),
               ],
             );
           }
+
           return const SizedBox.shrink();
         },
       ),
@@ -85,28 +85,16 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
     );
   }
 
-  Widget _buildEarnedList(List dynamicList) {
-    if (dynamicList.isEmpty) {
-      return const CustomEmptyState(titleEmpty: 'لا يوجد رصيد إضافي', contentEmpty: 'لم تقم بتسجيل أي أيام عمل إضافية.');
+  Widget _buildList(List<ExtraWorkRecord> records) {
+    if (records.isEmpty) {
+      return const CustomEmptyState(titleEmpty: 'لا توجد بيانات', contentEmpty: 'لا توجد سجلات لعرضها هنا.');
     }
-    return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: dynamicList.length,
-      itemBuilder: (context, index) {
-        return OvertimeRecordCard(record: dynamicList[index]);
-      },
-    );
-  }
 
-  Widget _buildConsumedList(List dynamicList) {
-    if (dynamicList.isEmpty) {
-      return const CustomEmptyState(titleEmpty: 'لا توجد بدلات مستهلكة', contentEmpty: 'لم تقم باستهلاك أي بدلات راحة بعد.');
-    }
     return ListView.builder(
       padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
-      itemCount: dynamicList.length,
+      itemCount: records.length,
       itemBuilder: (context, index) {
-        return RestAllowanceCard(allowance: dynamicList[index]);
+        return ExtraWorkCard(record: records[index]);
       },
     );
   }

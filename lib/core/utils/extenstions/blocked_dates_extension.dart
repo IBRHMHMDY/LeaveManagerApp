@@ -8,10 +8,7 @@ import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.da
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 
-/// Extension on BuildContext to extract globally blocked dates
-/// across Leaves, Holidays, and Rest Allowances.
 extension BlockedDatesExtension on BuildContext {
-  /// يولد مجموعة من التواريخ المحجوزة بناءً على المعطيات المطلوبة
   Set<DateTime> getBlockedDates({
     bool includeHolidays = true,
     bool includeLeaves = true,
@@ -20,7 +17,6 @@ extension BlockedDatesExtension on BuildContext {
   }) {
     final Set<DateTime> blockedDates = {};
 
-    // 1. تضمين تواريخ الإجازات
     if (includeLeaves) {
       final leavesState = read<LeavesBloc>().state;
       if (leavesState is LeavesLoaded) {
@@ -30,24 +26,26 @@ extension BlockedDatesExtension on BuildContext {
       }
     }
 
-    // 2. تضمين تواريخ العمل الإضافي وبدلات الراحة المستهلكة
     if (includeOvertimes || includeRestAllowances) {
       final restState = read<RestAllowancesBloc>().state;
       if (restState is RestAllowancesLoaded) {
         if (includeOvertimes) {
-          for (final overtime in restState.earnedAllowances) {
-            _addDatesToSet(blockedDates, overtime.startDate, overtime.endDate);
+          // 👈 القراءة من القائمة الجديدة extrawork
+          for (final overtime in restState.extrawork) { 
+            _addDatesToSet(blockedDates, overtime.workStartDate, overtime.workEndDate);
           }
         }
         if (includeRestAllowances) {
-          for (final rest in restState.consumedAllowances) {
-            _addDatesToSet(blockedDates, rest.startDate, rest.endDate);
+          // 👈 القراءة من القائمة الجديدة rest
+          for (final rest in restState.rest) {
+            if (rest.restStartDate != null && rest.restEndDate != null) {
+              _addDatesToSet(blockedDates, rest.restStartDate!, rest.restEndDate!);
+            }
           }
         }
       }
     }
 
-    // 3. تضمين تواريخ العطلات الرسمية
     if (includeHolidays) {
       final holidaysState = read<HolidaysCubit>().state;
       if (holidaysState is HolidaysLoaded) {
@@ -60,10 +58,8 @@ extension BlockedDatesExtension on BuildContext {
     return blockedDates;
   }
 
-  /// دالة مساعدة لتوليد الأيام بين تاريخين وإضافتها إلى المجموعة
   void _addDatesToSet(Set<DateTime> set, DateTime start, DateTime end) {
     for (DateTime d = start; !d.isAfter(end); d = d.add(const Duration(days: 1))) {
-      // إزالة أي فوارق زمنية (الساعات/الدقائق) لضمان دقة المقارنة
       set.add(DateTime(d.year, d.month, d.day)); 
     }
   }

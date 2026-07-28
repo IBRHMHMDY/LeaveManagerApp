@@ -5,13 +5,11 @@ import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
 import 'package:leave_manager/core/errors/failures.dart';
-import 'package:leave_manager/features/rest_allowances/data/datasources/rest_allowances_local_data_source.dart';
-import 'package:leave_manager/features/rest_allowances/data/models/overtime_record_mapper.dart';
-import 'package:leave_manager/features/rest_allowances/data/models/rest_allowance_mapper.dart';
-import 'package:leave_manager/features/rest_allowances/domain/entities/overtime_record_entity.dart';
-import 'package:leave_manager/features/rest_allowances/domain/entities/rest_allowance_entity.dart';
-import 'package:leave_manager/features/rest_allowances/domain/repositories/rest_allowances_repository.dart';
 import 'package:leave_manager/core/utils/enums/work_reason.dart';
+import 'package:leave_manager/features/rest_allowances/data/datasources/rest_allowances_local_data_source.dart';
+import 'package:leave_manager/features/rest_allowances/data/models/extra_work_mapper.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
+import 'package:leave_manager/features/rest_allowances/domain/repositories/rest_allowances_repository.dart';
 
 @LazySingleton(as: RestAllowancesRepository)
 class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
@@ -19,120 +17,77 @@ class RestAllowancesRepositoryImpl implements RestAllowancesRepository {
 
   RestAllowancesRepositoryImpl(this.localDataSource);
 
-  // ==========================================
-  // 1. سجلات العمل الإضافي (Overtime Records)
-  // ==========================================
-
   @override
-  Future<Either<Failure, Unit>> addOvertimeRecord(OvertimeRecord record) async {
+  Future<Either<Failure, Unit>> addExtraWork(ExtraWorkRecord record) async {
     try {
-      final companion = OvertimeRecordsTableCompanion(
+      final companion = RestAllowancesTableCompanion(
         workReason: Value(record.workReason == WorkReason.holiday ? 0 : 1),
-        startDate: Value(record.startDate),
-        endDate: Value(record.endDate),
+        workStartDate: Value(record.workStartDate),
+        workEndDate: Value(record.workEndDate),
         daysCount: Value(record.daysCount),
-        holidayId: Value(record.holidayId),
-        isConsumed: Value(record.isConsumed),
+        isUsed: Value(record.isUsed),
+        holidayId: record.holidayId != null ? Value(record.holidayId) : const Value.absent(),
         notes: record.notes != null && record.notes!.isNotEmpty
             ? Value(record.notes)
             : const Value.absent(),
       );
 
-      await localDataSource.addOvertimeRecord(companion);
+      await localDataSource.addExtraWork(companion);
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
-    } catch (e, stackTrace) {
-      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
+    } catch (e) {
+      return const Left(DatabaseFailure('حدث خطأ غير متوقع أثناء الحفظ.'));
     }
   }
 
   @override
-  Future<Either<Failure, List<OvertimeRecord>>> getOvertimeRecords() async {
+  Future<Either<Failure, List<ExtraWorkRecord>>> getAllExtraWork() async {
     try {
-      final models = await localDataSource.getOvertimeRecords();
+      final models = await localDataSource.getAllExtraWork();
+      // تحويل النماذج باستخدام الـ Mapper
       final domainEntities = models.map((model) => model.toDomain()).toList();
       return Right(domainEntities);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
-    } catch (e, stackTrace) {
-      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
+    } catch (e) {
+      return const Left(DatabaseFailure('حدث خطأ أثناء جلب السجلات.'));
     }
   }
 
   @override
-  Future<Either<Failure, Unit>> updateOvertimeConsumedStatus(int id, bool isConsumed) async {
+  Future<Either<Failure, Unit>> useRestAllowance({
+    required int id,
+    required int usedDaysCount,
+    required DateTime restStartDate,
+    required DateTime restEndDate,
+    String? notes,
+  }) async {
     try {
-      await localDataSource.updateOvertimeConsumedStatus(id, isConsumed);
-      return const Right(unit);
-    } on DatabaseException catch (e) {
-      return Left(DatabaseFailure(e.message));
-    } catch (e, stackTrace) {
-      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> deleteOvertimeRecord(int id) async {
-    try {
-      await localDataSource.deleteOvertimeRecord(id);
-      return const Right(unit);
-    } on DatabaseException catch (e) {
-      return Left(DatabaseFailure(e.message));
-    } catch (e, stackTrace) {
-      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
-    }
-  }
-
-  // ==========================================
-  // 2. أرصدة الراحة (Rest Allowances)
-  // ==========================================
-
-  @override
-  Future<Either<Failure, Unit>> addRestAllowance(RestAllowance allowance) async {
-    try {
-      final companion = RestAllowancesTableCompanion(
-        workReason: Value(allowance.workReason == WorkReason.holiday ? 0 : 1),
-        overtimeId: Value(allowance.overtimeId),
-        startDate: Value(allowance.startDate),
-        endDate: Value(allowance.endDate),
-        daysCount: Value(allowance.daysCount),
-        notes: allowance.notes != null && allowance.notes!.isNotEmpty
-            ? Value(allowance.notes)
-            : const Value.absent(),
+      await localDataSource.useRestAllowance(
+        id: id,
+        usedDaysCount: usedDaysCount,
+        restStartDate: restStartDate,
+        restEndDate: restEndDate,
+        notes: notes,
       );
-
-      await localDataSource.addRestAllowance(companion);
       return const Right(unit);
     } on DatabaseException catch (e) {
-      return Left(DatabaseFailure(e.message)); 
-    } catch (e, stackTrace) {
-      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
+      return Left(DatabaseFailure(e.message));
+    } catch (e) {
+      return const Left(DatabaseFailure('فشل في تحويل الرصيد المتاح.'));
     }
   }
 
   @override
-  Future<Either<Failure, List<RestAllowance>>> getRestAllowances() async {
+  Future<Either<Failure, Unit>> deleteExtraWork(int id) async {
     try {
-      final models = await localDataSource.getRestAllowances();
-      final domainEntities = models.map((model) => model.toDomain()).toList();
-      return Right(domainEntities);
-    } on DatabaseException catch (e) {
-      return Left(DatabaseFailure(e.message));
-    } catch (e, stackTrace) {
-      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> deleteRestAllowance(int id) async {
-    try {
-      await localDataSource.deleteRestAllowance(id);
+      await localDataSource.deleteExtraWork(id);
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
-    } catch (e, stackTrace) {
-      return const Left(DatabaseFailure('حدث خطأ غير متوقع.'));
+    } catch (e) {
+      return const Left(DatabaseFailure('حدث خطأ أثناء محاولة الحذف.'));
     }
   }
 }

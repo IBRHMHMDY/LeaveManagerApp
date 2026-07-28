@@ -4,9 +4,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/utils/extenstions/blocked_dates_extension.dart';
-import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
-import 'package:leave_manager/features/rest_allowances/domain/entities/overtime_record_entity.dart';
+import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
@@ -34,10 +33,9 @@ class _AddRestAllowancesForm extends StatefulWidget {
 }
 
 class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
-  DateTime? _startDate;
-  DateTime? _endDate;
-  OvertimeRecord? _selectedOvertime;
-  
+  DateTime? _restStartDate;
+  DateTime? _restEndDate;
+  ExtraWorkRecord? _selectedRecord;
   final TextEditingController _notesController = TextEditingController();
 
   @override
@@ -52,69 +50,51 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
     final blockedDates = context.getBlockedDates();
 
     DateTime effectiveFirstDate = FinancialYearCalculator.currentFinancialYearStart;
-    if (_selectedOvertime != null && _selectedOvertime!.startDate.isAfter(effectiveFirstDate)) {
-      effectiveFirstDate = _selectedOvertime!.startDate;
+    if (_selectedRecord != null && _selectedRecord!.workStartDate.isAfter(effectiveFirstDate)) {
+      effectiveFirstDate = _selectedRecord!.workStartDate;
     }
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Text(
-          'قم باختيار رصيد العمل الإضافي المتاح لتحويله إلى أيام إجازة (بدل راحة).',
-          style: TextStyle(
-            fontSize: 14.sp,
-            color: colorScheme.onSurface.withAlpha(150),
-          ),
-        ),
-        SizedBox(height: 16.h),
-        
         BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
           builder: (context, state) {
             if (state is RestAllowancesLoaded) {
-              final availableOvertimes = state.earnedAllowances.where((ot) => !ot.isConsumed).toList();
+              final availables = state.extrawork; // الأرصدة المتاحة للتقسيم/الاستهلاك
               
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  DropdownButtonFormField<OvertimeRecord>(
-                    value: _selectedOvertime,
+                  DropdownButtonFormField<ExtraWorkRecord>(
+                    value: _selectedRecord,
                     dropdownColor: colorScheme.surface,
                     decoration: InputDecoration(
-                      labelText: 'اختر الرصيد المتاح (ارتباط بـ)',
+                      labelText: 'اختر الرصيد المتاح',
                       prefixIcon: Icon(Icons.link_rounded, color: colorScheme.primary),
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
-                    items: availableOvertimes.map((ot) {
-                      final title = ot.workReason == WorkReason.holiday ? 'عطلة رسمية' : 'عمل إضافي';
-                      final date = ot.startDate.isAtSameMomentAs(ot.endDate)
-                          ? ot.startDate.toFormatCurrentLocale()
-                          : '${ot.startDate.toFormatCurrentLocale()} - ${ot.endDate.toFormatCurrentLocale()}';
-                      return DropdownMenuItem<OvertimeRecord>(
-                        value: ot,
-                        child: Text('$title ($date)'),
+                    items: availables.map((record) {
+                      final title = record.workReason == WorkReason.holiday ? 'عطلة' : 'عمل إضافي';
+                      return DropdownMenuItem<ExtraWorkRecord>(
+                        value: record,
+                        child: Text('$title (${record.daysCount} أيام)'),
                       );
                     }).toList(),
                     onChanged: (val) {
                       setState(() {
-                        _selectedOvertime = val;
-                        if (_startDate != null && val != null && _startDate!.isBefore(val.startDate)) {
-                          _startDate = null;
-                          _endDate = null;
-                        }
-                        if (val != null) {
-                          final reasonLabel = val.workReason == WorkReason.holiday ? 'عطلة رسمية' : 'عمل إضافي';
-                          _notesController.text = 'بدل راحة مقابل $reasonLabel';
-                        }
+                        _selectedRecord = val;
+                        _restStartDate = null;
+                        _restEndDate = null;
                       });
                     },
                   ),
                   SizedBox(height: 16.h),
                   
                   CustomDateRangePickerField(
-                    startDate: _startDate,
-                    endDate: _endDate,
-                    hintText: 'تاريخ الإجازة (بدل الراحة)',
+                    startDate: _restStartDate,
+                    endDate: _restEndDate,
+                    hintText: 'تواريخ الراحة المطلوبة',
                     firstDate: effectiveFirstDate,
                     lastDate: FinancialYearCalculator.currentFinancialYearEnd,
                     selectableDayPredicate: (day) {
@@ -123,8 +103,8 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                     onDateSelected: (pickedRange) {
                       if (pickedRange != null) {
                         setState(() {
-                          _startDate = pickedRange.start;
-                          _endDate = pickedRange.end;
+                          _restStartDate = pickedRange.start;
+                          _restEndDate = pickedRange.end;
                         });
                       }
                     },
@@ -145,27 +125,31 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
                     onPressed: () {
-                      // UI Validation فقط
-                      if (_selectedOvertime == null || _startDate == null || _endDate == null) {
-                        AppToast.showError(context, 'يرجى تعبئة جميع الحقول بشكل صحيح.');
+                      if (_selectedRecord == null || _restStartDate == null || _restEndDate == null) {
+                        AppToast.showError(context, 'يرجى إكمال جميع الحقول.');
                         return;
                       }
-                      
-                      // تمرير الحدث للـ BLoC للتعامل مع الـ Business Logic
+
+                      final usedDaysCount = _restEndDate!.difference(_restStartDate!).inDays + 1;
+
+                      if (usedDaysCount > _selectedRecord!.daysCount) {
+                        AppToast.showError(context, 'أيام الراحة المطلوبة تتجاوز رصيد السجل المختار.');
+                        return;
+                      }
+
                       context.read<RestAllowancesBloc>().add(
                         ConsumeRestEvent(
-                          startDate: _startDate!,
-                          endDate: _endDate!,
-                          overtimeId: _selectedOvertime!.id,
-                          linkedOvertimeStartDate: _selectedOvertime!.startDate,
-                          workReason: _selectedOvertime!.workReason,
+                          allowanceId: _selectedRecord!.id,
+                          restStartDate: _restStartDate!,
+                          restEndDate: _restEndDate!,
+                          usedDaysCount: usedDaysCount,
                           notes: _notesController.text.trim(),
                         ),
                       );
                       context.pop();
                     },
                     child: Text(
-                      'استهلاك كبدل راحة',
+                      'تأكيد استهلاك الراحة',
                       style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.bold),
                     ),
                   ),

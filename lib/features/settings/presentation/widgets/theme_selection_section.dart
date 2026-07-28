@@ -1,3 +1,4 @@
+// lib/features/settings/presentation/widgets/theme_selection_section.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -9,13 +10,12 @@ class ThemeSelectionSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
-    final isCurrentDark = Theme.of(context).brightness == Brightness.dark;
-
+    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'إعدادات النظام والتفضيلات',
+          'المظهر',
           style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
         ),
         SizedBox(height: 12.h),
@@ -27,15 +27,17 @@ class ThemeSelectionSection extends StatelessWidget {
           ),
           child: BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {
+              final isCurrentDark = themeMode == ThemeMode.dark; // الاعتماد على الـ State
+              
               return SwitchListTile(
                 title: Text(
-                  'الوضع الليلي',
+                  'الوضع الداكن',
                   style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
                   isCurrentDark 
-                      ? 'تفعيل المظهر الداكن للراحة البصرية' 
-                      : 'تفعيل المظهر الفاتح لسطوع أوضح',
+                      ? 'مفعل حالياً' 
+                      : 'غير مفعل',
                   style: TextStyle(fontSize: 12.sp, color: colorScheme.onSurface.withAlpha(140)),
                 ),
                 secondary: Icon(
@@ -45,7 +47,8 @@ class ThemeSelectionSection extends StatelessWidget {
                 value: isCurrentDark,
                 activeThumbColor: colorScheme.primary,
                 onChanged: (bool value) {
-                  context.read<ThemeCubit>().toggleTheme(context);
+                  // استدعاء الدالة النظيفة
+                  context.read<ThemeCubit>().toggleTheme();
                 },
               );
             },

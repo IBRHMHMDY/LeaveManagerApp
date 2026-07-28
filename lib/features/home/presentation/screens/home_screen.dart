@@ -105,7 +105,6 @@ class _HomeScreenState extends State<HomeScreen> {
                             ],
                           );
                         }
-                        // إظهار بطاقة فارغة كعنصر نائب أثناء التحميل
                         return Column(
                           children: [
                             const UpcomingHolidayCard(upcomingHoliday: null),
@@ -125,13 +124,14 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     SizedBox(height: 16.h),
                     BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
-                      builder: (context, state) {
-                        if (state is RestAllowancesLoaded) {
+                      builder: (context, restState) { // 👈 فصلنا المتغير لتجنب التعارض
+                        if (restState is RestAllowancesLoaded) {
                           return Column(
                             children: [
                               RestAllowanceStatsCard(
-                                totalAvailableDays: state.totalAvailableDays,
-                                totalConsumedDays: state.totalConsumedDays,
+                                // 👈 قراءة المتغيرات الحديثة الموحدة
+                                totalAvailableDays: restState.availables, 
+                                totalConsumedDays: restState.usage,
                               ),
                             ],
                           );

@@ -7,11 +7,10 @@ import 'package:path/path.dart' as p;
 import 'tables/settings_table.dart';
 import 'tables/leave_records_table.dart';
 import 'tables/rest_allowances_table.dart';
-import 'tables/overtime_records_table.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [SettingsTable, LeaveRecordsTable, HolidaysTable,RestAllowancesTable,OvertimeRecordsTable,])
+@DriftDatabase(tables: [SettingsTable, LeaveRecordsTable, HolidaysTable,RestAllowancesTable,])
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -32,7 +31,6 @@ class AppDatabase extends _$AppDatabase {
         }
         // schemaVersion => 3
         if (from < 3) {
-          await m.createTable(overtimeRecordsTable);
           await m.createTable(restAllowancesTable);
         }
       },
