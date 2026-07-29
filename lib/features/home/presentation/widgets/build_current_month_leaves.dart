@@ -32,14 +32,14 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             const Text(
-              'إجازات هذا الشهر',
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              'إجازات الشهر الحالى ',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
             Text(
               now.toFormatCurrentMonthYear,
               style: const TextStyle(
                 color: AppColors.primaryTeal,
-                fontSize: 16,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),

@@ -39,12 +39,12 @@ class RestAllowancesButton extends StatelessWidget {
             Container(
               padding: EdgeInsets.all(12.w),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withAlpha(150),
+                color: colorScheme.primary.withAlpha(150),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.workspace_premium_rounded,
-                color: colorScheme.primary,
+                color: colorScheme.onPrimary,
                 size: 28.w,
               ),
             ),

@@ -43,7 +43,7 @@ class LeaveManagerApp extends StatelessWidget {
             builder: (context, themeMode) {
               return MaterialApp.router(
                 debugShowCheckedModeBanner: false,
-                title: 'مدير إجازاتي',
+                title: 'مدير اجازاتى',
                 supportedLocales: const [
                   Locale('ar', 'EG'),
                   Locale('en', 'US'),

@@ -21,7 +21,7 @@ class ThemeSelectionSection extends StatelessWidget {
         SizedBox(height: 12.h),
         Container(
           decoration: BoxDecoration(
-            color: colorScheme.surfaceContainerHighest.withAlpha(50),
+            
             borderRadius: BorderRadius.circular(16.r),
             border: Border.all(color: colorScheme.outline.withAlpha(40)),
           ),
@@ -47,7 +47,6 @@ class ThemeSelectionSection extends StatelessWidget {
                 value: isCurrentDark,
                 activeThumbColor: colorScheme.primary,
                 onChanged: (bool value) {
-                  // استدعاء الدالة النظيفة
                   context.read<ThemeCubit>().toggleTheme();
                 },
               );

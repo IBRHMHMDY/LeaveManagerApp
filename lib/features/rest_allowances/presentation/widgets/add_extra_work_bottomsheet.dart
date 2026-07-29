@@ -13,14 +13,14 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 import 'package:leave_manager/shared/widgets/custom_date_range_picker_field.dart';
-import 'package:leave_manager/shared/widgets/custom_text_field.dart';
+// import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 import 'package:leave_manager/shared/widgets/show_bottom_sheet.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
 
 void showAddExtraWorkBottomSheet(BuildContext context) {
   ShowBottomSheet.show(
     context: context,
-    title: 'إضافة عمل إضافي / عطلة',
+    title: 'تسجيل إضافي / عطلة',
     icon: Icons.add_circle_outline_rounded,
     isScrollControlled: true,
     child: const _AddExtraWorkForm(),
@@ -39,11 +39,11 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
   DateTime? _endDate;
   WorkReason _selectedReason = WorkReason.holiday;
   Holiday? _selectedHoliday;
-  final TextEditingController _notesController = TextEditingController();
+  // final TextEditingController _notesController = TextEditingController();
 
   @override
   void dispose() {
-    _notesController.dispose();
+    // _notesController.dispose();
     super.dispose();
   }
 
@@ -66,7 +66,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
           ),
           items: const [
             DropdownMenuItem(value: WorkReason.holiday, child: Text('عطلة رسمية')),
-            DropdownMenuItem(value: WorkReason.overtime, child: Text('عمل إضافي (Overtime)')),
+            DropdownMenuItem(value: WorkReason.overtime, child: Text('عمل إضافي')),
           ],
           onChanged: (val) {
             if (val != null) {
@@ -75,7 +75,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                 _startDate = null;
                 _endDate = null;
                 _selectedHoliday = null;
-                _notesController.clear();
+                // _notesController.clear();
               });
             }
           },
@@ -121,7 +121,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                         _selectedHoliday = val;
                         _startDate = val.startDate;
                         _endDate = val.endDate;
-                        _notesController.text = 'عطلة: ${val.name}';
+                        // _notesController.text = 'عطلة: ${val.name}';
                       });
                     }
                   },
@@ -153,11 +153,11 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
         ),
         SizedBox(height: 16.h),
         
-        CustomTextField(
-          label: 'ملاحظات (اختياري)',
-          icon: Icons.notes_rounded,
-          controller: _notesController,
-        ),
+        // CustomTextField(
+        //   label: 'ملاحظات (اختياري)',
+        //   icon: Icons.notes_rounded,
+        //   controller: _notesController,
+        // ),
         SizedBox(height: 24.h),
         
         BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
@@ -188,7 +188,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                     workEndDate: _endDate!,
                     daysCount: daysCount,
                     workReason: _selectedReason,
-                    notes: _notesController.text.trim(),
+                    // notes: _notesController.text.trim(),
                     holidayId: _selectedReason == WorkReason.holiday ? _selectedHoliday?.id : null,
                   ),
                 );

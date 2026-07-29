@@ -61,13 +61,17 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
         BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
           builder: (context, state) {
             if (state is RestAllowancesLoaded) {
-              final availables = state.extrawork; // الأرصدة المتاحة للتقسيم/الاستهلاك
+              final availables = state.extrawork; 
+              
+              // 💡 التعديل هنا: التحقق من وجود العنصر المختار داخل القائمة الجديدة
+              final bool recordExists = availables.any((record) => record == _selectedRecord);
+              final ExtraWorkRecord? validSelectedRecord = recordExists ? _selectedRecord : null;
               
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DropdownButtonFormField<ExtraWorkRecord>(
-                    value: _selectedRecord,
+                    value: validSelectedRecord, // 💡 استخدام المتغير الآمن هنا
                     dropdownColor: colorScheme.surface,
                     decoration: InputDecoration(
                       labelText: 'اختر الرصيد المتاح',
@@ -75,7 +79,7 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                       border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
                     items: availables.map((record) {
-                      final title = record.workReason == WorkReason.holiday ? 'عطلة' : 'عمل إضافي';
+                      final title = record.workReason == WorkReason.holiday ? 'عطلة' : 'إضافي';
                       return DropdownMenuItem<ExtraWorkRecord>(
                         value: record,
                         child: Text('$title (${record.daysCount} أيام)'),

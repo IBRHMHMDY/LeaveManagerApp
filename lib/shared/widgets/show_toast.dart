@@ -55,16 +55,17 @@ class AppToast {
     required Color color,
     required Color bgColor,
   }) {
-    // إزالة الإشعار القديم إذا كان موجوداً لتجنب التكدس (UI Clutter)
+    // إزالة أي Toast سابق لمنع التكدس (UI Clutter)
     _currentOverlay?.remove();
     _timer?.cancel();
 
-    final overlayState = Overlay.of(context);
-    
+    // 💡 التعديل هنا: استخدام rootOverlay: true للوصول إلى الطبقة الجذرية للتطبيق
+    final overlayState = Overlay.of(context, rootOverlay: true);
+         
     _currentOverlay = OverlayEntry(
       builder: (context) => SafeArea(
         child: Align(
-          alignment: Alignment.bottomCenter, // التعديل 1: التوجيه للأسفل
+          alignment: Alignment.bottomCenter,
           child: _ToastAnimatedWidget(
             title: title,
             message: message,
@@ -77,9 +78,10 @@ class AppToast {
       ),
     );
 
+    // إدراج الـ Toast في الـ Root Overlay
     overlayState.insert(_currentOverlay!);
 
-    // إغلاق تلقائي بعد 4 ثوانٍ
+    // إعداد المؤقت للإخفاء التلقائي
     _timer = Timer(const Duration(seconds: 4), () {
       _removeToast();
     });

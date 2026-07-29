@@ -48,3 +48,5 @@ android/key.properties
 *.jks
 # Version 1.0.0
 /bundle
+*.zip
+*.rar

@@ -25,7 +25,7 @@ class RestActionButtons extends StatelessWidget {
                 ),
                 onPressed: () => showAddExtraWorkBottomSheet(context),
                 icon: const Icon(Icons.add),
-                label: Text('يوم اضافى', style: TextStyle(color: colorScheme.onPrimary, fontSize: 15.sp, fontWeight: FontWeight.bold)),
+                label: Text('اضافى/عطله', style: TextStyle(color: colorScheme.onPrimary, fontSize: 15.sp, fontWeight: FontWeight.bold)),
               ),
             ),
             SizedBox(width: 12.w),

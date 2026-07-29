@@ -24,7 +24,7 @@ class RestAllowanceTabs extends StatelessWidget {
         children: [
           Expanded(
             child: _TabButton(
-              title: 'متاح ($availablesCount)',
+              title: 'اضافى/عطلات ($availablesCount)',
               isActive: showAvailables,
               onTap: () => onChanged(true),
             ),
@@ -32,7 +32,7 @@ class RestAllowanceTabs extends StatelessWidget {
           SizedBox(width: 12.w),
           Expanded(
             child: _TabButton(
-              title: 'مستهلك ($usageCount)',
+              title: 'بدلات الراحه ($usageCount)',
               isActive: !showAvailables,
               onTap: () => onChanged(false),
             ),

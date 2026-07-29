@@ -96,13 +96,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
           context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
           AppToast.showSuccess(context, 'تم حفظ الإعدادات بنجاح');
-          
+
           if (_isFirstTime) {
             setState(() {
               _isFirstTime = false;
             });
-            context.go(AppRouter.home);
           }
+          context.go(AppRouter.home);
         } else if (state is SettingsError) {
           AppToast.showError(context, state.message);
         }
@@ -130,13 +130,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   regularLeavesController: _regularLeavesController,
                   casualLeavesController: _casualLeavesController,
                 ),
-      
+
                 SizedBox(height: 24.w),
-      
+
                 const ThemeSelectionSection(),
-      
+
                 SizedBox(height: 32.h),
-      
+
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
                     final isLoading = state is SettingsLoading;
@@ -150,7 +150,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           borderRadius: BorderRadius.circular(12.r),
                         ),
                       ),
-                      onPressed: isLoading ? null :  _saveSettings,
+                      onPressed: isLoading ? null : _saveSettings,
                       child: isLoading
                           ? SizedBox(
                               height: 24.h,
@@ -170,9 +170,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                 ),
-      
+
                 // if (!_isFirstTime) const DangerZoneSection(),
-      
                 SizedBox(height: 32.h),
               ],
             ),

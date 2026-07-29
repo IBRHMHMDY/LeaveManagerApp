@@ -77,7 +77,7 @@ class UpcomingHolidayCard extends StatelessWidget {
                         ),
                       ),
                     ),
-                  SizedBox(height: 8.h),
+                  // SizedBox(height: 8.h),
                   if (upcomingHoliday != null) ...[
                     Text(
                       upcomingHoliday!.name,
