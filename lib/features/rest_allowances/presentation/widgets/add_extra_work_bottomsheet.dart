@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/core/utils/enums/work_reason.dart';
 import 'package:leave_manager/core/utils/extenstions/blocked_dates_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
@@ -61,7 +62,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
           dropdownColor: colorScheme.surface,
           decoration: InputDecoration(
             labelText: 'نوع العمل',
-            prefixIcon: Icon(Icons.work_history_rounded, color: colorScheme.primary),
+            prefixIcon: const Icon(Icons.work_history_rounded, color: AppColors.restAllowance),
             border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
           ),
           items: const [
@@ -101,7 +102,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                     .toList();
 
                 if (availableHolidays.isEmpty) {
-                  return Text('لا توجد عطلات متاحة للتسجيل.', style: TextStyle(color: colorScheme.error));
+                  return Text('لا توجد عطلات متاحة', style: TextStyle(color: colorScheme.error));
                 }
 
                 return DropdownButtonFormField<Holiday>(
@@ -109,7 +110,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                   dropdownColor: colorScheme.surface,
                   decoration: InputDecoration(
                     labelText: 'اختر العطلة',
-                    prefixIcon: Icon(Icons.celebration_rounded, color: colorScheme.primary),
+                    prefixIcon: const Icon(Icons.celebration_rounded, color: AppColors.restAllowance),
                     border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
                   ),
                   items: availableHolidays.map((holiday) {
@@ -165,8 +166,8 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
             final isLoading = state is RestAllowancesLoading;
             return ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: colorScheme.primary,
-                foregroundColor: colorScheme.onPrimary,
+                backgroundColor: AppColors.restAllowance,
+                foregroundColor: AppColors.darkText,
                 padding: EdgeInsets.symmetric(vertical: 16.h),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
               ),
@@ -195,8 +196,8 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                 context.pop();
               },
               child: isLoading
-                  ? SizedBox(height: 24.h, width: 24.h, child: CircularProgressIndicator(color: colorScheme.onPrimary, strokeWidth: 2))
-                  : Text('حفظ', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                  ? SizedBox(height: 24.h, width: 24.h, child: const CircularProgressIndicator(color:  AppColors.restAllowance, strokeWidth: 2))
+                  : Text('حفظ اضافى/عطله', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
             );
           },
         ),

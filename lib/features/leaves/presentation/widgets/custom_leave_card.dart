@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart'; // 1. استيراد ScreenUtil
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
-import 'package:leave_manager/shared/themes/app_colors.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/shared/widgets/confirm_delete_dialog.dart';
@@ -18,7 +18,7 @@ class CustomLeaveCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final isRegular = leave.leaveType == LeaveType.regular;
-    final color = isRegular ? AppColors.regularLeaveColor : AppColors.casualLeaveColor;
+    final color = isRegular ? AppColors.regularLeave : AppColors.casualLeave;
     
     final colorScheme = Theme.of(context).colorScheme;
     final isDark = colorScheme.brightness == Brightness.dark;

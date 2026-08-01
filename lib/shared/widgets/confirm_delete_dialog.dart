@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 class ConfirmDeleteDialog extends StatelessWidget {
   final String titleDialog;
   final String contentDialog;
-  final void Function() onPressedButton;
-  
+  final VoidCallback onPressedButton;
+
   const ConfirmDeleteDialog({
     super.key,
     required this.titleDialog,
@@ -15,31 +15,28 @@ class ConfirmDeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    
     return AlertDialog(
       title: Text(titleDialog),
       content: Text(contentDialog),
-      actionsAlignment: MainAxisAlignment.end, // محاذاة الأزرار للنهاية (اليسار في RTL)
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+      actionsAlignment: MainAxisAlignment.end,
       actions: [
         TextButton(
-          style: TextButton.styleFrom(
-            // إبطال التمدد المفروض من الثيم العام بإرجاع الحجم الأدنى للصفر
-            minimumSize: const Size(0, 45), 
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-          ),
           onPressed: () => context.pop(false),
           child: const Text('إلغاء'),
         ),
-        ElevatedButton(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: Colors.red,
-            foregroundColor: Colors.white,
+        FilledButton(
+          style: FilledButton.styleFrom(
+            backgroundColor: colorScheme.error,
+            foregroundColor: colorScheme.onError,
             elevation: 0,
-            // إبطال التمدد المفروض من الثيم العام ليأخذ الزر حجم النص فقط
-            minimumSize: const Size(0, 45),
-            padding: const EdgeInsets.symmetric(horizontal: 16),
           ),
           onPressed: onPressedButton,
-          child: const Text('نعم، حذف'),
+          child: const Text('تأكيد الحذف'),
         ),
       ],
     );

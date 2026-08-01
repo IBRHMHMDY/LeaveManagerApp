@@ -1,6 +1,9 @@
+// lib/app/layout/widgets/welcome_card.dart
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 
-/// ويدجت بطاقة الترحيب بالموظف
+/// البطاقة الترحيبية للموظف، تم تحديثها لتعمل بمعايير 2026.
+/// لا يوجد استخدام مباشر لـ withOpacity لتقليل استهلاك الـ GPU Rendering.
 class WelcomeCard extends StatelessWidget {
   final String employeeName;
   final String role;
@@ -13,58 +16,73 @@ class WelcomeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // استدعاء الثيم المخصص من طبقة shared
     final theme = Theme.of(context);
     final colorScheme = theme.colorScheme;
+    final textTheme = theme.textTheme;
 
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 5),
+      // استخدام ثوابت المسافات (AppSpacing) بدلاً من الأرقام الثابتة
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.md, 
+        vertical: AppSpacing.sm,
+      ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // القسم الأيمن (الاسم والمسمى الوظيفي)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'مرحباً، $employeeName',
-                style: theme.textTheme.headlineSmall?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: colorScheme.onSurface,
+          // القسم الخاص بالاسم والمسمى الوظيفي
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  'أهلاً، $employeeName',
+                  style: textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: colorScheme.onSurface,
+                  ),
+                  // استخدام overflow لضمان عدم حدوث خطأ إذا كان الاسم طويلاً جداً
+                  overflow: TextOverflow.ellipsis, 
                 ),
-              ),
-              const SizedBox(height: 8),
-              // وسم المسمى الوظيفي (Badge)
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                decoration: BoxDecoration(
-                  color: colorScheme.primaryContainer, // لون حاوية أولي من الثيم
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: colorScheme.primary.withOpacity(0.5), // لون الإطار من الثيم
-                    width: 0.5,
+                SizedBox(height: AppSpacing.sm),
+                // الشارة (Badge) الخاصة بالوظيفة
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md, 
+                    vertical: AppSpacing.xs,
+                  ),
+                  decoration: BoxDecoration(
+                    // استخدام الألوان الدلالية للأسطح الثانوية (surfaceContainer)
+                    color: colorScheme.surfaceContainerHighest, 
+                    borderRadius: AppRadii.xl,
+                    border: Border.all(
+                      color: colorScheme.outlineVariant, 
+                      width: 1,
+                    ),
+                  ),
+                  child: Text(
+                    role,
+                    style: textTheme.labelLarge?.copyWith(
+                      color: colorScheme.primary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-                child: Text(
-                  role,
-                  style: theme.textTheme.labelLarge?.copyWith(
-                    color: colorScheme.primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
-          // القسم الأيسر (أيقونة المستخدم)
+          SizedBox(width: AppSpacing.md),
+          // القسم الخاص بالأيقونة الشخصية
           Container(
-            width: 64,
+            width: 64, // مقاس الأيقونة ثابت لضمان التناسق
             height: 64,
             decoration: BoxDecoration(
               color: colorScheme.primary,
-              borderRadius: BorderRadius.circular(18),
+              // استخدام انحناء متناسق مع باقي مكونات التطبيق
+              borderRadius: AppRadii.lg, 
               boxShadow: [
                 BoxShadow(
-                  color: colorScheme.primary.withOpacity(0.2),
+                  // استخدام لون الظل من المظهر ليكون متوافقاً مع الوضعين الفاتح والداكن
+                  color: colorScheme.shadow.withAlpha(20), 
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -72,7 +90,7 @@ class WelcomeCard extends StatelessWidget {
             ),
             child: Icon(
               Icons.person_outline_rounded,
-              color: colorScheme.onPrimary, // لون النص/الأيقونة فوق اللون الأساسي
+              color: colorScheme.onPrimary, 
               size: 32,
             ),
           ),

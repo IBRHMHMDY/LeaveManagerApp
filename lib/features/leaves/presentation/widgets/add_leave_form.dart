@@ -82,15 +82,6 @@ class AddLeaveFormState extends State<AddLeaveForm> {
     final fillColor = isDark ? Colors.black12 : Colors.grey.shade50;
     final blockedDates = context.getBlockedDates();
 
-    // final holidaysState = context.watch<HolidaysCubit>().state;
-    // List<Holiday> holidays = holidaysState is HolidaysLoaded ? holidaysState.financialYearHolidays : [];
-
-    // final leavesState = context.watch<LeavesBloc>().state;
-    // List<LeaveRecord> existingLeaves = leavesState is LeavesLoaded ? leavesState.currentYearLeaves : [];
-
-    // // حساب التواريخ المحجوزة قبل رسم دالة التقويم
-    // _calculateBlockedDates(holidays, existingLeaves);
-
     return BlocListener<LeavesBloc, LeavesState>(
       bloc: context.read<LeavesBloc>(),
       listener: (context, state) {

@@ -3,8 +3,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 
-class RestAllowancesButton extends StatelessWidget {
-  const RestAllowancesButton({super.key});
+class RestAllowancesStatsButton extends StatelessWidget {
+  const RestAllowancesStatsButton({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -22,7 +22,7 @@ class RestAllowancesButton extends StatelessWidget {
           color: colorScheme.surface,
           borderRadius: BorderRadius.circular(16.r),
           border: Border.all(
-            color: isDark ? Colors.white12 : colorScheme.primary.withAlpha(50),
+            color: const Color(0xFF7C4DFF).withAlpha(50),
             width: 1.w,
           ),
           boxShadow: [
@@ -38,13 +38,13 @@ class RestAllowancesButton extends StatelessWidget {
           children: [
             Container(
               padding: EdgeInsets.all(12.w),
-              decoration: BoxDecoration(
-                color: colorScheme.primary.withAlpha(150),
+              decoration: const BoxDecoration(
+                color: Color(0xE07C4DFF),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.workspace_premium_rounded,
-                color: colorScheme.onPrimary,
+                color: colorScheme.onSurfaceVariant,
                 size: 28.w,
               ),
             ),

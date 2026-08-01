@@ -1,30 +1,33 @@
+// lib/features/leaves/presentation/widgets/leave_list_shimmer.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // استيراد المكتبة
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 
-/// مكون يعرض هيكل تحميل (Skeleton) لقائمة الإجازات
+/// تأثير الهيكل العظمي (Skeleton) للتحميل
 class LeaveListShimmer extends StatelessWidget {
   const LeaveListShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
-    final baseColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
-    final highlightColor = isDark ? Colors.grey[700]! : Colors.grey[100]!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       itemCount: 5,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: baseColor,
-          highlightColor: highlightColor,
+          baseColor: colorScheme.surfaceContainerHighest,
+          highlightColor: colorScheme.surface,
           child: Container(
             margin: EdgeInsets.only(bottom: 14.h),
-            height: 100.h, 
+            height: 100.h,
             decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16.r), 
+              color: colorScheme.surface,
+              borderRadius: AppRadii.lg, // استخدام نصف القطر الموحد
             ),
           ),
         );

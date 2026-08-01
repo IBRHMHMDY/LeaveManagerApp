@@ -47,6 +47,7 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    Color restColor = const Color(0xE07C4DFF);
     final blockedDates = context.getBlockedDates();
 
     DateTime effectiveFirstDate = FinancialYearCalculator.currentFinancialYearStart;
@@ -124,7 +125,7 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                   
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.orange.shade600,
+                      backgroundColor: restColor,
                       padding: EdgeInsets.symmetric(vertical: 16.h),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),

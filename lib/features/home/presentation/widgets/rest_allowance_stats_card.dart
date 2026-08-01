@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:leave_manager/features/home/presentation/widgets/rest_allowances_button.dart';
+import 'package:leave_manager/features/home/presentation/widgets/rest_allowances_stats_button.dart';
 
 class RestAllowanceStatsCard extends StatelessWidget {
   final int totalAvailableDays;
@@ -23,7 +23,7 @@ class RestAllowanceStatsCard extends StatelessWidget {
         color: colorScheme.surface,
         borderRadius: BorderRadius.circular(16.r),
         border: Border.all(
-          color: colorScheme.primary.withAlpha(50),
+          color: isDark? const Color(0xFF7C4DFF).withAlpha(50): const Color(0xFF7C4DFF).withAlpha(150),
           width: 1.5,
         ),
         boxShadow: [
@@ -65,7 +65,7 @@ class RestAllowanceStatsCard extends StatelessWidget {
           SizedBox(height: 16.h),
           const Padding(
             padding: EdgeInsets.only(top: 12,left: 20,right: 20,bottom: 0),
-            child: RestAllowancesButton(),
+            child: RestAllowancesStatsButton(),
           ),
         ],
       ),

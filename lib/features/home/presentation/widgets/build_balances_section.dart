@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_balance_entity.dart';
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
-import 'package:leave_manager/shared/themes/app_colors.dart';
 
 import 'balance_circular_indicator.dart';
 
@@ -24,7 +24,7 @@ class BuildBalancesSection extends StatelessWidget {
             title: 'اعتيادي',
             remaining: balance.remainingRegular,
             total: settings.totalRegularLeaves,
-            color: AppColors.regularLeaveColor,
+            color: AppColors.regularLeave,
           ),
         ),
         const SizedBox(width: 16),
@@ -33,7 +33,7 @@ class BuildBalancesSection extends StatelessWidget {
             title: 'عارضة',
             remaining: balance.remainingCasual,
             total: settings.totalCasualLeaves,
-            color: AppColors.casualLeaveColor,
+            color: AppColors.casualLeave,
           ),
         ),
       ],

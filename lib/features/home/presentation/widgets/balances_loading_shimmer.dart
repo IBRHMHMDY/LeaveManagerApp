@@ -2,34 +2,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shimmer/shimmer.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 
 class BalancesLoadingShimmer extends StatelessWidget {
   const BalancesLoadingShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
-    final baseColor = isDark ? Colors.grey[800]! : Colors.grey[300]!;
-    final highlightColor = isDark ? Colors.grey[700]! : Colors.grey[100]!;
+    final colorScheme = Theme.of(context).colorScheme;
 
     return Row(
       children: [
-        Expanded(child: _buildShimmerCard(baseColor, highlightColor)),
-        SizedBox(width: 16.w), // مسافة عرضية متجاوبة
-        Expanded(child: _buildShimmerCard(baseColor, highlightColor)),
+        Expanded(child: _buildShimmerCard(colorScheme)),
+        SizedBox(width: AppSpacing.md),
+        Expanded(child: _buildShimmerCard(colorScheme)),
       ],
     );
   }
 
-  Widget _buildShimmerCard(Color baseColor, Color highlightColor) {
+  Widget _buildShimmerCard(ColorScheme colorScheme) {
     return Shimmer.fromColors(
-      baseColor: baseColor,
-      highlightColor: highlightColor,
+      // استخدام الألوان الدلالية بدلاً من الألوان الثابتة
+      baseColor: colorScheme.surfaceContainerHighest,
+      highlightColor: colorScheme.surface,
       child: Card(
-        // توافق مع الزوايا في المكون الحقيقي
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20.r)),
+        elevation: 0,
+        shape: RoundedRectangleBorder(borderRadius: AppRadii.xl),
         child: SizedBox(
-          height: 200.h, // ارتفاع متجاوب مقارب للبطاقة الأصلية
+          height: 200.h,
           width: double.infinity,
         ),
       ),

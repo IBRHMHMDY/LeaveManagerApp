@@ -53,13 +53,14 @@ class _TabButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    Color restColor = const Color(0xE07C4DFF);
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 250),
         padding: EdgeInsets.symmetric(vertical: 12.h),
         decoration: BoxDecoration(
-          color: isActive ? colorScheme.primary : Colors.transparent,
+          color: isActive ? restColor : Colors.transparent,
           borderRadius: BorderRadius.circular(12.r),
         ),
         alignment: Alignment.center,
@@ -68,7 +69,7 @@ class _TabButton extends StatelessWidget {
           style: TextStyle(
             fontSize: 14.sp,
             fontWeight: FontWeight.bold,
-            color: isActive ? colorScheme.onPrimary : colorScheme.onSurface.withAlpha(150),
+            color: isActive ?colorScheme.surface : restColor ,
           ),
         ),
       ),

@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:leave_manager/shared/themes/app_colors.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
@@ -19,32 +18,16 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
+    // الكود الآن يعتمد بالكامل على المظهر المركزي (Theme) لتحديد الألوان والحدود
     return Padding(
       padding: const EdgeInsets.only(bottom: 16.0),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         validator: validator,
-        style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
         decoration: InputDecoration(
           labelText: label,
-          labelStyle: TextStyle(color: Theme.of(context).colorScheme.onSurface.withAlpha(150)),
-          prefixIcon: Icon(icon, color: AppColors.primaryTeal),
-          filled: true,
-          fillColor: isDark ? Colors.black12 : Colors.grey.shade50,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: BorderSide(color: isDark ? Colors.white24 : Colors.grey.shade300),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-            borderSide: const BorderSide(color: AppColors.primaryTeal, width: 2),
-          ),
-          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+          prefixIcon: Icon(icon),
         ),
       ),
     );

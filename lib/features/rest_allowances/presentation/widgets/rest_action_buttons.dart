@@ -9,6 +9,7 @@ class RestActionButtons extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    final isDark = colorScheme.brightness == Brightness.dark;
 
     return SafeArea(
       child: Padding(
@@ -18,28 +19,28 @@ class RestActionButtons extends StatelessWidget {
             Expanded(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: Colors.white,
+                  backgroundColor: const Color(0xE07C4DFF),
+                  foregroundColor: colorScheme.onSurface,
                   padding: EdgeInsets.symmetric(vertical: 14.h),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                 ),
                 onPressed: () => showAddExtraWorkBottomSheet(context),
-                icon: const Icon(Icons.add),
-                label: Text('اضافى/عطله', style: TextStyle(color: colorScheme.onPrimary, fontSize: 15.sp, fontWeight: FontWeight.bold)),
+                icon:  Icon(Icons.add, color: isDark? colorScheme.onSurface : colorScheme.onPrimary, size: 20.sp),
+                label: Text('اضافى/عطله', style:  TextStyle(color: isDark? colorScheme.onSurface : colorScheme.surface, fontSize: 15.sp, fontWeight: FontWeight.bold)),
               ),
             ),
             SizedBox(width: 12.w),
             Expanded(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
+                  backgroundColor: const Color(0xE07C4DFF),
+                  foregroundColor: colorScheme.onSurface,
                   padding: EdgeInsets.symmetric(vertical: 14.h),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                 ),
                 onPressed: () => showRestAllowancesBottomSheet(context),
-                icon: const Icon(Icons.add),
-                label: Text('بدل راحه', style: TextStyle(color: colorScheme.onPrimary, fontSize: 15.sp, fontWeight: FontWeight.bold)),
+                icon:  Icon(Icons.add, size: 20.sp, color: isDark? colorScheme.onSurface : colorScheme.surface,),
+                label: Text('بدل راحه', style: TextStyle(color: isDark? colorScheme.onSurface : colorScheme.surface, fontSize: 15.sp, fontWeight: FontWeight.bold)),
               ),
             ),
           ],

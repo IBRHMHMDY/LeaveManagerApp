@@ -19,15 +19,15 @@ dependencies:
   path_provider: ^2.1.1         # للوصول إلى مسارات التخزين في الجهاز (مجلد المستندات)
   path: ^1.8.3                  # للتعامل مع مسارات الملفات برمجياً
   intl: ^0.20.2                 # لتنسيق التواريخ (Date Formatting)
-  google_fonts: ^6.1.0          # (اختياري) لاستخدام خطوط عصرية مثل Cairo أو Almarai
+  google_fonts: ^6.2.0          # (اختياري) لاستخدام خطوط عصرية مثل Cairo أو Almarai
   flutter_localizations:        # لدعم اللغة العربية والاتجاه من اليمين لليسار (RTL)
     sdk: flutter
   share_plus: ^10.0.0           # إضافة حزمة المشاركة الحديثة
   go_router: ^17.3.0
-  package_info_plus: ^8.0.0  # لقراءة رقم إصدار التطبيق برمجياً
-  url_launcher: ^6.3.0       # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
-  shimmer: ^3.0.0
-  flutter_screenutil: ^5.9.0
+  package_info_plus: ^8.0.0     # لقراءة معلومات التطبيق برمجياً
+  url_launcher: ^6.3.0          # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
+  shimmer: ^3.0.0               # يعطى تاثير جمالى أثناء التحميل وقبل ظهور البيانات 
+  flutter_screenutil: ^5.9.0    # لجعل التطبيق متجاوب مع كافه الشاشات
   lottie: ^3.1.0
   injectable: ^2.6.0
 dev_dependencies:

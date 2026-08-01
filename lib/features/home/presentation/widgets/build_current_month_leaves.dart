@@ -1,11 +1,12 @@
 // lib/features/home/presentation/widgets/build_current_month_leaves.dart
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
-import 'package:leave_manager/shared/themes/app_colors.dart';
+import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
 
 class BuildCurrentMonthLeaves extends StatelessWidget {
   final List<LeaveRecord> leaves;
@@ -21,9 +22,6 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
   Widget build(BuildContext context) {
     final now = DateTime.now();
     
-    if (leaves.isEmpty && restAllowances.isEmpty) {
-      return const SizedBox.shrink();
-    }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -46,6 +44,9 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
+    if(leaves.isEmpty && restAllowances.isEmpty)
+      const CustomEmptyState(titleEmpty: "لا توجد بيانات", contentEmpty: "لا توجد اجازات لهذا الشهر"),
+    
         
         ...leaves.map((leave) {
           return CustomLeaveCard(key: ValueKey('leave_${leave.id}'), leave: leave);
