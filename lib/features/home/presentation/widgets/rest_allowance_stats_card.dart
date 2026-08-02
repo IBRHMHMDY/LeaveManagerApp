@@ -1,5 +1,7 @@
+// lib/features/home/presentation/widgets/rest_allowance_stats_card.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/home/presentation/widgets/rest_allowances_stats_button.dart';
 
 class RestAllowanceStatsCard extends StatelessWidget {
@@ -14,24 +16,24 @@ class RestAllowanceStatsCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
+    final restColor = context.leaveColors.restAllowance;
+    final casualColor = context.leaveColors.casual; 
 
     return Container(
-      padding: EdgeInsets.symmetric(vertical: 20.h),
+      padding: EdgeInsets.symmetric(vertical: AppSpacing.lg),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
-        borderRadius: BorderRadius.circular(16.r),
+        color: context.colorScheme.surface,
+        borderRadius: AppRadii.lg,
         border: Border.all(
-          color: isDark? const Color(0xFF7C4DFF).withAlpha(50): const Color(0xFF7C4DFF).withAlpha(150),
+          color: restColor.withOpacity(context.isDarkMode ? 0.2 : 0.6),
           width: 1.5,
         ),
         boxShadow: [
-          if (!isDark)
+          if (!context.isDarkMode)
             BoxShadow(
-              color: colorScheme.shadow.withAlpha(10),
-              blurRadius: 10.r,
-              offset: Offset(0, 4.h),
+              color: context.colorScheme.shadow.withOpacity(0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
             ),
         ],
       ),
@@ -39,44 +41,42 @@ class RestAllowanceStatsCard extends StatelessWidget {
         children: [
           Text(
             'بدلات الراحة',
-            style: TextStyle(
-              fontSize: 20.sp,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.onSurface,
+            style: context.textTheme.headlineMedium?.copyWith(
+              color: context.colorScheme.onSurface,
             ),
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: AppSpacing.md),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               _StatItem(
-                title: 'الرصيد المتاح',
+                title: 'متاح',
                 value: totalAvailableDays,
-                color: const Color(0xFF7C4DFF),
+                color: restColor,
               ),
-              _buildDivider(colorScheme),
+              _buildDivider(context),
               _StatItem(
-                title: 'الرصيد المستهلك',
+                title: 'مستهلك',
                 value: totalConsumedDays,
-                color: Colors.orange.shade700,
+                color: casualColor,
               ),
             ],
           ),
-          SizedBox(height: 16.h),
-          const Padding(
-            padding: EdgeInsets.only(top: 12,left: 20,right: 20,bottom: 0),
-            child: RestAllowancesStatsButton(),
+          SizedBox(height: AppSpacing.md),
+          Padding(
+            padding: EdgeInsets.only(top: AppSpacing.sm, left: AppSpacing.lg, right: AppSpacing.lg, bottom: 0),
+            child: const RestAllowancesStatsButton(),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildDivider(ColorScheme colorScheme) {
+  Widget _buildDivider(BuildContext context) {
     return Container(
-      height: 60.h,
-      width: 1.w,
-      color: colorScheme.onSurface.withAlpha(30),
+      height: 60,
+      width: 1,
+      color: context.colorScheme.outlineVariant.withOpacity(0.3),
     );
   }
 }
@@ -98,26 +98,22 @@ class _StatItem extends StatelessWidget {
       children: [
         Text(
           title,
-          style: TextStyle(
-            fontSize: 12.sp,
-            fontWeight: FontWeight.w600,
-            color: Theme.of(context).colorScheme.onSurface.withAlpha(180),
+          style: context.textTheme.labelMedium?.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
           ),
         ),
-        SizedBox(height: 8.h),
+        SizedBox(height: AppSpacing.sm),
         Text(
           '$value',
-          style: TextStyle(
-            fontSize: 24.sp,
+          style: context.textTheme.displaySmall?.copyWith(
             fontWeight: FontWeight.w900,
             color: color,
           ),
         ),
         Text(
-          'يوم',
-          style: TextStyle(
-            fontSize: 10.sp,
-            color: Theme.of(context).colorScheme.onSurface.withAlpha(120),
+          'أيام',
+          style: context.textTheme.labelSmall?.copyWith(
+            color: context.colorScheme.onSurfaceVariant.withOpacity(0.6),
           ),
         ),
       ],

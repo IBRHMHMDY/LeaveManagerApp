@@ -1,6 +1,8 @@
+// lib/features/home/presentation/widgets/build_alert_banners.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
 
@@ -9,6 +11,7 @@ enum AlertType { info, warning, error }
 class BuildAlertBanners extends StatelessWidget {
   final String message;
   final AlertType alertType;
+
   const BuildAlertBanners({
     super.key,
     required this.alertType,
@@ -17,41 +20,38 @@ class BuildAlertBanners extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
     Color baseColor;
     IconData iconData;
+
     switch (alertType) {
       case AlertType.info:
-        baseColor = isDark ? Colors.blue.shade400 : Colors.blue.shade600;
+        baseColor = context.colorScheme.primary;
         iconData = Icons.info_outline_rounded;
         break;
       case AlertType.warning:
-        baseColor = isDark ? Colors.orange.shade400 : Colors.orange.shade600;
+        baseColor = context.colorScheme.secondary;
         iconData = Icons.warning_amber_rounded;
         break;
       case AlertType.error:
-        baseColor = isDark ? Colors.red.shade400 : Colors.red.shade600;
+        baseColor = context.colorScheme.error;
         iconData = Icons.error_outline_rounded;
         break;
     }
-    final bgColor = baseColor.withAlpha(isDark ? 25 : 15);
-    final textColor = isDark
-        ? Colors.white.withAlpha(240)
-        : baseColor.withAlpha(220);
+
+    final bgColor = baseColor.withOpacity(0.1);
+    final textColor = context.colorScheme.onSurface;
 
     return BlocBuilder<LeavesBloc, LeavesState>(
       builder: (context, state) {
         if (state is LeavesLoaded) {
           List<Widget> alerts = [];
           final currentMonth = DateTime.now().month;
-          // إضافة تنبيه معلوماتي (Info)
+
           if (currentMonth == 6) {
             alerts.add(
               ShowAlertBanner(
                 bgColor: bgColor,
                 baseColor: baseColor,
-                isDark: isDark,
                 iconData: iconData,
                 message: message,
                 textColor: textColor,
@@ -71,7 +71,6 @@ class ShowAlertBanner extends StatelessWidget {
     super.key,
     required this.bgColor,
     required this.baseColor,
-    required this.isDark,
     required this.iconData,
     required this.message,
     required this.textColor,
@@ -79,27 +78,28 @@ class ShowAlertBanner extends StatelessWidget {
 
   final Color bgColor;
   final Color baseColor;
-  final bool isDark;
   final IconData iconData;
   final String message;
   final Color textColor;
 
   @override
   Widget build(BuildContext context) {
+    final isDark = context.isDarkMode;
+
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
+      margin: EdgeInsets.only(bottom: AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: AppRadii.lg,
         border: Border.all(
-          color: baseColor.withAlpha(isDark ? 80 : 40),
+          color: baseColor.withOpacity(isDark ? 0.3 : 0.15),
           width: 1,
         ),
         boxShadow: [
           if (!isDark)
             BoxShadow(
-              color: baseColor.withAlpha(15),
+              color: baseColor.withOpacity(0.06),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -109,29 +109,27 @@ class ShowAlertBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(8),
+            padding: EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
-              color: baseColor.withAlpha(40),
+              color: baseColor.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(iconData, color: baseColor, size: 22),
           ),
-          const SizedBox(width: 14),
+          SizedBox(width: AppSpacing.md),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(top: 4.0),
               child: Text(
                 message,
-                style: TextStyle(
+                style: context.textTheme.bodyMedium?.copyWith(
                   color: textColor,
                   fontWeight: FontWeight.w600,
-                  fontSize: 14,
                   height: 1.4,
                 ),
               ),
             ),
           ),
-          SizedBox(height: 16.h),
         ],
       ),
     );

@@ -1,9 +1,10 @@
 // lib/features/rest_allowances/presentation/widgets/add_rest_allowances_bottomsheet.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/blocked_dates_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
@@ -20,6 +21,7 @@ void showRestAllowancesBottomSheet(BuildContext context) {
     context: context,
     title: 'استهلاك بدل راحة',
     icon: Icons.event_available_rounded,
+    iconColor: context.leaveColors.restAllowance,
     isScrollControlled: true,
     child: const _AddRestAllowancesForm(),
   );
@@ -46,11 +48,10 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    Color restColor = const Color(0xE07C4DFF);
+    final restColor = context.leaveColors.restAllowance; 
     final blockedDates = context.getBlockedDates();
-
     DateTime effectiveFirstDate = FinancialYearCalculator.currentFinancialYearStart;
+
     if (_selectedRecord != null && _selectedRecord!.workStartDate.isAfter(effectiveFirstDate)) {
       effectiveFirstDate = _selectedRecord!.workStartDate;
     }
@@ -62,9 +63,8 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
         BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
           builder: (context, state) {
             if (state is RestAllowancesLoaded) {
-              final availables = state.extrawork; 
+              final availables = state.extrawork;
               
-              // 💡 التعديل هنا: التحقق من وجود العنصر المختار داخل القائمة الجديدة
               final bool recordExists = availables.any((record) => record == _selectedRecord);
               final ExtraWorkRecord? validSelectedRecord = recordExists ? _selectedRecord : null;
               
@@ -72,15 +72,14 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   DropdownButtonFormField<ExtraWorkRecord>(
-                    value: validSelectedRecord, // 💡 استخدام المتغير الآمن هنا
-                    dropdownColor: colorScheme.surface,
+                    value: validSelectedRecord,
+                    dropdownColor: context.colorScheme.surface,
                     decoration: InputDecoration(
-                      labelText: 'اختر الرصيد المتاح',
-                      prefixIcon: Icon(Icons.link_rounded, color: colorScheme.primary),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                      labelText: 'اختر الرصيد المراد استهلاكه',
+                      prefixIcon: Icon(Icons.link_rounded, color: restColor), 
                     ),
                     items: availables.map((record) {
-                      final title = record.workReason == WorkReason.holiday ? 'عطلة' : 'إضافي';
+                      final title = record.workReason == WorkReason.holiday ? 'عطلة رسمية' : 'عمل إضافي';
                       return DropdownMenuItem<ExtraWorkRecord>(
                         value: record,
                         child: Text('$title (${record.daysCount} أيام)'),
@@ -94,12 +93,12 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                       });
                     },
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: AppSpacing.md),
                   
                   CustomDateRangePickerField(
                     startDate: _restStartDate,
                     endDate: _restEndDate,
-                    hintText: 'تواريخ الراحة المطلوبة',
+                    hintText: 'حدد فترة الراحة',
                     firstDate: effectiveFirstDate,
                     lastDate: FinancialYearCalculator.currentFinancialYearEnd,
                     selectableDayPredicate: (day) {
@@ -113,32 +112,30 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                         });
                       }
                     },
+                    colorIcon: restColor,
                   ),
-                  SizedBox(height: 16.h),
+                  SizedBox(height: AppSpacing.md),
                   
                   CustomTextField(
-                    label: 'ملاحظات',
+                    label: 'ملاحظات (اختياري)',
                     icon: Icons.notes_rounded,
                     controller: _notesController,
                   ),
-                  SizedBox(height: 24.h),
+                  SizedBox(height: AppSpacing.lg),
                   
                   ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: restColor,
-                      padding: EdgeInsets.symmetric(vertical: 16.h),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
                     ),
                     onPressed: () {
                       if (_selectedRecord == null || _restStartDate == null || _restEndDate == null) {
-                        AppToast.showError(context, 'يرجى إكمال جميع الحقول.');
+                        AppToast.showError(context, 'الرجاء إكمال جميع البيانات.');
                         return;
                       }
 
                       final usedDaysCount = _restEndDate!.difference(_restStartDate!).inDays + 1;
-
                       if (usedDaysCount > _selectedRecord!.daysCount) {
-                        AppToast.showError(context, 'أيام الراحة المطلوبة تتجاوز رصيد السجل المختار.');
+                        AppToast.showError(context, 'أيام الراحة المطلوبة تتجاوز الرصيد المتاح.');
                         return;
                       }
 
@@ -153,10 +150,7 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                       );
                       context.pop();
                     },
-                    child: Text(
-                      'تأكيد استهلاك الراحة',
-                      style: TextStyle(color: Colors.white, fontSize: 16.sp, fontWeight: FontWeight.bold),
-                    ),
+                    child: const Text('تسجيل الاستهلاك'),
                   ),
                 ],
               );

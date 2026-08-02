@@ -1,7 +1,8 @@
 // lib/features/settings/presentation/widgets/theme_selection_section.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/shared/themes/theme_cubit.dart';
 
 class ThemeSelectionSection extends StatelessWidget {
@@ -9,43 +10,39 @@ class ThemeSelectionSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           'اعدادات النظام والتفضيلات',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          style: context.textTheme.titleLarge,
         ),
-        SizedBox(height: 12.h),
+        SizedBox(height: AppSpacing.md),
         Container(
           decoration: BoxDecoration(
-            
-            borderRadius: BorderRadius.circular(16.r),
-            border: Border.all(color: colorScheme.outline.withAlpha(40)),
+            borderRadius: AppRadii.lg,
+            border: Border.all(color: context.colorScheme.outline.withOpacity(0.15)),
           ),
           child: BlocBuilder<ThemeCubit, ThemeMode>(
             builder: (context, themeMode) {
-              final isCurrentDark = themeMode == ThemeMode.dark; // الاعتماد على الـ State
+              final isCurrentDark = themeMode == ThemeMode.dark; 
               
               return SwitchListTile(
                 title: Text(
                   'الوضع الليلى',
-                  style: TextStyle(fontSize: 15.sp, fontWeight: FontWeight.bold),
+                  style: context.textTheme.titleMedium,
                 ),
                 subtitle: Text(
                   isCurrentDark 
                       ? 'تفعيل المظهر الداكن للراحه البصريه' 
                       : 'تفعيل المظهر الفاتح لسطوع اوضح',
-                  style: TextStyle(fontSize: 12.sp, color: colorScheme.onSurface.withAlpha(140)),
+                  style: context.textTheme.bodySmall,
                 ),
                 secondary: Icon(
                   isCurrentDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-                  color: colorScheme.primary,
+                  color: context.colorScheme.primary,
                 ),
                 value: isCurrentDark,
-                activeThumbColor: colorScheme.primary,
                 onChanged: (bool value) {
                   context.read<ThemeCubit>().toggleTheme();
                 },

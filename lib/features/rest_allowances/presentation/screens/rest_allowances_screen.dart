@@ -1,7 +1,8 @@
 // lib/features/rest_allowances/presentation/screens/rest_allowances_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
@@ -30,16 +31,19 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Scaffold(
       appBar: AppBar(
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.workspace_premium_outlined, color: colorScheme.primary),
-            SizedBox(width: 8.w),
-            Text('بدلات الراحة', style: TextStyle(fontSize: 20.sp, fontWeight: FontWeight.bold)),
+            Icon(Icons.workspace_premium_outlined, color: context.colorScheme.onSurface),
+            SizedBox(width: AppSpacing.sm),
+            Text(
+              'بدلات الراحة', 
+              style: context.textTheme.headlineMedium?.copyWith(
+                color: context.leaveColors.restAllowance,
+              ),
+            ),
           ],
         ),
       ),
@@ -87,11 +91,14 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
 
   Widget _buildList(List<ExtraWorkRecord> extrawork) {
     if (extrawork.isEmpty) {
-      return const CustomEmptyState(titleEmpty: 'لا توجد بيانات', contentEmpty: 'لا توجد سجلات لعرضها هنا.');
+      return const CustomEmptyState(
+        titleEmpty: 'لا توجد بيانات', 
+        contentEmpty: 'لا توجد سجلات لعرضها هنا.',
+      );
     }
 
     return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 8.h),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       itemCount: extrawork.length,
       itemBuilder: (context, index) {
         return RestAllowancesCard(extrawork: extrawork[index]);

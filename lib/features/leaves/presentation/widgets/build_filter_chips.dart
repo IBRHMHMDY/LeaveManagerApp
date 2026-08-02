@@ -1,6 +1,8 @@
+// lib/features/leaves/presentation/widgets/build_filter_chips.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart'; // استيراد المكتبة
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
 class BuildFilterChips extends StatelessWidget {
   final LeaveFilter selectedFilter;
@@ -25,14 +27,12 @@ class BuildFilterChips extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Container(
-      margin: EdgeInsets.all(16.w), // إزالة const واستخدام .w
-      padding: EdgeInsets.all(4.w), // إزالة const واستخدام .w
+      margin: EdgeInsets.all(AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.xs),
       decoration: BoxDecoration(
-        color: colorScheme.surfaceContainerHighest.withAlpha(80),
-        borderRadius: BorderRadius.circular(16.r), // متجاوب
+        color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        borderRadius: AppRadii.lg,
       ),
       child: Row(
         children: LeaveFilter.values.map((filter) {
@@ -44,16 +44,16 @@ class BuildFilterChips extends StatelessWidget {
               },
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 250),
-                padding: EdgeInsets.symmetric(vertical: 12.h), // إزالة const واستخدام .h
+                padding: EdgeInsets.symmetric(vertical: AppSpacing.sm),
                 decoration: BoxDecoration(
-                  color: isSelected ? colorScheme.primary : Colors.transparent,
-                  borderRadius: BorderRadius.circular(12.r), // متجاوب
+                  color: isSelected ? context.colorScheme.primary : Colors.transparent,
+                  borderRadius: AppRadii.md,
                   boxShadow: isSelected
                       ? [
                           BoxShadow(
-                            color: colorScheme.primary.withAlpha(40),
-                            blurRadius: 8.r, // متجاوب
-                            offset: Offset(0, 2.h), // متجاوب
+                            color: context.colorScheme.primary.withOpacity(0.15),
+                            blurRadius: 8,
+                            offset: const Offset(0, 2),
                           )
                         ]
                       : [],
@@ -63,16 +63,15 @@ class BuildFilterChips extends StatelessWidget {
                   children: [
                     Icon(
                       _getFilterIcon(filter),
-                      size: 16.w, // حجم الأيقونة متجاوب
-                      color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                      size: 18,
+                      color: isSelected ? context.colorScheme.onPrimary : context.colorScheme.onSurfaceVariant,
                     ),
-                    SizedBox(width: 6.w), // مسافة متجاوبة
+                    SizedBox(width: AppSpacing.xs),
                     Text(
                       filter.label,
-                      style: TextStyle(
-                        fontSize: 13.sp, // حجم الخط متجاوب
+                      style: context.textTheme.labelLarge?.copyWith(
                         fontWeight: isSelected ? FontWeight.bold : FontWeight.w600,
-                        color: isSelected ? colorScheme.onPrimary : colorScheme.onSurfaceVariant,
+                        color: isSelected ? context.colorScheme.onPrimary : context.colorScheme.onSurfaceVariant,
                       ),
                     ),
                   ],

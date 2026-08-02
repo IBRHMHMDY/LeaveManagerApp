@@ -1,6 +1,6 @@
 // lib/features/home/presentation/widgets/balances_loading_shimmer.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 
@@ -9,27 +9,24 @@ class BalancesLoadingShimmer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Row(
       children: [
-        Expanded(child: _buildShimmerCard(colorScheme)),
+        Expanded(child: _buildShimmerCard(context)),
         SizedBox(width: AppSpacing.md),
-        Expanded(child: _buildShimmerCard(colorScheme)),
+        Expanded(child: _buildShimmerCard(context)),
       ],
     );
   }
 
-  Widget _buildShimmerCard(ColorScheme colorScheme) {
+  Widget _buildShimmerCard(BuildContext context) {
     return Shimmer.fromColors(
-      // استخدام الألوان الدلالية بدلاً من الألوان الثابتة
-      baseColor: colorScheme.surfaceContainerHighest,
-      highlightColor: colorScheme.surface,
+      baseColor: context.colorScheme.surfaceContainerHighest,
+      highlightColor: context.colorScheme.surface,
       child: Card(
         elevation: 0,
         shape: RoundedRectangleBorder(borderRadius: AppRadii.xl),
-        child: SizedBox(
-          height: 200.h,
+        child: const SizedBox(
+          height: 200,
           width: double.infinity,
         ),
       ),

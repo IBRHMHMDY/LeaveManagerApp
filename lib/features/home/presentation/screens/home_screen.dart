@@ -1,10 +1,10 @@
 // lib/features/home/presentation/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
-import 'package:leave_manager/features/holidays/presentation/widgets/upcoming_holiday_card.dart';
+import 'package:leave_manager/features/home/presentation/widgets/upcoming_holiday_card.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_cubit.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_state.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
@@ -17,7 +17,7 @@ import 'package:leave_manager/features/home/presentation/widgets/balances_loadin
 import 'package:leave_manager/features/home/presentation/widgets/build_balances_section.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_current_month_leaves.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_financialyear_card.dart';
-import 'package:leave_manager/app/layout/widgets/welcome_card.dart';
+import 'package:leave_manager/features/home/presentation/widgets/welcome_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_alert_banners.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
@@ -82,17 +82,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 },
                 child: ListView(
                   padding: EdgeInsets.symmetric(
-                    horizontal: 16.w,
-                    vertical: 16.h,
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.md,
                   ),
                   children: [
                     WelcomeCard(
                       employeeName: state.settings.employeeName,
                       role: state.settings.jobTitle,
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: AppSpacing.md),
                     const BuildFinancialYearCard(),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: AppSpacing.md),
                     BlocBuilder<HolidaysCubit, HolidaysState>(
                       builder: (context, holidayState) {
                         if (holidayState is HolidaysLoaded) {
@@ -101,14 +101,14 @@ class _HomeScreenState extends State<HomeScreen> {
                               UpcomingHolidayCard(
                                 upcomingHoliday: holidayState.upcomingHoliday,
                               ),
-                              SizedBox(height: 16.h),
+                              SizedBox(height: AppSpacing.md),
                             ],
                           );
                         }
                         return Column(
                           children: [
                             const UpcomingHolidayCard(upcomingHoliday: null),
-                            SizedBox(height: 16.h),
+                            SizedBox(height: AppSpacing.md),
                           ],
                         );
                       },
@@ -122,14 +122,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       balance: state.balance,
                       settings: state.settings,
                     ),
-                    SizedBox(height: 16.h),
+                    SizedBox(height: AppSpacing.md),
                     BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
-                      builder: (context, restState) { // 👈 فصلنا المتغير لتجنب التعارض
+                      builder: (context, restState) { 
                         if (restState is RestAllowancesLoaded) {
                           return Column(
                             children: [
                               RestAllowanceStatsCard(
-                                // 👈 قراءة المتغيرات الحديثة الموحدة
                                 totalAvailableDays: restState.availables, 
                                 totalConsumedDays: restState.usage,
                               ),
@@ -139,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return const SizedBox.shrink();
                       },
                     ),
-                    SizedBox(height: 24.h),
+                    SizedBox(height: AppSpacing.lg),
     
                     BuildCurrentMonthLeaves(
                       leaves: state.currentMonthLeaves,

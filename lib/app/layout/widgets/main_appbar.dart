@@ -1,33 +1,25 @@
+// lib/app/layout/widgets/main_appbar.dart
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
 class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
   const MainAppBar({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colorScheme = theme.colorScheme;
+    // تم حذف backgroundColor و elevation لأنها موروثة تلقائياً من AppTheme
     return AppBar(
-      backgroundColor: Colors.transparent,
-      elevation: 0,
       toolbarHeight: 80,
-      title: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
+      title: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          // القسم الأيمن (النصوص)
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Text(
-                'مدير إجازاتي',
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                  color: colorScheme.onSurface,
-                ),
-              ),
-            ],
+          Text(
+            'مدير إجازاتي',
+            style: context.textTheme.displaySmall?.copyWith(
+              fontWeight: FontWeight.w900,
+              color: context.colorScheme.onSurface,
+            ),
           ),
         ],
       ),

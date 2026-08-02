@@ -1,7 +1,9 @@
+// lib/features/settings/presentation/widgets/settings_form_section.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:leave_manager/shared/widgets/custom_text_field.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 
 class SettingsFormSection extends StatelessWidget {
   final TextEditingController nameController;
@@ -34,28 +36,27 @@ class SettingsFormSection extends StatelessWidget {
       children: [
         Text(
           'البيانات الشخصية',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          style: context.textTheme.titleLarge,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: AppSpacing.md),
         CustomTextField(
           label: 'اسم الموظف',
           icon: Icons.person_outline,
           controller: nameController,
           validator: (val) => val == null || val.trim().isEmpty ? 'مطلوب' : null,
         ),
-        SizedBox(height: 12.h),
         CustomTextField(
           label: 'المسمى الوظيفي',
           icon: Icons.work_outline,
           controller: jobController,
           validator: (val) => val == null || val.trim().isEmpty ? 'مطلوب' : null,
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: AppSpacing.sm),
         Text(
           'الأرصدة السنويه المستحقة',
-          style: TextStyle(fontSize: 18.sp, fontWeight: FontWeight.bold),
+          style: context.textTheme.titleLarge,
         ),
-        SizedBox(height: 18.h),
+        SizedBox(height: AppSpacing.md),
         Row(
           children: [
             Expanded(
@@ -67,7 +68,7 @@ class SettingsFormSection extends StatelessWidget {
                 validator: _numberValidator,
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: AppSpacing.md),
             Expanded(
               child: CustomTextField(
                 label: 'إجمالي العارضة',

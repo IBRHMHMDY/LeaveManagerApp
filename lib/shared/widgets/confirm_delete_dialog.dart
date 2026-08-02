@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
 class ConfirmDeleteDialog extends StatelessWidget {
   final String titleDialog;
@@ -15,14 +16,9 @@ class ConfirmDeleteDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    
     return AlertDialog(
       title: Text(titleDialog),
       content: Text(contentDialog),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
       actionsAlignment: MainAxisAlignment.end,
       actions: [
         TextButton(
@@ -31,8 +27,8 @@ class ConfirmDeleteDialog extends StatelessWidget {
         ),
         FilledButton(
           style: FilledButton.styleFrom(
-            backgroundColor: colorScheme.error,
-            foregroundColor: colorScheme.onError,
+            backgroundColor: context.colorScheme.error,
+            foregroundColor: context.colorScheme.onError,
             elevation: 0,
           ),
           onPressed: onPressedButton,

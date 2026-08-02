@@ -1,9 +1,12 @@
+// lib/features/holidays/presentation/widgets/upcoming_holiday_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 
 class UpcomingHolidayCard extends StatelessWidget {
@@ -13,47 +16,46 @@ class UpcomingHolidayCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
-
     return InkWell(
       onTap: () {
         context.push(AppRouter.holidays);
       },
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: AppRadii.lg,
       child: Container(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16.r),
+          color: context.colorScheme.surface,
+          borderRadius: AppRadii.lg,
           border: Border.all(
-            color: isDark ? Colors.white12 : colorScheme.primary.withAlpha(50),
-            width: 1.w,
+            color: context.isDarkMode 
+                ? context.colorScheme.outline.withOpacity(0.15) 
+                : context.colorScheme.primary.withOpacity(0.2),
+            width: 1,
           ),
           boxShadow: [
-            if (!isDark)
+            if (!context.isDarkMode)
               BoxShadow(
-                color: colorScheme.shadow.withAlpha(10),
-                blurRadius: 10.r,
-                offset: Offset(0, 4.h),
+                color: context.colorScheme.shadow.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12.w),
+              padding: EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: colorScheme.primaryContainer.withAlpha(150),
+                color: context.colorScheme.primaryContainer.withOpacity(0.6),
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.celebration_rounded,
-                color: colorScheme.primary,
-                size: 28.w,
+                color: context.colorScheme.primary,
+                size: 28,
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -61,60 +63,47 @@ class UpcomingHolidayCard extends StatelessWidget {
                   if (upcomingHoliday != null)
                     Container(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 12.w,
-                        vertical: 8.h,
+                        horizontal: AppSpacing.sm,
+                        vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
-                        color: colorScheme.primary.withAlpha(20),
-                        borderRadius: BorderRadius.circular(20.r),
+                        color: context.colorScheme.primary.withOpacity(0.08),
+                        borderRadius: AppRadii.xl,
                       ),
                       child: Text(
                         upcomingHoliday!.daysLeft.remainingDaysText,
-                        style: TextStyle(
-                          fontSize: 11.sp,
-                          fontWeight: FontWeight.bold,
-                          color: colorScheme.primary,
+                        style: context.textTheme.labelSmall?.copyWith(
+                          color: context.colorScheme.primary,
+                          fontSize: 12.spMax
                         ),
                       ),
                     ),
-                  // SizedBox(height: 8.h),
                   if (upcomingHoliday != null) ...[
                     Text(
                       upcomingHoliday!.name,
-                      style: TextStyle(
-                        fontSize: 16.sp,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
+                      style: context.textTheme.titleMedium,
                     ),
-                    SizedBox(height: 2.h),
+                    SizedBox(height: AppSpacing.xs),
                     Text(
                       upcomingHoliday!.startDate.toFormatFullDaysDate(),
-                      style: TextStyle(
-                        fontSize: 14.sp,
-                        color: colorScheme.primary,
+                      style: context.textTheme.bodyMedium?.copyWith(
+                        color: context.colorScheme.primary,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                   ] else ...[
                     Text(
                       'لا توجد عطلات قادمة قريباً',
-                      style: TextStyle(
-                        fontSize: 15.sp,
-                        fontWeight: FontWeight.bold,
-                        color: colorScheme.onSurface,
-                      ),
+                      style: context.textTheme.titleMedium,
                     ),
                   ],
-                  
-                  
                 ],
               ),
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              color: colorScheme.onSurfaceVariant.withAlpha(100),
-              size: 20.w,
+              color: context.colorScheme.onSurfaceVariant.withOpacity(0.4),
+              size: 20,
             ),
           ],
         ),

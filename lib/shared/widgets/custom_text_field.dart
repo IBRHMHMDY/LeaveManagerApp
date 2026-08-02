@@ -1,4 +1,6 @@
+// lib/shared/widgets/custom_text_field.dart
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 
 class CustomTextField extends StatelessWidget {
   final String label;
@@ -18,13 +20,13 @@ class CustomTextField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // الكود الآن يعتمد بالكامل على المظهر المركزي (Theme) لتحديد الألوان والحدود
     return Padding(
-      padding: const EdgeInsets.only(bottom: 16.0),
+      padding: EdgeInsets.only(bottom: AppSpacing.md),
       child: TextFormField(
         controller: controller,
         keyboardType: keyboardType,
         validator: validator,
+        // تم إزالة الأنماط الثابتة للسماح لـ AppTheme بتطبيق خطوط Cairo الموحدة
         decoration: InputDecoration(
           labelText: label,
           prefixIcon: Icon(icon),

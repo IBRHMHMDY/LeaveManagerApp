@@ -1,10 +1,13 @@
+// lib/shared/widgets/show_bottom_sheet.dart
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 
 class ShowBottomSheet {
-  /// يعرض [BottomSheet] مخصص مع زوايا دائرية، ومقبض سحب، ويدعم التكيف مع لوحة المفاتيح
   static Future<T?> show<T>({
     required BuildContext context,
     required IconData? icon,
+    required Color? iconColor,
     required String? title,
     required Widget child,
     bool isScrollControlled = true,
@@ -14,16 +17,15 @@ class ShowBottomSheet {
       context: context,
       isScrollControlled: isScrollControlled,
       isDismissible: isDismissible,
-      backgroundColor:
-          Colors.transparent, // لجعل الزوايا الدائرية تظهر بشكل صحيح
-      useSafeArea: true, // يمنع تداخل الواجهة مع شريط الحالة أو النوتش
+      backgroundColor: Colors.transparent,
+      useSafeArea: true,
       builder: (BuildContext ctx) {
         return Padding(
-          // هذا السطر يضمن ارتفاع الـ BottomSheet عند فتح لوحة المفاتيح
           padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(ctx).bottom),
           child: _GenericBottomSheetContent(
             title: title,
             icon: Icons.edit_calendar_rounded,
+            iconColor: iconColor,
             child: child,
           ),
         );
@@ -32,29 +34,27 @@ class ShowBottomSheet {
   }
 }
 
-/// الويدجت الداخلية التي تبني الهيكل المرئي للـ BottomSheet
 class _GenericBottomSheetContent extends StatelessWidget {
   final String? title;
   final IconData icon;
+  final Color? iconColor;
   final Widget child;
 
   const _GenericBottomSheetContent({
     required this.title,
     required this.icon,
+    required this.iconColor,
     required this.child,
   });
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Container(
-      // تحديد أقصى ارتفاع للـ BottomSheet ليكون 90% من الشاشة
       constraints: BoxConstraints(
         maxHeight: MediaQuery.sizeOf(context).height * 0.9,
       ),
       decoration: BoxDecoration(
-        color: colorScheme.surface,
+        color: context.colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
@@ -68,25 +68,26 @@ class _GenericBottomSheetContent extends StatelessWidget {
               width: 40,
               height: 5,
               decoration: BoxDecoration(
-                color: colorScheme.onSurface.withAlpha(50),
+                color: context.colorScheme.onSurface.withOpacity(
+                  0.2,
+                ), // استبدال withAlpha
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
           const SizedBox(height: 26),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 26),
+            padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Icon(icon, color: colorScheme.primary),
-                const SizedBox(width: 8),
+                Icon(icon, color: iconColor),
+                SizedBox(width: AppSpacing.sm),
                 Text(
                   title!,
-                  style: TextStyle(
-                    fontSize: 18,
+                  style: context.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: colorScheme.onSurface,
+                    color: context.colorScheme.onSurface,
                   ),
                 ),
               ],
@@ -96,7 +97,7 @@ class _GenericBottomSheetContent extends StatelessWidget {
           Flexible(
             child: SingleChildScrollView(
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: EdgeInsets.all(AppSpacing.lg),
                 child: child,
               ),
             ),

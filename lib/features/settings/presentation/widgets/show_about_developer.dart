@@ -1,16 +1,17 @@
+// lib/features/settings/presentation/widgets/show_about_developer.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/constants/app_colors.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/shared/widgets/current_version.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:leave_manager/app/splash/widgets/custom_app_logo_icon.dart';
 
 void showAboutDeveloperBottomSheet(BuildContext context) {
-  final colorScheme = Theme.of(context).colorScheme;
-
   showModalBottomSheet(
     context: context,
     isScrollControlled: true,
-    backgroundColor: colorScheme.surface,
+    backgroundColor: context.colorScheme.surface,
     elevation: 0,
     shape: const RoundedRectangleBorder(
       borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
@@ -27,20 +28,11 @@ class _AboutDeveloperContent extends StatefulWidget {
 }
 
 class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
-  
 
-  @override
-  void initState() {
-    super.initState();
-  }
-
-
-
-  // دالة فتح البريد الإلكتروني
   Future<void> _launchEmail() async {
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
-      path: 'ibrhmhmdy@example.com', // ضع بريدك الإلكتروني هنا
+      path: 'ibrhmhmdy@example.com', 
       queryParameters: {
         'subject': 'تطبيق متتبع الإجازات - تواصل',
       },
@@ -50,17 +42,11 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
     }
   }
 
-  // دالة فتح الواتساب (WhatsApp) المضافة حديثاً
   Future<void> _launchWhatsApp() async {
-    // ضع رقم هاتفك هنا مع مفتاح الدولة بدون أصفار أو علامة + (مثال لمصر: 201000000000)
     const String phoneNumber = '2001007576297'; 
-    // الرسالة الافتراضية التي ستظهر في المحادثة
     final String message = Uri.encodeComponent('مرحباً، لدي استفسار بخصوص تطبيق مدير اجازاتى.');
-    
-    // استخدام الرابط العالمي wa.me لضمان التوافقية
     final Uri whatsappUri = Uri.parse('https://wa.me/$phoneNumber?text=$message');
 
-    // LaunchMode.externalApplication يضمن الخروج من التطبيق وفتح الواتساب بشكل نظيف
     if (!await launchUrl(whatsappUri, mode: LaunchMode.externalApplication)) {
       debugPrint('لا يمكن فتح الواتساب');
     }
@@ -68,120 +54,104 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 24.w, vertical: 16.h),
+      padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // 1. مؤشر السحب (Drag Handle)
+          // 1. مؤشر السحب
           Container(
-            width: 45.w,
-            height: 5.h,
+            width: 45,
+            height: 5,
             decoration: BoxDecoration(
-              color: colorScheme.onSurface.withAlpha(50),
-              borderRadius: BorderRadius.circular(10),
+              color: context.colorScheme.onSurface.withOpacity(0.2),
+              borderRadius: AppRadii.sm,
             ),
           ),
-          SizedBox(height: 32.h),
+          SizedBox(height: AppSpacing.xl),
 
           // 2. شعار التطبيق
-          CustomAppLogoIcon(context),
-          SizedBox(height: 16.h),
+          const CustomAppLogoIcon(),
+          SizedBox(height: AppSpacing.md),
 
           // 3. اسم التطبيق وإصداره
           Text(
             'مدير اجازاتى',
-            style: TextStyle(
-              fontSize: 22.sp,
-              fontWeight: FontWeight.w900,
-              color: colorScheme.onSurface,
-            ),
+            style: context.textTheme.headlineLarge,
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppSpacing.sm),
           const CurrentVersion(),
-          SizedBox(height: 32.h),
+          SizedBox(height: AppSpacing.xl),
 
           // 4. بطاقة معلومات المطور
           Container(
-            padding: EdgeInsets.all(16.r),
+            padding: EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: colorScheme.surfaceContainerHighest.withAlpha(100),
-              borderRadius: BorderRadius.circular(16.r),
-              border: Border.all(color: colorScheme.outline.withAlpha(50)),
+              color: context.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+              borderRadius: AppRadii.lg,
+              border: Border.all(color: context.colorScheme.outline.withOpacity(0.2)),
             ),
             child: Column(
               children: [
                 Text(
                   'تم التطوير بكل حب لخدمة الموظفين وتنظيم أوقاتهم بطريقة احترافية وذكية.',
                   textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 13.5,
-                    color: colorScheme.onSurface.withAlpha(200),
-                    height: 1.5.r,
+                  style: context.textTheme.bodyMedium?.copyWith(
+                    color: context.colorScheme.onSurface.withOpacity(0.8),
+                    height: 1.5,
                   ),
                 ),
-                SizedBox(height: 16.h),
+                SizedBox(height: AppSpacing.md),
                 const Divider(),
-                SizedBox(height: 8.h),
+                SizedBox(height: AppSpacing.sm),
                 Text(
                   'تطوير وتصميم',
-                  style: TextStyle(fontSize: 12.sp, color: colorScheme.onSurface.withAlpha(150)),
+                  style: context.textTheme.labelMedium?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 Text(
                   'IbrahimHamdy',
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
-                    color: colorScheme.primary,
+                  style: context.textTheme.titleLarge?.copyWith(
+                    color: context.colorScheme.primary,
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 24.h),
+          SizedBox(height: AppSpacing.lg),
 
-          // 5. زر التواصل عبر واتساب (الجديد)
+          // 5. زر التواصل عبر واتساب
           ElevatedButton.icon(
             style: ElevatedButton.styleFrom(
               minimumSize: const Size(double.infinity, 50),
-              backgroundColor: const Color(0xFF25D366), // لون الواتساب الرسمي
-              foregroundColor: Colors.white,
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
+              backgroundColor: AppColors.whatsappColor,
+              foregroundColor: context.colorScheme.onSurface,
             ),
-            icon: const Icon(Icons.chat_bubble_outline_rounded), // أيقونة المحادثة
-            label: Text('تواصل عبر واتساب', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+            icon: const Icon(Icons.chat_bubble_outline_rounded),
+            label: const Text('تواصل عبر واتساب'),
             onPressed: _launchWhatsApp,
           ),
-          SizedBox(height: 12.h),
+          SizedBox(height: AppSpacing.sm),
 
-          // 6. زر التواصل عبر البريد الإلكتروني (تصميم مختلف لتمييزه)
+          // 6. زر التواصل عبر البريد
           OutlinedButton.icon(
             style: OutlinedButton.styleFrom(
               minimumSize: const Size(double.infinity, 50),
-              foregroundColor: colorScheme.primary,
-              side: BorderSide(color: colorScheme.primary.withAlpha(100), width: 1.5),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
-              ),
             ),
             icon: const Icon(Icons.mail_outline_rounded),
-            label: Text('إرسال بريد إلكتروني', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+            label: const Text('إرسال بريد إلكتروني'),
             onPressed: _launchEmail,
           ),
           
-          SizedBox(height: 24.h),
+          SizedBox(height: AppSpacing.lg),
           
           // 7. حقوق الملكية
           Text(
             '© ${DateTime.now().year} جميع الحقوق محفوظة',
-            style: TextStyle(fontSize: 12.sp, color: colorScheme.onSurface.withAlpha(100)),
+            style: context.textTheme.bodySmall,
           ),
-          const SizedBox(height: 16),
+          SizedBox(height: AppSpacing.md),
         ],
       ),
     );

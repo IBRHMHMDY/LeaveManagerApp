@@ -1,6 +1,8 @@
+// lib/features/holidays/presentation/screens/holidays_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
 import 'package:intl/intl.dart';
@@ -17,35 +19,31 @@ class HolidaysScreen extends StatelessWidget {
           if (state is HolidaysLoading || state is HolidaysInitial) {
             return const Center(child: CircularProgressIndicator());
           }
-    
           if (state is HolidaysError) {
             return Center(child: Text(state.message));
           }
-    
           if (state is HolidaysLoaded) {
             final holidays = state.financialYearHolidays;
-    
             if (holidays.isEmpty) {
               return Center(
                 child: Text(
-                  'لا توجد عطلات رسمية مسجلة للسنة المالية الحالية.',
-                  style: TextStyle(fontSize: 16.sp),
+                  'لا توجد عطلات مسجلة',
+                  style: context.textTheme.titleMedium?.copyWith(
+                    color: context.colorScheme.onSurfaceVariant,
+                  ),
                 ),
               );
             }
-    
             return ListView.builder(
-              padding: EdgeInsets.all(16.w),
+              padding: EdgeInsets.all(AppSpacing.md),
               itemCount: holidays.length,
               itemBuilder: (context, index) {
                 final holiday = holidays[index];
                 final isPast = holiday.endDate.isBefore(DateTime.now());
-    
                 return _buildHolidayCard(context, holiday, isPast);
               },
             );
           }
-    
           return const SizedBox.shrink();
         },
       ),
@@ -53,25 +51,22 @@ class HolidaysScreen extends StatelessWidget {
   }
 
   Widget _buildHolidayCard(BuildContext context, holiday, bool isPast) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
-
-    // استخدام ألوان باهتة للعطلات السابقة للدلالة البصرية
     final cardColor = isPast
-        ? colorScheme.surfaceContainerHighest.withAlpha(100)
-        : colorScheme.surface;
+        ? context.colorScheme.surfaceContainerHighest.withOpacity(0.4)
+        : context.colorScheme.surface;
+        
     final textColor = isPast
-        ? colorScheme.onSurfaceVariant
-        : colorScheme.onSurface;
+        ? context.colorScheme.onSurfaceVariant
+        : context.colorScheme.onSurface;
 
     return Container(
-      margin: EdgeInsets.only(bottom: 12.h),
-      padding: EdgeInsets.all(16.w),
+      margin: EdgeInsets.only(bottom: AppSpacing.md),
+      padding: EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: BorderRadius.circular(16.r),
+        borderRadius: AppRadii.lg,
         border: Border.all(
-          color: isDark ? Colors.white12 : colorScheme.outline.withAlpha(40),
+          color: context.colorScheme.outline.withOpacity(0.15),
         ),
       ),
       child: Row(
@@ -82,28 +77,25 @@ class HolidaysScreen extends StatelessWidget {
               children: [
                 Text(
                   holiday.name,
-                  style: TextStyle(
-                    fontSize: 16.sp,
-                    fontWeight: FontWeight.bold,
+                  style: context.textTheme.titleLarge?.copyWith(
                     color: textColor,
                     decoration: isPast ? TextDecoration.lineThrough : null,
                   ),
                 ),
-                SizedBox(height: 6.h),
+                SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
                     Icon(
                       Icons.calendar_today_rounded,
-                      size: 14.w,
-                      color: colorScheme.onSurfaceVariant,
+                      size: 14,
+                      color: context.colorScheme.onSurfaceVariant,
                     ),
-                    SizedBox(width: 6.w),
+                    SizedBox(width: AppSpacing.xs),
                     Expanded(
                       child: Text(
                         _formatDateRange(holiday.startDate, holiday.endDate),
-                        style: TextStyle(
-                          fontSize: 13.sp,
-                          color: colorScheme.onSurfaceVariant,
+                        style: context.textTheme.bodyMedium?.copyWith(
+                          color: context.colorScheme.onSurfaceVariant,
                         ),
                       ),
                     ),
@@ -112,31 +104,27 @@ class HolidaysScreen extends StatelessWidget {
               ],
             ),
           ),
-
           Container(
-            padding: EdgeInsets.all(12.w),
+            padding: EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
               color: isPast
-                  ? Colors.grey.withAlpha(50)
-                  : colorScheme.primary.withAlpha(30),
-              borderRadius: BorderRadius.circular(12.r),
+                  ? context.colorScheme.onSurface.withOpacity(0.06)
+                  : context.colorScheme.primary.withOpacity(0.12),
+              borderRadius: AppRadii.md,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Text(
                   '${holiday.daysCount}',
-                  style: TextStyle(
-                    fontSize: 20.sp,
-                    fontWeight: FontWeight.bold,
-                    color: isPast ? Colors.grey : colorScheme.primary,
+                  style: context.textTheme.headlineMedium?.copyWith(
+                    color: isPast ? context.colorScheme.onSurfaceVariant : context.colorScheme.primary,
                   ),
                 ),
                 Text(
                   'أيام',
-                  style: TextStyle(
-                    fontSize: 11.sp,
-                    color: isPast ? Colors.grey : colorScheme.primary,
+                  style: context.textTheme.labelSmall?.copyWith(
+                    color: isPast ? context.colorScheme.onSurfaceVariant : context.colorScheme.primary,
                   ),
                 ),
               ],

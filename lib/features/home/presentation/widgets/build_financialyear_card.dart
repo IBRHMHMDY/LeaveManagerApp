@@ -1,4 +1,7 @@
+// lib/features/home/presentation/widgets/build_financialyear_card.dart
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 
 class BuildFinancialYearCard extends StatelessWidget {
@@ -6,48 +9,43 @@ class BuildFinancialYearCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.primaryContainer,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      color: context.colorScheme.primaryContainer.withOpacity(0.12), // بديل withAlpha(30)
+      shape: RoundedRectangleBorder(borderRadius: AppRadii.lg),
       child: Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: EdgeInsets.all(AppSpacing.md),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-           Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-               Icon(
-              Icons.calendar_month,
-              color: Theme.of(context).colorScheme.onPrimaryContainer,
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Icon(
+                  Icons.calendar_month,
+                  color: context.colorScheme.primary,
+                ),
+              ],
             ),
-            ],
-           ),
-
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  const SizedBox(width: 8),
+                  SizedBox(width: AppSpacing.sm),
                   Text(
                     'العام المالى الحالى',
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: isDark? Theme.of(context).colorScheme.onPrimaryContainer : Theme.of(context).colorScheme.onSurface,
+                    style: context.textTheme.titleMedium?.copyWith(
+                      color: context.colorScheme.onSurface,
+                      fontWeight: FontWeight.w900
                     ),
                   ),
+                  const SizedBox(height: 8,),
                   Text(
                     FinancialYearCalculator.financialYearString,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: Theme.of(context).colorScheme.primary,
+                    style: context.textTheme.titleLarge?.copyWith(
+                      color: context.colorScheme.primary,
                     ),
                   ),
                 ],

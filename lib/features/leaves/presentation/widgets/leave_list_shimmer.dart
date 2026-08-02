@@ -1,17 +1,14 @@
 // lib/features/leaves/presentation/widgets/leave_list_shimmer.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:shimmer/shimmer.dart';
 
-/// تأثير الهيكل العظمي (Skeleton) للتحميل
 class LeaveListShimmer extends StatelessWidget {
   const LeaveListShimmer({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return ListView.builder(
       padding: EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
@@ -20,14 +17,14 @@ class LeaveListShimmer extends StatelessWidget {
       itemCount: 5,
       itemBuilder: (context, index) {
         return Shimmer.fromColors(
-          baseColor: colorScheme.surfaceContainerHighest,
-          highlightColor: colorScheme.surface,
+          baseColor: context.colorScheme.surfaceContainerHighest,
+          highlightColor: context.colorScheme.surface,
           child: Container(
-            margin: EdgeInsets.only(bottom: 14.h),
-            height: 100.h,
+            margin: EdgeInsets.only(bottom: AppSpacing.md),
+            height: 100, // ارتفاع متوافق مع البطاقة القياسية
             decoration: BoxDecoration(
-              color: colorScheme.surface,
-              borderRadius: AppRadii.lg, // استخدام نصف القطر الموحد
+              color: context.colorScheme.surface,
+              borderRadius: AppRadii.lg, 
             ),
           ),
         );

@@ -1,52 +1,45 @@
-// lib/core/utils/app_toast.dart
+// lib/shared/widgets/show_toast.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
-/// كلاس مسؤول عن إدارة وعرض إشعارات Toast بشكل مستقل عن Scaffold
 class AppToast {
   static OverlayEntry? _currentOverlay;
   static Timer? _timer;
 
-  // 1. إشعار النجاح
   static void showSuccess(BuildContext context, String message) {
-    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     _showToast(
       context,
       message,
-      title: 'عملية ناجحة',
+      title: 'نجاح',
       icon: Icons.check_circle_rounded,
-      color: isDark ? Colors.green.shade400 : Colors.green.shade600,
-      bgColor: isDark ? Colors.green.withAlpha(30) : Colors.green.shade50,
+      color: context.colorScheme.primary,
+      bgColor: context.colorScheme.primary.withOpacity(0.12),
     );
   }
 
-  // 2. إشعار الخطأ
   static void showError(BuildContext context, String message) {
-    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     _showToast(
       context,
       message,
-      title: 'عذراً',
+      title: 'خطأ',
       icon: Icons.error_rounded,
-      color: isDark ? Colors.red.shade400 : Colors.red.shade600,
-      bgColor: isDark ? Colors.red.withAlpha(30) : Colors.red.shade50,
+      color: context.colorScheme.error,
+      bgColor: context.colorScheme.error.withOpacity(0.12),
     );
   }
 
-  // 3. إشعار التنبيه
   static void showWarning(BuildContext context, String message) {
-    final isDark = Theme.of(context).colorScheme.brightness == Brightness.dark;
     _showToast(
       context,
       message,
       title: 'تنبيه',
       icon: Icons.warning_rounded,
-      color: isDark ? Colors.orange.shade400 : Colors.orange.shade600,
-      bgColor: isDark ? Colors.orange.withAlpha(30) : Colors.orange.shade50,
+      color: context.colorScheme.secondary,
+      bgColor: context.colorScheme.secondary.withOpacity(0.12),
     );
   }
 
-  /// الدالة الأساسية لبناء وعرض الـ Overlay
   static void _showToast(
     BuildContext context,
     String message, {
@@ -55,13 +48,11 @@ class AppToast {
     required Color color,
     required Color bgColor,
   }) {
-    // إزالة أي Toast سابق لمنع التكدس (UI Clutter)
     _currentOverlay?.remove();
     _timer?.cancel();
 
-    // 💡 التعديل هنا: استخدام rootOverlay: true للوصول إلى الطبقة الجذرية للتطبيق
     final overlayState = Overlay.of(context, rootOverlay: true);
-         
+    
     _currentOverlay = OverlayEntry(
       builder: (context) => SafeArea(
         child: Align(
@@ -78,10 +69,8 @@ class AppToast {
       ),
     );
 
-    // إدراج الـ Toast في الـ Root Overlay
     overlayState.insert(_currentOverlay!);
 
-    // إعداد المؤقت للإخفاء التلقائي
     _timer = Timer(const Duration(seconds: 4), () {
       _removeToast();
     });
@@ -95,7 +84,6 @@ class AppToast {
   }
 }
 
-/// الويدجت المسؤولة عن الأنيميشن والشكل البصري للـ Toast
 class _ToastAnimatedWidget extends StatefulWidget {
   final String title;
   final String message;
@@ -126,20 +114,18 @@ class _ToastAnimatedWidgetState extends State<_ToastAnimatedWidget>
   @override
   void initState() {
     super.initState();
-    // إعداد الأنيميشن عند ظهور الـ Toast
     _animationController = AnimationController(
       vsync: this,
       duration: const Duration(milliseconds: 500),
     );
 
-    // التعديل 2: أنيميشن احترافي من الأسفل باستخدام Curves.easeOutBack
     _slideAnimation = Tween<Offset>(
-      begin: const Offset(0, 1.5), // يبدأ من أسفل الشاشة
+      begin: const Offset(0, 1.5),
       end: Offset.zero,
     ).animate(CurvedAnimation(
       parent: _animationController,
-      curve: Curves.easeOutBack, // يضيف تأثير الارتداد (Bounce) الاحترافي
-      reverseCurve: Curves.easeInCubic, // تسريع الخروج عند السحب
+      curve: Curves.easeOutBack,
+      reverseCurve: Curves.easeInCubic,
     ));
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
@@ -152,62 +138,54 @@ class _ToastAnimatedWidgetState extends State<_ToastAnimatedWidget>
     _animationController.forward();
   }
 
-  // AMD 2026: تنظيف الموارد لمنع Memory Leaks
   @override
   void dispose() {
     _animationController.dispose();
     super.dispose();
   }
 
-  /// دالة الإغلاق اليدوي بالسحب (Swipe down to dismiss)
   Future<void> _dismissToast() async {
-    // التعديل 3: استخدام async/await بدلاً من .then()
     await _animationController.reverse();
     widget.onDismissed();
   }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
-
     return SlideTransition(
       position: _slideAnimation,
       child: FadeTransition(
         opacity: _fadeAnimation,
         child: GestureDetector(
           onVerticalDragUpdate: (details) {
-            // التعديل 4: الإغلاق يتم عند السحب للأسفل (موجب)
             if (details.primaryDelta! > 5) {
-              _dismissToast(); 
+              _dismissToast();
             }
           },
           child: Container(
-            // التعديل 5: رفع منطقة الإشعار عن حافة الشاشة بشكل ملحوظ
             margin: const EdgeInsets.only(bottom: 90, left: 16, right: 16),
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
-              color: colorScheme.surface,
+              color: context.colorScheme.surface,
               borderRadius: BorderRadius.circular(16),
               boxShadow: [
                 BoxShadow(
-                  color: isDark ? Colors.transparent : widget.color.withAlpha(20),
+                  color: widget.color.withOpacity(0.08), // استبدال withAlpha
                   blurRadius: 16,
                   offset: const Offset(0, 8),
                 ),
                 BoxShadow(
-                  color: Colors.black.withAlpha(isDark ? 50 : 10),
+                  color: context.colorScheme.shadow.withOpacity(0.08),
                   blurRadius: 12,
                   offset: const Offset(0, 4),
                 ),
               ],
               border: Border.all(
-                color: isDark ? Colors.white12 : widget.color.withAlpha(40),
+                color: context.colorScheme.outline.withOpacity(0.15),
                 width: 1,
               ),
             ),
             child: Material(
-              color: Colors.transparent, // ضروري لمنع الخطأ عند استخدام Overlay
+              color: Colors.transparent,
               child: Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
@@ -228,18 +206,15 @@ class _ToastAnimatedWidgetState extends State<_ToastAnimatedWidget>
                       children: [
                         Text(
                           widget.title,
-                          style: TextStyle(
-                            color: colorScheme.onSurface,
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
+                          style: context.textTheme.titleMedium?.copyWith(
+                            color: context.colorScheme.onSurface,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           widget.message,
-                          style: TextStyle(
-                            color: colorScheme.onSurface.withAlpha(180),
-                            fontSize: 13,
+                          style: context.textTheme.bodyMedium?.copyWith(
+                            color: context.colorScheme.onSurfaceVariant,
                             height: 1.4,
                           ),
                         ),

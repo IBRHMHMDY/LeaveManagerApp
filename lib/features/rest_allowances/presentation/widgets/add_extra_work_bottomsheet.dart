@@ -1,11 +1,11 @@
 // lib/features/rest_allowances/presentation/widgets/add_extra_work_bottomsheet.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leave_manager/core/constants/app_colors.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/enums/work_reason.dart';
 import 'package:leave_manager/core/utils/extenstions/blocked_dates_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
@@ -14,7 +14,6 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 import 'package:leave_manager/shared/widgets/custom_date_range_picker_field.dart';
-// import 'package:leave_manager/shared/widgets/custom_text_field.dart';
 import 'package:leave_manager/shared/widgets/show_bottom_sheet.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
 
@@ -23,6 +22,7 @@ void showAddExtraWorkBottomSheet(BuildContext context) {
     context: context,
     title: 'تسجيل إضافي / عطلة',
     icon: Icons.add_circle_outline_rounded,
+    iconColor: context.leaveColors.restAllowance,
     isScrollControlled: true,
     child: const _AddExtraWorkForm(),
   );
@@ -40,18 +40,11 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
   DateTime? _endDate;
   WorkReason _selectedReason = WorkReason.holiday;
   Holiday? _selectedHoliday;
-  // final TextEditingController _notesController = TextEditingController();
-
-  @override
-  void dispose() {
-    // _notesController.dispose();
-    super.dispose();
-  }
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final blockedDates = context.getBlockedDates(includeHolidays: false);
+    final restColor = context.leaveColors.restAllowance;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -59,11 +52,10 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
       children: [
         DropdownButtonFormField<WorkReason>(
           value: _selectedReason,
-          dropdownColor: colorScheme.surface,
+          dropdownColor: context.colorScheme.surface,
           decoration: InputDecoration(
             labelText: 'نوع العمل',
-            prefixIcon: const Icon(Icons.work_history_rounded, color: AppColors.restAllowance),
-            border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+            prefixIcon: Icon(Icons.work_history_rounded, color: restColor),
           ),
           items: const [
             DropdownMenuItem(value: WorkReason.holiday, child: Text('عطلة رسمية')),
@@ -76,12 +68,11 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                 _startDate = null;
                 _endDate = null;
                 _selectedHoliday = null;
-                // _notesController.clear();
               });
             }
           },
         ),
-        SizedBox(height: 16.h),
+        SizedBox(height: AppSpacing.md),
         
         if (_selectedReason == WorkReason.holiday) ...[
           BlocBuilder<HolidaysCubit, HolidaysState>(
@@ -102,16 +93,20 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                     .toList();
 
                 if (availableHolidays.isEmpty) {
-                  return Text('لا توجد عطلات متاحة', style: TextStyle(color: colorScheme.error));
+                  return Text(
+                    'لا توجد عطلات متاحة', 
+                    style: context.textTheme.labelMedium?.copyWith(
+                      color: context.colorScheme.error,
+                    ),
+                  );
                 }
 
                 return DropdownButtonFormField<Holiday>(
                   value: _selectedHoliday,
-                  dropdownColor: colorScheme.surface,
+                  dropdownColor: context.colorScheme.surface,
                   decoration: InputDecoration(
                     labelText: 'اختر العطلة',
-                    prefixIcon: const Icon(Icons.celebration_rounded, color: AppColors.restAllowance),
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(12.r)),
+                    prefixIcon: Icon(Icons.celebration_rounded, color: restColor),
                   ),
                   items: availableHolidays.map((holiday) {
                     return DropdownMenuItem(value: holiday, child: Text(holiday.name));
@@ -122,7 +117,6 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                         _selectedHoliday = val;
                         _startDate = val.startDate;
                         _endDate = val.endDate;
-                        // _notesController.text = 'عطلة: ${val.name}';
                       });
                     }
                   },
@@ -131,7 +125,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
               return const Center(child: CircularProgressIndicator());
             },
           ),
-          SizedBox(height: 16.h),
+          SizedBox(height: AppSpacing.md),
         ],
         
         CustomDateRangePickerField(
@@ -151,25 +145,16 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
               });
             }
           },
+          colorIcon: restColor,
         ),
-        SizedBox(height: 16.h),
-        
-        // CustomTextField(
-        //   label: 'ملاحظات (اختياري)',
-        //   icon: Icons.notes_rounded,
-        //   controller: _notesController,
-        // ),
-        SizedBox(height: 24.h),
+        SizedBox(height: AppSpacing.md),
         
         BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
           builder: (context, state) {
             final isLoading = state is RestAllowancesLoading;
             return ElevatedButton(
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.restAllowance,
-                foregroundColor: AppColors.darkText,
-                padding: EdgeInsets.symmetric(vertical: 16.h),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                backgroundColor: restColor,
               ),
               onPressed: isLoading ? null : () {
                 if (_selectedReason == WorkReason.holiday && _selectedHoliday == null) {
@@ -189,15 +174,18 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                     workEndDate: _endDate!,
                     daysCount: daysCount,
                     workReason: _selectedReason,
-                    // notes: _notesController.text.trim(),
                     holidayId: _selectedReason == WorkReason.holiday ? _selectedHoliday?.id : null,
                   ),
                 );
                 context.pop();
               },
               child: isLoading
-                  ? SizedBox(height: 24.h, width: 24.h, child: const CircularProgressIndicator(color:  AppColors.restAllowance, strokeWidth: 2))
-                  : Text('حفظ اضافى/عطله', style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold)),
+                  ? const SizedBox(
+                      height: 24, 
+                      width: 24, 
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    )
+                  : const Text('حفظ اضافى/عطله'),
             );
           },
         ),

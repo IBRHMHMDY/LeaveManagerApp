@@ -1,5 +1,7 @@
+// lib/features/rest_allowances/presentation/widgets/rest_action_buttons.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_extra_work_bottomsheet.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_rest_allowances_bottomsheet.dart';
 
@@ -8,39 +10,32 @@ class RestActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
+    final restColor = context.leaveColors.restAllowance;
 
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(AppSpacing.md),
         child: Row(
           children: [
             Expanded(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xE07C4DFF),
-                  foregroundColor: colorScheme.onSurface,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                  backgroundColor: restColor,
                 ),
                 onPressed: () => showAddExtraWorkBottomSheet(context),
-                icon:  Icon(Icons.add, color: isDark? colorScheme.onSurface : colorScheme.onPrimary, size: 20.sp),
-                label: Text('اضافى/عطله', style:  TextStyle(color: isDark? colorScheme.onSurface : colorScheme.surface, fontSize: 15.sp, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.add, size: 20),
+                label: const Text('تسجيل عمل إضافي'),
               ),
             ),
-            SizedBox(width: 12.w),
+            SizedBox(width: AppSpacing.sm),
             Expanded(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xE07C4DFF),
-                  foregroundColor: colorScheme.onSurface,
-                  padding: EdgeInsets.symmetric(vertical: 14.h),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12.r)),
+                  backgroundColor: restColor,
                 ),
                 onPressed: () => showRestAllowancesBottomSheet(context),
-                icon:  Icon(Icons.add, size: 20.sp, color: isDark? colorScheme.onSurface : colorScheme.surface,),
-                label: Text('بدل راحه', style: TextStyle(color: isDark? colorScheme.onSurface : colorScheme.surface, fontSize: 15.sp, fontWeight: FontWeight.bold)),
+                icon: const Icon(Icons.add, size: 20),
+                label: const Text('استهلاك بدل راحة'),
               ),
             ),
           ],

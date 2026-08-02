@@ -1,9 +1,10 @@
+// lib/features/leaves/presentation/screens/leave_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:leave_manager/core/constants/app_colors.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/build_filter_chips.dart';
@@ -27,7 +28,17 @@ class _LeaveScreenState extends State<LeaveScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('الاجازات')),
+      appBar: AppBar(title:  Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(Icons.calendar_month_rounded, color: context.colorScheme.onSurface),
+          SizedBox(width: AppSpacing.sm),
+           Text('الاجازات',
+            style: context.textTheme.headlineMedium?.copyWith(
+                color: context.colorScheme.primary,
+              ),),
+        ],
+      )),
       body: BlocListener<LeavesBloc, LeavesState>(
         listener: (context, state) {
           if (state is LeaveDeletedSuccess) {
@@ -63,12 +74,15 @@ class _LeaveScreenState extends State<LeaveScreen> {
                       return leave.leaveType == LeaveType.casual;
                     }).toList();
                     if (filteredLeaves.isEmpty) {
-                      return const CustomEmptyState(titleEmpty: 'لا توجد اجازات مسجله حتى الآن',contentEmpty: 'قم بتسجيل اجازتك الاولى',);
+                      return const CustomEmptyState(
+                        titleEmpty: 'لا توجد اجازات مسجله حتى الآن',
+                        contentEmpty: 'قم بتسجيل اجازتك الاولى',
+                      );
                     }
                     return ListView.builder(
                       padding: EdgeInsets.symmetric(
-                        horizontal: 16.0.w,
-                        vertical: 8.0.h,
+                        horizontal: AppSpacing.md,
+                        vertical: AppSpacing.sm,
                       ),
                       itemCount: filteredLeaves.length,
                       itemBuilder: (context, index) {
@@ -89,15 +103,11 @@ class _LeaveScreenState extends State<LeaveScreen> {
         ),
       ),
       floatingActionButton: AddLeaveButton(
-      onTap: () => showAddLeaveBottomSheet(context),
-      label: const Text('إجازة جديدة'),
-      icon: const Icon(Icons.add),
-      backgroundColor: AppColors.primaryTeal,
-      foregroundColor: Colors.white,
-    )
+        onTap: () => showAddLeaveBottomSheet(context),
+        label: const Text('إجازة جديدة'),
+        icon: const Icon(Icons.add),
+        // الألوان موروثة تلقائياً من floatingActionButtonTheme
+      )
     );
   }
 }
-  
-
-

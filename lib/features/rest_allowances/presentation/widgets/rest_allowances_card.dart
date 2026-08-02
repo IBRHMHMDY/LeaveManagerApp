@@ -1,10 +1,11 @@
 // lib/features/rest_allowances/presentation/widgets/rest_allowances_card.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/enums/work_reason.dart';
-import 'package:leave_manager/core/utils/extenstions/date_extension.dart'; 
+import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
@@ -15,34 +16,32 @@ import 'package:leave_manager/shared/widgets/confirm_delete_dialog.dart';
 
 class RestAllowancesCard extends StatelessWidget {
   final ExtraWorkRecord extrawork;
-
   const RestAllowancesCard({super.key, required this.extrawork});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
-
-    // تغيير لون الكارت بناءً على حالة الاستهلاك
-    final Color cardColor = extrawork.isUsed ? Colors.orange.shade700 : Colors.deepPurpleAccent;
+    final cardColor = context.leaveColors.restAllowance;
 
     return Dismissible(
       key: ValueKey('extrawork_${extrawork.id}'),
       direction: DismissDirection.endToStart,
       background: Container(
-        margin: EdgeInsets.only(bottom: 14.h),
-        decoration: BoxDecoration(color: Colors.red.shade600, borderRadius: BorderRadius.circular(16.r)),
+        margin: EdgeInsets.only(bottom: AppSpacing.md),
+        decoration: BoxDecoration(
+          color: context.colorScheme.error, 
+          borderRadius: AppRadii.lg,
+        ),
         alignment: AlignmentDirectional.centerEnd,
-        padding: EdgeInsets.symmetric(horizontal: 24.w),
-        child: Icon(Icons.delete_sweep_rounded, color: Colors.white, size: 28.w),
+        padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+        child: Icon(Icons.delete_sweep_rounded, color: context.colorScheme.onError, size: 28),
       ),
       confirmDismiss: (direction) async {
         bool confirm = false;
         await showDialog(
           context: context,
           builder: (ctx) => ConfirmDeleteDialog(
-            titleDialog: 'تأكيد الحذف',
-            contentDialog: 'هل أنت متأكد من حذف هذا السجل؟',
+            titleDialog: 'حذف السجل',
+            contentDialog: 'هل أنت متأكد من رغبتك في حذف هذا السجل؟',
             onPressedButton: () {
               confirm = true;
               ctx.pop();
@@ -55,34 +54,31 @@ class RestAllowancesCard extends StatelessWidget {
         context.read<RestAllowancesBloc>().add(DeleteExtraWorkEvent(extrawork.id));
       },
       child: Container(
-        margin: EdgeInsets.only(bottom: 14.h),
+        margin: EdgeInsets.only(bottom: AppSpacing.md),
         clipBehavior: Clip.antiAlias,
         decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16.r),
-          boxShadow: [
-            if (!isDark) BoxShadow(color: colorScheme.shadow.withAlpha(15), blurRadius: 10.r, offset: Offset(0, 4.h)),
-          ],
-          border: Border.all(color: isDark ? Colors.white12 : Colors.transparent, width: 1.w),
+          color: context.colorScheme.surface,
+          borderRadius: AppRadii.lg,
+          border: Border.all(
+            color: context.colorScheme.outline.withOpacity(0.15), 
+            width: 1,
+          ),
         ),
         child: IntrinsicHeight(
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Container(width: 6.w, color: cardColor),
+              Container(width: 6, color: cardColor),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(16.w),
+                  padding: EdgeInsets.all(AppSpacing.md),
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Expanded(
-                        // 🔹 الاستماع لحالة العطلات للوصول لاسم المناسبة
                         child: BlocBuilder<HolidaysCubit, HolidaysState>(
                           builder: (context, holidayState) {
                             Holiday? associatedHoliday;
-                            
-                            // البحث عن العطلة المرتبطة في حالة وجود holidayId
                             if (extrawork.holidayId != null && holidayState is HolidaysLoaded) {
                               try {
                                 associatedHoliday = holidayState.financialYearHolidays.firstWhere(
@@ -92,69 +88,67 @@ class RestAllowancesCard extends StatelessWidget {
                                 associatedHoliday = null;
                               }
                             }
-
                             String pillText = '';
                             String subtitleText = '';
-                            
-                            // 🔹 استخدام الـ Extension النظيف هنا
+
                             final workDateShort = extrawork.workStartDate.toDateRangeString(extrawork.workEndDate, short: true);
                             final workDateFull = extrawork.workStartDate.toDateRangeString(extrawork.workEndDate, short: false);
-
+                            
                             if (extrawork.isUsed) {
                               final restStart = extrawork.restStartDate ?? extrawork.workStartDate;
                               final restEnd = extrawork.restEndDate ?? extrawork.workEndDate;
-                              // 🔹 استخدام الـ Extension
                               final restDateShort = restStart.toDateRangeString(restEnd, short: true);
-                              
+
                               pillText = '$restDateShort بدل راحه عن $workDateShort';
-                              
+
                               if (extrawork.workReason == WorkReason.holiday) {
                                 if (associatedHoliday != null) {
-                                  // 🔹 استخدام الـ Extension لتاريخ العطلة
                                   final holidayDateFull = associatedHoliday.startDate.toDateRangeString(associatedHoliday.endDate, short: false);
                                   subtitleText = '${associatedHoliday.name} $holidayDateFull';
                                 } else {
-                                  subtitleText = 'يوم عمل فى عطله $workDateFull';
+                                  subtitleText = 'عمل رسمي في عطلة $workDateFull';
                                 }
                               } else {
-                                subtitleText = 'يوم عمل اضافى';
+                                subtitleText = 'عمل إضافي (Overtime)';
                               }
                             } else {
                               if (extrawork.workReason == WorkReason.holiday) {
                                 if (associatedHoliday != null) {
-                                  pillText = 'يوم عمل فى عطله (${associatedHoliday.name})';
+                                  pillText = 'رصيد عطلة (${associatedHoliday.name})';
                                 } else {
-                                  pillText = 'يوم عمل فى عطله';
+                                  pillText = 'رصيد عطلة رسمية';
                                 }
                               } else {
-                                pillText = 'يوم عمل اضافى';
+                                pillText = 'رصيد عمل إضافي';
                               }
                               subtitleText = workDateFull;
                             }
-
                             return Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 4.h),
-                                  decoration: BoxDecoration(color: cardColor.withAlpha(20), borderRadius: BorderRadius.circular(20.r)),
+                                  padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+                                  decoration: BoxDecoration(
+                                    color: cardColor.withOpacity(0.08), 
+                                    borderRadius: AppRadii.xl,
+                                  ),
                                   child: Text(
                                     pillText,
-                                    style: TextStyle(color: cardColor, fontWeight: FontWeight.bold, fontSize: 12.sp),
+                                    style: context.textTheme.labelMedium?.copyWith(
+                                      color: cardColor,
+                                    ),
                                   ),
                                 ),
-                                SizedBox(height: 12.h),
+                                SizedBox(height: AppSpacing.sm),
                                 Row(
                                   children: [
-                                    Icon(Icons.calendar_today_rounded, size: 16.w, color: colorScheme.onSurfaceVariant),
-                                    SizedBox(width: 8.w),
+                                    Icon(Icons.calendar_today_rounded, size: 16, color: context.colorScheme.onSurfaceVariant),
+                                    SizedBox(width: AppSpacing.xs),
                                     Expanded(
                                       child: Text(
                                         subtitleText,
-                                        style: TextStyle(
-                                          fontSize: 13.5.sp,
-                                          color: colorScheme.onSurface,
-                                          fontWeight: FontWeight.w600,
+                                        style: context.textTheme.titleMedium?.copyWith(
+                                          color: context.colorScheme.onSurface,
                                         ),
                                       ),
                                     ),
@@ -162,17 +156,31 @@ class RestAllowancesCard extends StatelessWidget {
                                 ),
                               ],
                             );
-                          }
+                          },
                         ),
                       ),
                       Container(
-                        padding: EdgeInsets.symmetric(horizontal: 14.w, vertical: 10.h),
-                        decoration: BoxDecoration(color: cardColor.withAlpha(15), borderRadius: BorderRadius.circular(12.r)),
+                        padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.sm),
+                        decoration: BoxDecoration(
+                          color: cardColor.withOpacity(0.06), 
+                          borderRadius: AppRadii.md,
+                        ),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('${extrawork.daysCount}', style: TextStyle(color: cardColor, fontWeight: FontWeight.w900, fontSize: 20.sp)),
-                            Text('يوم', style: TextStyle(color: cardColor, fontSize: 10.sp, fontWeight: FontWeight.bold)),
+                            Text(
+                              '${extrawork.daysCount}', 
+                              style: context.textTheme.headlineMedium?.copyWith(
+                                color: cardColor,
+                                fontWeight: FontWeight.w900,
+                              ),
+                            ),
+                            Text(
+                              'أيام', 
+                              style: context.textTheme.labelSmall?.copyWith(
+                                color: cardColor,
+                              ),
+                            ),
                           ],
                         ),
                       ),

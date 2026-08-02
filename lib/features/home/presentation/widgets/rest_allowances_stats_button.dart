@@ -1,72 +1,70 @@
+// lib/features/home/presentation/widgets/rest_allowances_stats_button.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
 class RestAllowancesStatsButton extends StatelessWidget {
   const RestAllowancesStatsButton({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-    final isDark = colorScheme.brightness == Brightness.dark;
+    final restColor = context.leaveColors.restAllowance;
 
     return InkWell(
       onTap: () {
         context.go(AppRouter.restAllowances);
       },
-      borderRadius: BorderRadius.circular(16.r),
+      borderRadius: AppRadii.lg,
       child: Container(
-        padding: EdgeInsets.all(16.w),
+        padding: EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
-          color: colorScheme.surface,
-          borderRadius: BorderRadius.circular(16.r),
+          color: context.colorScheme.surface,
+          borderRadius: AppRadii.lg,
           border: Border.all(
-            color: const Color(0xFF7C4DFF).withAlpha(50),
-            width: 1.w,
+            color: restColor.withOpacity(0.2), // بديل withAlpha(50)
+            width: 1,
           ),
           boxShadow: [
-            if (!isDark)
+            if (!context.isDarkMode)
               BoxShadow(
-                color: colorScheme.shadow.withAlpha(10),
-                blurRadius: 10.r,
-                offset: Offset(0, 4.h),
+                color: context.colorScheme.shadow.withOpacity(0.04),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
               ),
           ],
         ),
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(12.w),
-              decoration: const BoxDecoration(
-                color: Color(0xE07C4DFF),
+              padding: EdgeInsets.all(AppSpacing.sm),
+              decoration: BoxDecoration(
+                color: restColor.withOpacity(0.8), // بديل withAlpha(200)
                 shape: BoxShape.circle,
               ),
               child: Icon(
                 Icons.workspace_premium_rounded,
-                color: colorScheme.onSurfaceVariant,
-                size: 28.w,
+                color: context.colorScheme.surface,
+                size: 28,
               ),
             ),
-            SizedBox(width: 16.w),
+            SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'بدلات الراحة',
-                    style: TextStyle(
-                      fontSize: 16.sp,
-                      fontWeight: FontWeight.bold,
-                      color: colorScheme.onSurface,
+                    'بدلات الراحه',
+                    style: context.textTheme.titleMedium?.copyWith(
+                      color: context.colorScheme.onSurface,
                     ),
                   ),
-                  SizedBox(height: 4.h),
+                  SizedBox(height: AppSpacing.xs),
                   Text(
-                    'إدارة العمل الإضافي والعطلات',
-                    style: TextStyle(
-                      fontSize: 13.sp,
-                      color: colorScheme.onSurfaceVariant,
+                    'ادارة الاضافى والعطلات',
+                    style: context.textTheme.bodyMedium?.copyWith(
+                      color: context.colorScheme.onSurfaceVariant,
                     ),
                   ),
                 ],
@@ -74,8 +72,8 @@ class RestAllowancesStatsButton extends StatelessWidget {
             ),
             Icon(
               Icons.arrow_forward_ios_rounded,
-              color: colorScheme.onSurfaceVariant.withAlpha(100),
-              size: 20.w,
+              color: context.colorScheme.onSurfaceVariant.withOpacity(0.4),
+              size: 20,
             ),
           ],
         ),

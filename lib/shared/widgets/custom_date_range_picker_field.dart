@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
 class CustomDateRangePickerField extends StatelessWidget {
   final DateTime? startDate;
@@ -9,7 +11,7 @@ class CustomDateRangePickerField extends StatelessWidget {
   final DateTime firstDate;
   final DateTime lastDate;
   final bool Function(DateTime)? selectableDayPredicate;
-
+  final Color? colorIcon;
 
   const CustomDateRangePickerField({
     super.key,
@@ -18,9 +20,9 @@ class CustomDateRangePickerField extends StatelessWidget {
     required this.onDateSelected,
     required this.firstDate,
     required this.lastDate,
+    this.colorIcon,
     this.hintText = 'اختر نطاق التاريخ',
     this.selectableDayPredicate,
-
   });
 
   Future<void> _pickDateRange(BuildContext context) async {
@@ -53,7 +55,6 @@ class CustomDateRangePickerField extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
     final hasDate = startDate != null && endDate != null;
 
     String displayText = hintText;
@@ -68,30 +69,32 @@ class CustomDateRangePickerField extends StatelessWidget {
 
     return InkWell(
       onTap: () => _pickDateRange(context),
-      borderRadius: BorderRadius.circular(12),
+      borderRadius: AppRadii.md,
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+        padding: EdgeInsets.symmetric(
+          vertical: AppSpacing.md,
+          horizontal: AppSpacing.md,
+        ),
         decoration: BoxDecoration(
-          color: colorScheme.surfaceContainerHighest.withAlpha(80),
-          borderRadius: BorderRadius.circular(12),
+          color: context.colorScheme.surfaceContainerHighest,
+          borderRadius: AppRadii.md,
           border: Border.all(
-            color: hasDate ? colorScheme.primary : colorScheme.outlineVariant,
-            width: hasDate ? 1.5 : 1,
+            color: hasDate ? context.colorScheme.primary : Colors.transparent,
+            width: hasDate ? 1.5 : 0,
           ),
         ),
         child: Row(
           children: [
-            Icon(Icons.date_range_rounded, color: colorScheme.primary),
-            const SizedBox(width: 12),
+            Icon(Icons.date_range_rounded, color: colorIcon),
+            SizedBox(width: AppSpacing.md),
             Expanded(
               child: Text(
                 displayText,
-                style: TextStyle(
-                  fontSize: 16,
+                style: context.textTheme.bodyLarge?.copyWith(
                   fontWeight: hasDate ? FontWeight.bold : FontWeight.normal,
                   color: hasDate
-                      ? colorScheme.primary
-                      : colorScheme.onSurfaceVariant,
+                      ? context.colorScheme.primary
+                      : context.colorScheme.onSurfaceVariant,
                 ),
               ),
             ),

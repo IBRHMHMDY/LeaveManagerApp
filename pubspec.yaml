@@ -1,7 +1,7 @@
 name: leave_manager
 description: "Leave Manager App - مدير اجازاتى - تتبع إجازاتك بذكاء وسهولة."
 publish_to: 'none'
-version: 1.2.0+5 # previous Release: 1.1.2+4
+version: 1.2.1+6 # previous Release: 1.1.2+4
 
 environment:
   sdk: ^3.11.5

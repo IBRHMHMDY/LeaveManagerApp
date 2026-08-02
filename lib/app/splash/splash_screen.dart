@@ -5,6 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/app/splash/widgets/custom_app_logo.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
@@ -86,18 +87,15 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           context.go(AppRouter.home);
         } else if (state is SettingsNotFound) {
           SystemChrome.setEnabledSystemUIMode(SystemUiMode.edgeToEdge);
-          // التوجيه إلى مسار الإعداد المستقل
           context.go(AppRouter.setup); 
         } else if (state is SettingsError) {
           AppToast.showError(context, state.message);
-          // التوجيه إلى مسار الإعداد المستقل في حالة الخطأ أيضاً
           context.go(AppRouter.setup); 
         }
       },
       child: Scaffold(
-        backgroundColor: Theme.of(context).colorScheme.surface,
+        backgroundColor: context.colorScheme.surface,
         body: Stack(
-          // ... (باقي الكود كما هو دون تغيير في تصميم الـ Stack)
           children: [
             Positioned(
               top: -100,
@@ -107,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 height: 250,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Theme.of(context).colorScheme.primary.withAlpha(15),
+                  color: context.colorScheme.primary.withOpacity(0.06), // بديل withAlpha(15)
                 ),
               ),
             ),
@@ -119,7 +117,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: Theme.of(context).colorScheme.secondary.withAlpha(15),
+                  color: context.colorScheme.secondary.withOpacity(0.06),
                 ),
               ),
             ),
@@ -129,7 +127,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 children: [
                   ScaleTransition(
                     scale: _logoScaleAnimation,
-                    child: CustomAppLogo(context),
+                    child: const CustomAppLogo(),
                   ),
                   const SizedBox(height: 32),
                   SlideTransition(
@@ -140,9 +138,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                         children: [
                           Text(
                             'مدير إجازاتي',
-                            style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                            style: context.textTheme.headlineMedium?.copyWith(
                                   fontWeight: FontWeight.w900,
-                                  color: Theme.of(context).colorScheme.primary,
+                                  color: context.colorScheme.primary,
                                   letterSpacing: 1.2,
                                 ),
                           ),
@@ -153,13 +151,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primaryContainer.withAlpha(150),
+                              color: context.colorScheme.primaryContainer.withOpacity(0.6), // بديل withAlpha(150)
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               'تتبع إجازاتك بذكاء وسهولة',
-                              style: Theme.of(context).textTheme.titleSmall?.copyWith(
-                                    color: Theme.of(context).colorScheme.primary,
+                              style: context.textTheme.titleSmall?.copyWith(
+                                    color: context.colorScheme.primary,
                                     fontWeight: FontWeight.w600,
                                   ),
                             ),
@@ -184,7 +182,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       height: 32,
                       child: CircularProgressIndicator(
                         strokeWidth: 3.5,
-                        color: Theme.of(context).colorScheme.primary.withAlpha(150),
+                        color: context.colorScheme.primary.withOpacity(0.6),
                         strokeCap: StrokeCap.round,
                       ),
                     ),

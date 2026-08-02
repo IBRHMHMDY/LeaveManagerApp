@@ -1,7 +1,9 @@
+// lib/features/settings/presentation/widgets/danger_zone_section.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/show_about_developer.dart';
@@ -13,59 +15,43 @@ class DangerZoneSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final colorScheme = Theme.of(context).colorScheme;
-
     return Column(
       children: [
-        SizedBox(height: 16.h),
+        SizedBox(height: AppSpacing.md),
         const Divider(),
-        SizedBox(height: 16.h),
+        SizedBox(height: AppSpacing.md),
         OutlinedButton.icon(
           style: OutlinedButton.styleFrom(
-            padding: EdgeInsets.symmetric(vertical: 16.h, horizontal: 16.w),
-            foregroundColor: Colors.red.shade700,
-            side: BorderSide(color: Colors.red.shade700),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(12.r),
-            ),
+            foregroundColor: context.colorScheme.error, 
+            side: BorderSide(color: context.colorScheme.error, width: 1.5), 
           ),
-          icon: Icon(Icons.delete_forever, size: 24.sp),
-          label: Text(
-            'تصفير الأرصدة (مسح سجلات الإجازات)',
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-          ),
-          onPressed: (){
+          icon: const Icon(Icons.delete_forever, size: 24),
+          label: const Text('حذف جميع السجلات'),
+          onPressed: () {
             showDialog(
               context: context,
               builder: (BuildContext dialogContext) {
                 return ConfirmDeleteDialog(
-                  titleDialog: 'تأكيد التصفير',
+                  titleDialog: 'تأكيد الحذف',
                   contentDialog:
-                      'هل أنت متأكد من أنك تريد مسح جميع سجلات الإجازات؟ هذا الإجراء لا يمكن التراجع عنه.',
+                      'هل أنت متأكد من رغبتك في حذف جميع سجلات الإجازات؟ هذا الإجراء لا يمكن التراجع عنه.',
                   onPressedButton: () {
-                    // 1. إرسال الحدث للـ BLoC
                     context.read<LeavesBloc>().add(ResetAllLeavesEvent());
-                    // 2. إغلاق الـ Dialog باستخدام الـ context الخاص به
                     dialogContext.pop();
-                    // 3. عرض رسالة النجاح
-                    AppToast.showSuccess(context, 'تم تصفير الأرصدة بنجاح');
+                    AppToast.showSuccess(context, 'تم تصفير الأرصدة وحذف السجلات');
                   },
                 );
               },
             );
           }
         ),
-        const SizedBox(height: 16),
+        SizedBox(height: AppSpacing.md),
         TextButton.icon(
           style: TextButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            foregroundColor: colorScheme.onSurface.withAlpha(200),
+            foregroundColor: context.colorScheme.onSurfaceVariant, 
           ),
-          icon: Icon(Icons.info_outline_rounded, size: 24.sp,),
-          label: Text(
-            'عن التطبيق',
-            style: TextStyle(fontSize: 16.sp, fontWeight: FontWeight.bold),
-          ),
+          icon: const Icon(Icons.info_outline_rounded, size: 24),
+          label: const Text('عن المطور'),
           onPressed: () => showAboutDeveloperBottomSheet(context),
         ),
       ],
