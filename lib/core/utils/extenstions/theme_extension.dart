@@ -1,6 +1,6 @@
 // lib/core/utils/extenstions/theme_extension.dart
 import 'package:flutter/material.dart';
-import 'package:leave_manager/shared/themes/leave_status_colors.dart';
+import 'package:leave_manager/shared/themes/leave_colors.dart';
 
 extension ThemeContextExtension on BuildContext {
   /// الوصول السريع للثيم الأساسي
@@ -13,7 +13,7 @@ extension ThemeContextExtension on BuildContext {
   TextTheme get textTheme => Theme.of(this).textTheme;
 
   /// الوصول السريع لألوان حالات الإجازات المخصصة
-  LeaveStatusColors get leaveColors => Theme.of(this).extension<LeaveStatusColors>()!;
+  LeaveColors get leaveColors => Theme.of(this).extension<LeaveColors>()!;
 
   /// التحقق من حالة الوضع (داكن/نهاري)
   bool get isDarkMode => Theme.of(this).brightness == Brightness.dark;

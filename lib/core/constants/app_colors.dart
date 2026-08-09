@@ -1,6 +1,6 @@
 // lib/core/constants/app_colors.dart
 import 'package:flutter/material.dart';
-import '../../shared/themes/leave_status_colors.dart';
+import '../../shared/themes/leave_colors.dart';
 
 class AppColors {
   // --- Primary Colors ---
@@ -37,13 +37,13 @@ class AppColors {
   static const Color restAllowance = Color(0xFF7C4DFF);
 
   // --- Theme Extensions ---
-  static const LeaveStatusColors lightLeaveStatusColors = LeaveStatusColors(
+  static const LeaveColors lightLeaveColors = LeaveColors(
     regular: regularLeave,
     casual: casualLeave,
     restAllowance: restAllowance,
   );
 
-  static const LeaveStatusColors darkLeaveStatusColors = LeaveStatusColors(
+  static const LeaveColors darkLeaveSColors = LeaveColors(
     regular: Color(0xFF81C784), 
     casual: Color(0xFFFFB300),
     restAllowance: Color(0xFFB388FF),

@@ -5,7 +5,7 @@ import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/shared/widgets/current_version.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:leave_manager/app/splash/widgets/custom_app_logo_icon.dart';
+import 'package:leave_manager/features/splash/presentation/widgets/custom_app_logo_icon.dart';
 
 void showAboutDeveloperBottomSheet(BuildContext context) {
   showModalBottomSheet(

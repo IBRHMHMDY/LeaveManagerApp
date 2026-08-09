@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leave_manager/app/layout/widgets/main_appbar.dart';
-import 'package:leave_manager/app/layout/widgets/main_bottom_nav_bar.dart';
+import 'package:leave_manager/features/layout/presentation/widgets/main_appbar.dart';
+import 'package:leave_manager/features/layout/presentation/widgets/main_bottom_nav_bar.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/shared/widgets/show_toast.dart';
 

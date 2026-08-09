@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leave_manager/app/layout/widgets/main_appbar.dart';
-import 'package:leave_manager/app/splash/splash_screen.dart';
-import 'package:leave_manager/app/layout/main_layout.dart';
+import 'package:leave_manager/features/layout/presentation/widgets/main_appbar.dart';
+import 'package:leave_manager/features/splash/presentation/screens/splash_screen.dart';
+import 'package:leave_manager/features/layout/presentation/screens/main_layout.dart';
 import 'package:leave_manager/features/holidays/presentation/screens/holidays_screen.dart';
 import 'package:leave_manager/features/home/presentation/screens/home_screen.dart';
 import 'package:leave_manager/features/leaves/presentation/screens/leave_screen.dart';
