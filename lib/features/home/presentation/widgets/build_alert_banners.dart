@@ -87,11 +87,11 @@ class ShowAlertBanner extends StatelessWidget {
     final isDark = context.isDarkMode;
 
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.md),
-      padding: EdgeInsets.all(AppSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: bgColor,
-        borderRadius: AppRadii.lg,
+        borderRadius: AppRadius.lg,
         border: Border.all(
           color: baseColor.withOpacity(isDark ? 0.3 : 0.15),
           width: 1,
@@ -109,14 +109,14 @@ class ShowAlertBanner extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
               color: baseColor.withOpacity(0.15),
               shape: BoxShape.circle,
             ),
             child: Icon(iconData, color: baseColor, size: 22),
           ),
-          SizedBox(width: AppSpacing.md),
+          const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Padding(
               padding: const EdgeInsets.only(top: 4.0),

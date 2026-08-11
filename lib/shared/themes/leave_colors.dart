@@ -4,24 +4,24 @@ import 'package:flutter/material.dart';
 class LeaveColors extends ThemeExtension<LeaveColors> {
   final Color regular;
   final Color casual;
-  final Color restAllowance;
+  final Color rest;
 
   const LeaveColors({
     required this.regular,
     required this.casual,
-    required this.restAllowance,
+    required this.rest,
   });
 
   @override
   ThemeExtension<LeaveColors> copyWith({
     Color? regular,
     Color? casual,
-    Color? restAllowance,
+    Color? rest,
   }) {
     return LeaveColors(
       regular: regular ?? this.regular,
       casual: casual ?? this.casual,
-      restAllowance: restAllowance ?? this.restAllowance,
+      rest: rest ?? this.rest,
     );
   }
 
@@ -32,7 +32,7 @@ class LeaveColors extends ThemeExtension<LeaveColors> {
     return LeaveColors(
       regular: Color.lerp(regular, other.regular, t)!,
       casual: Color.lerp(casual, other.casual, t)!,
-      restAllowance: Color.lerp(restAllowance, other.restAllowance, t)!,
+      rest: Color.lerp(rest, other.rest, t)!,
     );
   }
 }

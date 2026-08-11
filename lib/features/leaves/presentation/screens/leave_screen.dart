@@ -7,13 +7,10 @@ import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
-import 'package:leave_manager/features/leaves/presentation/widgets/build_filter_chips.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/show_add_leave_bottomsheet.dart';
-import 'package:leave_manager/shared/widgets/add_leave_button.dart';
-import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/leave_list_shimmer.dart';
+import 'package:leave_manager/shared/widgets/widgets.dart';
 
 class LeaveScreen extends StatefulWidget {
   const LeaveScreen({super.key});
@@ -28,17 +25,24 @@ class _LeaveScreenState extends State<LeaveScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title:  Row(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(Icons.calendar_month_rounded, color: context.colorScheme.onSurface),
-          SizedBox(width: AppSpacing.sm),
-           Text('الاجازات',
-            style: context.textTheme.headlineMedium?.copyWith(
+      appBar: AppBar(
+        title: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.calendar_month_rounded,
+              color: context.colorScheme.onSurface,
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Text(
+              'الاجازات',
+              style: context.textTheme.headlineMedium?.copyWith(
                 color: context.colorScheme.primary,
-              ),),
-        ],
-      )),
+              ),
+            ),
+          ],
+        ),
+      ),
       body: BlocListener<LeavesBloc, LeavesState>(
         listener: (context, state) {
           if (state is LeaveDeletedSuccess) {
@@ -49,15 +53,32 @@ class _LeaveScreenState extends State<LeaveScreen> {
         },
         child: Column(
           children: [
-            BuildFilterChips(
-              selectedFilter: _selectedFilter,
-              onFilterChanged: (newFilter) {
+            AppFilterChips<LeaveFilter>(
+              selectedValue: _selectedFilter,
+              onChanged: (newFilter) {
                 setState(() {
                   _selectedFilter = newFilter;
                 });
               },
+              items: const [
+                AppFilterChipItem(
+                  value: LeaveFilter.all,
+                  label: 'الكل',
+                  icon: Icons.all_inclusive_rounded,
+                ),
+                AppFilterChipItem(
+                  value: LeaveFilter.regular,
+                  label: 'اعتيادي',
+                  icon: Icons.event_available_rounded,
+                ),
+                AppFilterChipItem(
+                  value: LeaveFilter.casual,
+                  label: 'عارضة',
+                  icon: Icons.event_busy_rounded,
+                ),
+              ],
             ),
-    
+
             Expanded(
               child: BlocBuilder<LeavesBloc, LeavesState>(
                 builder: (context, state) {
@@ -74,13 +95,14 @@ class _LeaveScreenState extends State<LeaveScreen> {
                       return leave.leaveType == LeaveType.casual;
                     }).toList();
                     if (filteredLeaves.isEmpty) {
-                      return const CustomEmptyState(
-                        titleEmpty: 'لا توجد اجازات مسجله حتى الآن',
-                        contentEmpty: 'قم بتسجيل اجازتك الاولى',
+                      return const AppEmptyState(
+                        title: 'لا توجد اجازات مسجله حتى الآن',
+                        content: 'قم بتسجيل اجازتك الاولى',
+                        icon: Icons.import_contacts_outlined,
                       );
                     }
                     return ListView.builder(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.md,
                         vertical: AppSpacing.sm,
                       ),
@@ -94,7 +116,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
                       },
                     );
                   }
-    
+
                   return const LeaveListShimmer();
                 },
               ),
@@ -102,12 +124,12 @@ class _LeaveScreenState extends State<LeaveScreen> {
           ],
         ),
       ),
-      floatingActionButton: AddLeaveButton(
-        onTap: () => showAddLeaveBottomSheet(context),
-        label: const Text('إجازة جديدة'),
-        icon: const Icon(Icons.add),
-        // الألوان موروثة تلقائياً من floatingActionButtonTheme
-      )
+      floatingActionButton: AppFloatingButton.extended(
+        onPressed: () => showAddLeaveBottomSheet(context),
+        backgroundColor: context.colorScheme.primary,
+        label: 'إجازة جديدة',
+        icon: Icons.add,
+      ),
     );
   }
 }

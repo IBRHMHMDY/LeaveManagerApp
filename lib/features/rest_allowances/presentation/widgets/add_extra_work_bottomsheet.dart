@@ -13,16 +13,18 @@ import 'package:leave_manager/features/holidays/presentation/cubit/holidays_stat
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
-import 'package:leave_manager/shared/widgets/custom_date_range_picker_field.dart';
-import 'package:leave_manager/shared/widgets/show_bottom_sheet.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart';
+import 'package:leave_manager/shared/widgets/buttons/app_primary_button.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_date_range_picker.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_dropdown_field.dart';
+import 'package:leave_manager/shared/widgets/overlays/app_bottom_sheet.dart';
+import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 
 void showAddExtraWorkBottomSheet(BuildContext context) {
-  ShowBottomSheet.show(
+  AppBottomSheet.show(
     context: context,
-    title: 'تسجيل إضافي / عطلة',
+    title: 'إضافه رصيد',
     icon: Icons.add_circle_outline_rounded,
-    iconColor: context.leaveColors.restAllowance,
+    iconColor: context.colorScheme.primary,
     isScrollControlled: true,
     child: const _AddExtraWorkForm(),
   );
@@ -44,22 +46,24 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
   @override
   Widget build(BuildContext context) {
     final blockedDates = context.getBlockedDates(includeHolidays: false);
-    final restColor = context.leaveColors.restAllowance;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        DropdownButtonFormField<WorkReason>(
+        AppDropdownField<WorkReason>(
           value: _selectedReason,
-          dropdownColor: context.colorScheme.surface,
-          decoration: InputDecoration(
-            labelText: 'نوع العمل',
-            prefixIcon: Icon(Icons.work_history_rounded, color: restColor),
-          ),
+          label: 'نوع العمل',
+          prefixIcon: Icons.work_history_rounded,
           items: const [
-            DropdownMenuItem(value: WorkReason.holiday, child: Text('عطلة رسمية')),
-            DropdownMenuItem(value: WorkReason.overtime, child: Text('عمل إضافي')),
+            DropdownMenuItem(
+              value: WorkReason.holiday,
+              child: Text('عطلة رسمية'),
+            ),
+            DropdownMenuItem(
+              value: WorkReason.overtime,
+              child: Text('عمل إضافي'),
+            ),
           ],
           onChanged: (val) {
             if (val != null) {
@@ -72,15 +76,15 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
             }
           },
         ),
-        SizedBox(height: AppSpacing.md),
-        
+        const SizedBox(height: AppSpacing.md),
+
         if (_selectedReason == WorkReason.holiday) ...[
           BlocBuilder<HolidaysCubit, HolidaysState>(
             builder: (context, state) {
               if (state is HolidaysLoaded) {
                 final restState = context.read<RestAllowancesBloc>().state;
                 List<int> registeredHolidayIds = [];
-                
+
                 if (restState is RestAllowancesLoaded) {
                   registeredHolidayIds = restState.extrawork
                       .where((ot) => ot.holidayId != null)
@@ -89,27 +93,29 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                 }
 
                 final availableHolidays = state.financialYearHolidays
-                    .where((holiday) => !registeredHolidayIds.contains(holiday.id))
+                    .where(
+                      (holiday) => !registeredHolidayIds.contains(holiday.id),
+                    )
                     .toList();
 
                 if (availableHolidays.isEmpty) {
                   return Text(
-                    'لا توجد عطلات متاحة', 
+                    'لا توجد عطلات متاحة',
                     style: context.textTheme.labelMedium?.copyWith(
                       color: context.colorScheme.error,
                     ),
                   );
                 }
 
-                return DropdownButtonFormField<Holiday>(
+                return AppDropdownField<Holiday>(
                   value: _selectedHoliday,
-                  dropdownColor: context.colorScheme.surface,
-                  decoration: InputDecoration(
-                    labelText: 'اختر العطلة',
-                    prefixIcon: Icon(Icons.celebration_rounded, color: restColor),
-                  ),
+                  label: 'اختر العطلة',
+                  prefixIcon: Icons.celebration_rounded,
                   items: availableHolidays.map((holiday) {
-                    return DropdownMenuItem(value: holiday, child: Text(holiday.name));
+                    return DropdownMenuItem(
+                      value: holiday,
+                      child: Text(holiday.name),
+                    );
                   }).toList(),
                   onChanged: (val) {
                     if (val != null) {
@@ -125,17 +131,21 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
               return const Center(child: CircularProgressIndicator());
             },
           ),
-          SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.md),
         ],
-        
-        CustomDateRangePickerField(
+
+        AppDateRangePicker(
           startDate: _startDate,
           endDate: _endDate,
-          hintText: _selectedReason == WorkReason.holiday ? 'تواريخ العطلة' : 'تواريخ العمل الإضافي',
+          hintText: _selectedReason == WorkReason.holiday
+              ? 'تواريخ العطلة'
+              : 'تواريخ العمل الإضافي',
           firstDate: FinancialYearCalculator.currentFinancialYearStart,
           lastDate: FinancialYearCalculator.currentFinancialYearEnd,
           selectableDayPredicate: (day) {
-            return !blockedDates.contains(DateTime(day.year, day.month, day.day));
+            return !blockedDates.contains(
+              DateTime(day.year, day.month, day.day),
+            );
           },
           onDateSelected: (DateTimeRange? pickedRange) {
             if (pickedRange != null) {
@@ -145,47 +155,45 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
               });
             }
           },
-          colorIcon: restColor,
+          colorIcon: context.colorScheme.primary,
         ),
-        SizedBox(height: AppSpacing.md),
-        
+        const SizedBox(height: AppSpacing.md),
+
         BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
           builder: (context, state) {
             final isLoading = state is RestAllowancesLoading;
-            return ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: restColor,
-              ),
-              onPressed: isLoading ? null : () {
-                if (_selectedReason == WorkReason.holiday && _selectedHoliday == null) {
-                  AppToast.showError(context, 'يرجى اختيار العطلة.');
-                  return;
-                }
-                if (_startDate == null || _endDate == null) {
-                  AppToast.showError(context, 'يرجى تحديد التواريخ.');
-                  return;
-                }
-                
-                final daysCount = _endDate!.difference(_startDate!).inDays + 1;
+            return AppPrimaryButton(
+              label: 'اضافه رصيد',
+              backgroundColor: context.colorScheme.primary,
+              onPressed: isLoading
+                  ? null
+                  : () {
+                      if (_selectedReason == WorkReason.holiday &&
+                          _selectedHoliday == null) {
+                        AppToast.showError(context, 'يرجى اختيار العطلة.');
+                        return;
+                      }
+                      if (_startDate == null || _endDate == null) {
+                        AppToast.showError(context, 'يرجى تحديد التواريخ.');
+                        return;
+                      }
 
-                context.read<RestAllowancesBloc>().add(
-                  AddExtraWorkEvent(
-                    workStartDate: _startDate!,
-                    workEndDate: _endDate!,
-                    daysCount: daysCount,
-                    workReason: _selectedReason,
-                    holidayId: _selectedReason == WorkReason.holiday ? _selectedHoliday?.id : null,
-                  ),
-                );
-                context.pop();
-              },
-              child: isLoading
-                  ? const SizedBox(
-                      height: 24, 
-                      width: 24, 
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('حفظ اضافى/عطله'),
+                      final daysCount =
+                          _endDate!.difference(_startDate!).inDays + 1;
+
+                      context.read<RestAllowancesBloc>().add(
+                        AddExtraWorkEvent(
+                          workStartDate: _startDate!,
+                          workEndDate: _endDate!,
+                          daysCount: daysCount,
+                          workReason: _selectedReason,
+                          holidayId: _selectedReason == WorkReason.holiday
+                              ? _selectedHoliday?.id
+                              : null,
+                        ),
+                      );
+                      context.pop();
+                    },
             );
           },
         ),

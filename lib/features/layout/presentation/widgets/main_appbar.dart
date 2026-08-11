@@ -7,18 +7,19 @@ class MainAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
-    // تم حذف backgroundColor و elevation لأنها موروثة تلقائياً من AppTheme
     return AppBar(
       toolbarHeight: 80,
       title: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Text(
-            'مدير إجازاتي',
-            style: context.textTheme.displaySmall?.copyWith(
-              fontWeight: FontWeight.w900,
-              color: context.colorScheme.onSurface,
+          Center(
+            child: Text(
+              'مدير إجازاتي',
+              style: context.textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: context.colorScheme.primary,
+              ),
             ),
           ),
         ],

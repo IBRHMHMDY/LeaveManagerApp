@@ -7,7 +7,7 @@ import 'package:leave_manager/features/leaves/domain/entities/leave_record_entit
 import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
-import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
+import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
 
 class BuildCurrentMonthLeaves extends StatelessWidget {
   final List<LeaveRecord> leaves;
@@ -43,9 +43,9 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
             ),
           ],
         ),
-        SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.md),
         if(leaves.isEmpty && restAllowances.isEmpty)
-          const CustomEmptyState(titleEmpty: "لا توجد بيانات", contentEmpty: "لا توجد اجازات لهذا الشهر"),
+          const AppEmptyState(title: "لا توجد بيانات", content: "لا توجد اجازات لهذا الشهر"),
         
         ...leaves.map((leave) {
           return CustomLeaveCard(key: ValueKey('leave_${leave.id}'), leave: leave);

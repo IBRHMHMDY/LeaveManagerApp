@@ -28,7 +28,7 @@ class BuildBalancesSection extends StatelessWidget {
             color: context.leaveColors.regular,
           ),
         ),
-        SizedBox(width: AppSpacing.md),
+        const SizedBox(width: AppSpacing.md),
         Expanded(
           child: BalanceCircularIndicator(
             title: 'عارضة',

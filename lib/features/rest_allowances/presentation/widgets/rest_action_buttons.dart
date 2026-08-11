@@ -10,32 +10,30 @@ class RestActionButtons extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final restColor = context.leaveColors.restAllowance;
-
     return SafeArea(
       child: Padding(
-        padding: EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           children: [
             Expanded(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: restColor,
+                  backgroundColor: context.colorScheme.primary,
                 ),
                 onPressed: () => showAddExtraWorkBottomSheet(context),
                 icon: const Icon(Icons.add, size: 20),
-                label: const Text('تسجيل عمل إضافي'),
+                label: const Text('اضافه رصيد'),
               ),
             ),
-            SizedBox(width: AppSpacing.sm),
+            const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: ElevatedButton.icon(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: restColor,
+                  backgroundColor: context.colorScheme.primary,
                 ),
                 onPressed: () => showRestAllowancesBottomSheet(context),
                 icon: const Icon(Icons.add, size: 20),
-                label: const Text('استهلاك بدل راحة'),
+                label: const Text('استهلاك رصيد'),
               ),
             ),
           ],

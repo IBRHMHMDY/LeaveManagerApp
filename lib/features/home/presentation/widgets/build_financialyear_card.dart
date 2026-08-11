@@ -11,10 +11,10 @@ class BuildFinancialYearCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: context.colorScheme.primaryContainer.withOpacity(0.12), // بديل withAlpha(30)
-      shape: RoundedRectangleBorder(borderRadius: AppRadii.lg),
+      color: context.colorScheme.primaryContainer.withAlpha(30),
+      shape: RoundedRectangleBorder(borderRadius: AppRadius.lg),
       child: Padding(
-        padding: EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.md),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -29,16 +29,16 @@ class BuildFinancialYearCard extends StatelessWidget {
               ],
             ),
             Padding(
-              padding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  SizedBox(width: AppSpacing.sm),
+                  const SizedBox(width: AppSpacing.sm),
                   Text(
                     'العام المالى الحالى',
-                    style: context.textTheme.titleMedium?.copyWith(
+                    style: context.textTheme.titleLarge?.copyWith(
                       color: context.colorScheme.onSurface,
-                      fontWeight: FontWeight.w900
+                      
                     ),
                   ),
                   const SizedBox(height: 8,),

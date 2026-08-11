@@ -17,10 +17,10 @@ class ThemeSelectionSection extends StatelessWidget {
           'اعدادات النظام والتفضيلات',
           style: context.textTheme.titleLarge,
         ),
-        SizedBox(height: AppSpacing.md),
+        const SizedBox(height: AppSpacing.md),
         Container(
           decoration: BoxDecoration(
-            borderRadius: AppRadii.lg,
+            borderRadius: AppRadius.lg,
             border: Border.all(color: context.colorScheme.outline.withOpacity(0.15)),
           ),
           child: BlocBuilder<ThemeCubit, ThemeMode>(

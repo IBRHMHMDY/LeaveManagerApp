@@ -1,15 +1,15 @@
-// lib/shared/widgets/custom_tooltip.dart
+// lib/shared/widgets/displays/app_tooltip.dart
 import 'package:flutter/material.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
-class CustomTooltip extends StatelessWidget {
+class AppTooltip extends StatelessWidget {
   final String message;
   final Widget child;
   final bool preferBelow;
   final Duration waitDuration;
 
-  const CustomTooltip({
+  const AppTooltip({
     super.key,
     required this.message,
     required this.child,
@@ -23,13 +23,13 @@ class CustomTooltip extends StatelessWidget {
       message: message,
       preferBelow: preferBelow,
       waitDuration: waitDuration,
-      margin: EdgeInsets.symmetric(horizontal: AppSpacing.md),
+      margin: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
       decoration: BoxDecoration(
         color: context.colorScheme.inverseSurface,
-        borderRadius: AppRadii.sm, // استخدام ثوابت الزوايا
+        borderRadius: AppRadius.sm,
         boxShadow: [
           BoxShadow(
-            color: context.colorScheme.shadow.withOpacity(0.15), // استبدال withAlpha
+            color: context.colorScheme.shadow.withOpacity(0.15),
             blurRadius: 8,
             offset: const Offset(0, 4),
           ),

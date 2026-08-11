@@ -1,6 +1,5 @@
 // lib/features/holidays/presentation/widgets/upcoming_holiday_card.dart
 import 'package:flutter/material.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/router/app_router.dart';
@@ -20,12 +19,12 @@ class UpcomingHolidayCard extends StatelessWidget {
       onTap: () {
         context.push(AppRouter.holidays);
       },
-      borderRadius: AppRadii.lg,
+      borderRadius: AppRadius.lg,
       child: Container(
-        padding: EdgeInsets.all(AppSpacing.md),
+        padding: const EdgeInsets.all(AppSpacing.md),
         decoration: BoxDecoration(
           color: context.colorScheme.surface,
-          borderRadius: AppRadii.lg,
+          borderRadius: AppRadius.lg,
           border: Border.all(
             color: context.isDarkMode 
                 ? context.colorScheme.outline.withOpacity(0.15) 
@@ -44,7 +43,7 @@ class UpcomingHolidayCard extends StatelessWidget {
         child: Row(
           children: [
             Container(
-              padding: EdgeInsets.all(AppSpacing.sm),
+              padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
                 color: context.colorScheme.primaryContainer.withOpacity(0.6),
                 shape: BoxShape.circle,
@@ -55,26 +54,26 @@ class UpcomingHolidayCard extends StatelessWidget {
                 size: 28,
               ),
             ),
-            SizedBox(width: AppSpacing.md),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (upcomingHoliday != null)
                     Container(
-                      padding: EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                         horizontal: AppSpacing.sm,
                         vertical: AppSpacing.xs,
                       ),
                       decoration: BoxDecoration(
                         color: context.colorScheme.primary.withOpacity(0.08),
-                        borderRadius: AppRadii.xl,
+                        borderRadius: AppRadius.xl,
                       ),
                       child: Text(
                         upcomingHoliday!.daysLeft.remainingDaysText,
                         style: context.textTheme.labelSmall?.copyWith(
                           color: context.colorScheme.primary,
-                          fontSize: 12.spMax
+                          fontSize: 12
                         ),
                       ),
                     ),
@@ -83,7 +82,7 @@ class UpcomingHolidayCard extends StatelessWidget {
                       upcomingHoliday!.name,
                       style: context.textTheme.titleMedium,
                     ),
-                    SizedBox(height: AppSpacing.xs),
+                    const SizedBox(height: AppSpacing.xs),
                     Text(
                       upcomingHoliday!.startDate.toFormatFullDaysDate(),
                       style: context.textTheme.bodyMedium?.copyWith(

@@ -15,7 +15,7 @@ class AppColors {
   static const Color lightSurfaceContainerLow = Color(0xFFF5F5F5); 
   static const Color lightSurfaceContainer = Color(0xFFEEEEEE); 
   static const Color lightSurfaceContainerHighest = Color(0xFFE0E0E0); 
-  static const Color lightOutline = Color(0xFFBDBDBD);
+  static const Color lightOutline = Color(0xFF767676);
   static const Color lightOutlineVariant = Color(0xFFE0E0E0);
   static const Color lightText = Color(0xFF212529);
   static const Color lightShadow = Color(0xFF000000);
@@ -40,12 +40,12 @@ class AppColors {
   static const LeaveColors lightLeaveColors = LeaveColors(
     regular: regularLeave,
     casual: casualLeave,
-    restAllowance: restAllowance,
+    rest: restAllowance,
   );
 
   static const LeaveColors darkLeaveSColors = LeaveColors(
     regular: Color(0xFF81C784), 
     casual: Color(0xFFFFB300),
-    restAllowance: Color(0xFFB388FF),
+    rest: Color(0xFFB388FF),
   );
 }

@@ -1,15 +1,15 @@
-// lib/shared/widgets/show_bottom_sheet.dart
+// lib/shared/widgets/overlays/app_bottom_sheet.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 
-class ShowBottomSheet {
+class AppBottomSheet {
   static Future<T?> show<T>({
     required BuildContext context,
-    required IconData? icon,
-    required Color? iconColor,
-    required String? title,
+    required String title,
     required Widget child,
+    IconData? icon,
+    Color? iconColor,
     bool isScrollControlled = true,
     bool isDismissible = true,
   }) {
@@ -22,10 +22,10 @@ class ShowBottomSheet {
       builder: (BuildContext ctx) {
         return Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(ctx).bottom),
-          child: _GenericBottomSheetContent(
+          child: _BottomSheetContent(
             title: title,
-            icon: Icons.edit_calendar_rounded,
-            iconColor: iconColor,
+            icon: icon ?? Icons.widgets_rounded,
+            iconColor: iconColor ?? ctx.colorScheme.primary,
             child: child,
           ),
         );
@@ -34,13 +34,13 @@ class ShowBottomSheet {
   }
 }
 
-class _GenericBottomSheetContent extends StatelessWidget {
-  final String? title;
+class _BottomSheetContent extends StatelessWidget {
+  final String title;
   final IconData icon;
-  final Color? iconColor;
+  final Color iconColor;
   final Widget child;
 
-  const _GenericBottomSheetContent({
+  const _BottomSheetContent({
     required this.title,
     required this.icon,
     required this.iconColor,
@@ -62,29 +62,25 @@ class _GenericBottomSheetContent extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 12),
-          // 1. مقبض السحب (Drag Handle)
           Center(
             child: Container(
               width: 40,
               height: 5,
               decoration: BoxDecoration(
-                color: context.colorScheme.onSurface.withOpacity(
-                  0.2,
-                ), // استبدال withAlpha
+                color: context.colorScheme.onSurface.withOpacity(0.2),
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
           ),
           const SizedBox(height: 26),
           Padding(
-            padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
             child: Row(
-              mainAxisAlignment: MainAxisAlignment.start,
               children: [
                 Icon(icon, color: iconColor),
-                SizedBox(width: AppSpacing.sm),
+                const SizedBox(width: AppSpacing.sm),
                 Text(
-                  title!,
+                  title,
                   style: context.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.bold,
                     color: context.colorScheme.onSurface,
@@ -97,7 +93,7 @@ class _GenericBottomSheetContent extends StatelessWidget {
           Flexible(
             child: SingleChildScrollView(
               child: Padding(
-                padding: EdgeInsets.all(AppSpacing.lg),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: child,
               ),
             ),

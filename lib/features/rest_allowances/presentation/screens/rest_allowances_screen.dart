@@ -7,11 +7,11 @@ import 'package:leave_manager/features/rest_allowances/domain/entities/extra_wor
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowance_tabs.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_action_buttons.dart';
-import 'package:leave_manager/shared/widgets/custom_empty_state.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart';
+import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_segmented_tabs.dart';
+import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 
 class RestAllowancesScreen extends StatefulWidget {
   const RestAllowancesScreen({super.key});
@@ -21,7 +21,7 @@ class RestAllowancesScreen extends StatefulWidget {
 }
 
 class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
-  bool _showAvailables = true; 
+  bool _showAvailables = true;
 
   @override
   void initState() {
@@ -36,12 +36,15 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Icon(Icons.workspace_premium_outlined, color: context.colorScheme.onSurface),
-            SizedBox(width: AppSpacing.sm),
+            Icon(
+              Icons.workspace_premium_outlined,
+              color: context.colorScheme.onSurface,
+            ),
+            const SizedBox(width: AppSpacing.sm),
             Text(
-              'بدلات الراحة', 
+              'بدلات الراحة',
               style: context.textTheme.headlineMedium?.copyWith(
-                color: context.leaveColors.restAllowance,
+                color: context.leaveColors.rest,
               ),
             ),
           ],
@@ -55,9 +58,11 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
             AppToast.showError(context, state.message);
           }
         },
-        buildWhen: (previous, current) => current is RestAllowancesLoaded || current is RestAllowancesLoading,
+        buildWhen: (previous, current) =>
+            current is RestAllowancesLoaded || current is RestAllowancesLoading,
         builder: (context, state) {
-          if (state is RestAllowancesLoading || state is RestAllowancesInitial) {
+          if (state is RestAllowancesLoading ||
+              state is RestAllowancesInitial) {
             return const Center(child: CircularProgressIndicator());
           }
 
@@ -65,18 +70,29 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                RestAllowanceTabs(
-                  showAvailables: _showAvailables,
-                  availablesCount: state.availables,
-                  usageCount: state.usage,
+                // داخل دالة build في شاشة RestAllowancesScreen
+                AppSegmentedTabs<bool>(
+                  selectedValue: _showAvailables,
                   onChanged: (isAvailable) {
                     setState(() {
                       _showAvailables = isAvailable;
                     });
                   },
+                  tabs: [
+                    AppTabItem(
+                      value: true,
+                      label: 'رصيد متاح (${state.availables})',
+                    ),
+                    AppTabItem(
+                      value: false,
+                      label: 'رصيد مستهلك (${state.usage})',
+                    ),
+                  ],
                 ),
                 Expanded(
-                  child: _buildList(_showAvailables ? state.extrawork : state.rest),
+                  child: _buildList(
+                    _showAvailables ? state.extrawork : state.rest,
+                  ),
                 ),
               ],
             );
@@ -91,14 +107,17 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
 
   Widget _buildList(List<ExtraWorkRecord> extrawork) {
     if (extrawork.isEmpty) {
-      return const CustomEmptyState(
-        titleEmpty: 'لا توجد بيانات', 
-        contentEmpty: 'لا توجد سجلات لعرضها هنا.',
+      return const AppEmptyState(
+        title: 'لا توجد بيانات',
+        content: 'لا توجد سجلات لعرضها هنا.',
       );
     }
 
     return ListView.builder(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
       itemCount: extrawork.length,
       itemBuilder: (context, index) {
         return RestAllowancesCard(extrawork: extrawork[index]);

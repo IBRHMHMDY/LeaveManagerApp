@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/app_version.dart';
 import 'package:leave_manager/features/splash/presentation/widgets/custom_app_logo.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
@@ -12,8 +13,7 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
-import 'package:leave_manager/shared/widgets/current_version.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart';
+import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -187,7 +187,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                       ),
                     ),
                     const SizedBox(height: 16),
-                    const CurrentVersion(),
+                    const AppVersion(),
                   ],
                 ),
               ),

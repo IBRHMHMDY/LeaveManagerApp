@@ -11,7 +11,7 @@ import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dar
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
-import 'package:leave_manager/features/home/presentation/widgets/rest_allowance_stats_card.dart';
+import 'package:leave_manager/features/home/presentation/widgets/rest_stats_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/home/presentation/widgets/balances_loading_shimmer.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_balances_section.dart';
@@ -20,7 +20,7 @@ import 'package:leave_manager/features/home/presentation/widgets/build_financial
 import 'package:leave_manager/features/home/presentation/widgets/welcome_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_alert_banners.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart';
+import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -81,7 +81,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   await context.read<HomeCubit>().loadHomeData();
                 },
                 child: ListView(
-                  padding: EdgeInsets.symmetric(
+                  padding: const EdgeInsets.symmetric(
                     horizontal: AppSpacing.md,
                     vertical: AppSpacing.md,
                   ),
@@ -90,9 +90,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       employeeName: state.settings.employeeName,
                       role: state.settings.jobTitle,
                     ),
-                    SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     const BuildFinancialYearCard(),
-                    SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     BlocBuilder<HolidaysCubit, HolidaysState>(
                       builder: (context, holidayState) {
                         if (holidayState is HolidaysLoaded) {
@@ -101,13 +101,13 @@ class _HomeScreenState extends State<HomeScreen> {
                               UpcomingHolidayCard(
                                 upcomingHoliday: holidayState.upcomingHoliday,
                               ),
-                              SizedBox(height: AppSpacing.md),
+                              const SizedBox(height: AppSpacing.md),
                             ],
                           );
                         }
-                        return Column(
+                        return const Column(
                           children: [
-                            const UpcomingHolidayCard(upcomingHoliday: null),
+                            UpcomingHolidayCard(upcomingHoliday: null),
                             SizedBox(height: AppSpacing.md),
                           ],
                         );
@@ -122,13 +122,13 @@ class _HomeScreenState extends State<HomeScreen> {
                       balance: state.balance,
                       settings: state.settings,
                     ),
-                    SizedBox(height: AppSpacing.md),
+                    const SizedBox(height: AppSpacing.md),
                     BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
                       builder: (context, restState) { 
                         if (restState is RestAllowancesLoaded) {
                           return Column(
                             children: [
-                              RestAllowanceStatsCard(
+                              RestStatsCard(
                                 totalAvailableDays: restState.availables, 
                                 totalConsumedDays: restState.usage,
                               ),
@@ -138,7 +138,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         return const SizedBox.shrink();
                       },
                     ),
-                    SizedBox(height: AppSpacing.lg),
+                    const SizedBox(height: AppSpacing.lg),
     
                     BuildCurrentMonthLeaves(
                       leaves: state.currentMonthLeaves,

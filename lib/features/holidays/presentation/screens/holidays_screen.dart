@@ -35,7 +35,7 @@ class HolidaysScreen extends StatelessWidget {
               );
             }
             return ListView.builder(
-              padding: EdgeInsets.all(AppSpacing.md),
+              padding: const EdgeInsets.all(AppSpacing.md),
               itemCount: holidays.length,
               itemBuilder: (context, index) {
                 final holiday = holidays[index];
@@ -60,11 +60,11 @@ class HolidaysScreen extends StatelessWidget {
         : context.colorScheme.onSurface;
 
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.md),
-      padding: EdgeInsets.all(AppSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: cardColor,
-        borderRadius: AppRadii.lg,
+        borderRadius: AppRadius.lg,
         border: Border.all(
           color: context.colorScheme.outline.withOpacity(0.15),
         ),
@@ -82,7 +82,7 @@ class HolidaysScreen extends StatelessWidget {
                     decoration: isPast ? TextDecoration.lineThrough : null,
                   ),
                 ),
-                SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: AppSpacing.sm),
                 Row(
                   children: [
                     Icon(
@@ -90,7 +90,7 @@ class HolidaysScreen extends StatelessWidget {
                       size: 14,
                       color: context.colorScheme.onSurfaceVariant,
                     ),
-                    SizedBox(width: AppSpacing.xs),
+                    const SizedBox(width: AppSpacing.xs),
                     Expanded(
                       child: Text(
                         _formatDateRange(holiday.startDate, holiday.endDate),
@@ -105,12 +105,12 @@ class HolidaysScreen extends StatelessWidget {
             ),
           ),
           Container(
-            padding: EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
               color: isPast
                   ? context.colorScheme.onSurface.withOpacity(0.06)
                   : context.colorScheme.primary.withOpacity(0.12),
-              borderRadius: AppRadii.md,
+              borderRadius: AppRadius.md,
             ),
             child: Column(
               mainAxisSize: MainAxisSize.min,

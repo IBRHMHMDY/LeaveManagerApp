@@ -1,29 +1,34 @@
+// lib/shared/widgets/overlays/app_confirm_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
-class ConfirmDeleteDialog extends StatelessWidget {
-  final String titleDialog;
-  final String contentDialog;
-  final VoidCallback onPressedButton;
+class AppConfirmDialog extends StatelessWidget {
+  final String title;
+  final String content;
+  final VoidCallback onConfirm;
+  final String confirmText;
+  final String cancelText;
 
-  const ConfirmDeleteDialog({
+  const AppConfirmDialog({
     super.key,
-    required this.titleDialog,
-    required this.contentDialog,
-    required this.onPressedButton,
+    required this.title,
+    required this.content,
+    required this.onConfirm,
+    this.confirmText = 'تأكيد',
+    this.cancelText = 'إلغاء',
   });
 
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      title: Text(titleDialog),
-      content: Text(contentDialog),
+      title: Text(title),
+      content: Text(content),
       actionsAlignment: MainAxisAlignment.end,
       actions: [
         TextButton(
           onPressed: () => context.pop(false),
-          child: const Text('إلغاء'),
+          child: Text(cancelText),
         ),
         FilledButton(
           style: FilledButton.styleFrom(
@@ -31,8 +36,8 @@ class ConfirmDeleteDialog extends StatelessWidget {
             foregroundColor: context.colorScheme.onError,
             elevation: 0,
           ),
-          onPressed: onPressedButton,
-          child: const Text('تأكيد الحذف'),
+          onPressed: onConfirm,
+          child: Text(confirmText),
         ),
       ],
     );

@@ -14,9 +14,10 @@ import 'package:leave_manager/features/settings/domain/entities/settings_entity.
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/danger_zone_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_form_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/theme_selection_section.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart';
+import 'package:leave_manager/shared/widgets/widgets.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isFirstTime;
@@ -111,7 +112,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           ),
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(AppSpacing.md),
+          padding: const EdgeInsets.all(AppSpacing.md),
           child: Form(
             key: _formKey,
             child: Column(
@@ -123,29 +124,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   regularLeavesController: _regularLeavesController,
                   casualLeavesController: _casualLeavesController,
                 ),
-                SizedBox(height: AppSpacing.lg),
+                const SizedBox(height: AppSpacing.lg),
+                // Theme Toggle
                 const ThemeSelectionSection(),
-                SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.xl),
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
                     final isLoading = state is SettingsLoading;
-                    return ElevatedButton(
+                    return AppPrimaryButton(
                       onPressed: isLoading ? null : _saveSettings,
-                      // التنسيق الآن موروث تلقائياً من AppTheme
-                      child: isLoading
-                          ? SizedBox(
-                              height: 24,
-                              width: 24,
-                              child: CircularProgressIndicator(
-                                color: context.colorScheme.onPrimary,
-                                strokeWidth: 2,
-                              ),
-                            )
-                          : const Text('حفظ الإعدادات'),
+                      label: 'حفظ الإعدادات',
+                      backgroundColor: context.colorScheme.primary,
+                      foregroundColor: context.colorScheme.onPrimary,
                     );
                   },
                 ),
-                SizedBox(height: AppSpacing.xl),
+                const SizedBox(height: AppSpacing.xl),
+                const DangerZoneSection(),
               ],
             ),
           ),

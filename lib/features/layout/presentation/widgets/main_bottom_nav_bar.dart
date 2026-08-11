@@ -13,8 +13,6 @@ class MainBottomNavBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // جميع الألوان، الظلال، وحالات الـ (Selected/Unselected) 
-    // يتم التحكم بها الآن مركزياً من خلال NavigationBarTheme في AppTheme
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: onTabChanged,

@@ -1,0 +1,22 @@
+// lib/shared/widgets/widgets.dart
+// --- Inputs ---
+export 'inputs/app_text_field.dart';
+export 'inputs/app_dropdown_field.dart';
+export 'inputs/app_date_range_picker.dart';
+export 'inputs/app_filter_chips.dart';
+export 'inputs/app_segmented_tabs.dart';
+export 'inputs/app_number_counter.dart';
+// --- Displays ---
+export 'displays/app_badge.dart';
+export 'displays/app_empty_state.dart';
+export 'displays/app_tooltip.dart';
+export 'displays/app_version_display.dart';
+// --- Buttons ---
+export 'buttons/app_floating_button.dart'; // الزر العائم
+export 'buttons/app_outlined_button.dart';
+export 'buttons/app_primary_button.dart';
+export 'buttons/app_text_button.dart';
+// --- Overlays ---
+export 'overlays/app_confirm_dialog.dart';
+export 'overlays/app_bottom_sheet.dart';
+export 'overlays/app_toast.dart';

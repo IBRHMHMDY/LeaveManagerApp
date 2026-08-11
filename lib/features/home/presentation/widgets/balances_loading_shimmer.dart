@@ -12,7 +12,7 @@ class BalancesLoadingShimmer extends StatelessWidget {
     return Row(
       children: [
         Expanded(child: _buildShimmerCard(context)),
-        SizedBox(width: AppSpacing.md),
+        const SizedBox(width: AppSpacing.md),
         Expanded(child: _buildShimmerCard(context)),
       ],
     );
@@ -24,7 +24,7 @@ class BalancesLoadingShimmer extends StatelessWidget {
       highlightColor: context.colorScheme.surface,
       child: Card(
         elevation: 0,
-        shape: RoundedRectangleBorder(borderRadius: AppRadii.xl),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.xl),
         child: const SizedBox(
           height: 200,
           width: double.infinity,

@@ -11,7 +11,7 @@ abstract final class LightTheme {
       surface: AppColors.lightSurface,
       surfaceContainerHighest: AppColors.lightSurfaceContainerHighest,
       surfaceContainer: AppColors.lightSurfaceContainer,
-      onSurface: Color(0xFF737578),
+      onSurface: Color(0xFF262728),
       onSurfaceVariant: Color(0xFF5F6368),
       error: Colors.redAccent,
       shadow: AppColors.lightShadow,
@@ -69,11 +69,11 @@ abstract final class LightTheme {
 
       // --- Card Theme ---
       cardTheme: CardThemeData(
-        color: AppColors.lightSurfaceContainerLow,
+        color: AppColors.lightSurfaceContainerHighest,
         elevation: 1,
-        shadowColor: colorScheme.shadow.withOpacity(0.1),
+        shadowColor: colorScheme.shadow.withAlpha(10),
         shape: RoundedRectangleBorder(
-          borderRadius: AppRadii.lg,
+          borderRadius: AppRadius.lg,
           side: BorderSide.none,
         ),
         margin: EdgeInsets.zero,
@@ -83,7 +83,7 @@ abstract final class LightTheme {
       dialogTheme: DialogThemeData(
         backgroundColor: colorScheme.surface,
         elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: AppRadii.lg),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.lg),
         titleTextStyle: AppTypography.getTheme(AppColors.lightText).titleLarge,
         contentTextStyle: AppTypography.getTheme(
           AppColors.lightText,
@@ -104,24 +104,24 @@ abstract final class LightTheme {
       inputDecorationTheme: InputDecorationTheme(
         filled: false,
         fillColor: colorScheme.surfaceContainerHighest,
-        contentPadding: EdgeInsets.symmetric(
+        contentPadding: const EdgeInsets.symmetric(
           horizontal: AppSpacing.md,
           vertical: AppSpacing.md,
         ),
         border: OutlineInputBorder(
-          borderRadius: AppRadii.md,
-          borderSide: BorderSide.none,
+          borderRadius: AppRadius.md,
+          borderSide: const BorderSide(color: AppColors.lightOutline),
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: AppRadii.md,
-          borderSide: BorderSide.none,
+          borderRadius: AppRadius.md,
+          borderSide: BorderSide(color: colorScheme.outline.withAlpha(40)),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: AppRadii.md,
+          borderRadius: AppRadius.md,
           borderSide: BorderSide(color: colorScheme.primary, width: 1.5),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: AppRadii.md,
+          borderRadius: AppRadius.md,
           borderSide: BorderSide(color: colorScheme.error, width: 1.5),
         ),
       ),
@@ -132,19 +132,19 @@ abstract final class LightTheme {
           elevation: 0,
           backgroundColor: colorScheme.primary,
           foregroundColor: colorScheme.onPrimary,
-          shape: RoundedRectangleBorder(borderRadius: AppRadii.md),
-          padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.md),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
         style: OutlinedButton.styleFrom(
           foregroundColor: colorScheme.primary,
           side: BorderSide(
-            color: colorScheme.primary.withOpacity(0.5),
+            color: colorScheme.primary,
             width: 1.5,
           ),
-          shape: RoundedRectangleBorder(borderRadius: AppRadii.md),
-          padding: EdgeInsets.symmetric(
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.md),
+          padding: const EdgeInsets.symmetric(
             vertical: AppSpacing.md,
             horizontal: AppSpacing.md,
           ),
@@ -153,20 +153,20 @@ abstract final class LightTheme {
       textButtonTheme: TextButtonThemeData(
         style: TextButton.styleFrom(
           foregroundColor: colorScheme.onSurfaceVariant,
-          shape: RoundedRectangleBorder(borderRadius: AppRadii.md),
+          shape: RoundedRectangleBorder(borderRadius: AppRadius.md),
         ),
       ),
       floatingActionButtonTheme: FloatingActionButtonThemeData(
         backgroundColor: colorScheme.primary,
         foregroundColor: colorScheme.onPrimary,
         elevation: 3,
-        shape: RoundedRectangleBorder(borderRadius: AppRadii.md),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.md),
       ),
 
       // --- ListTile & Switch Theme ---
       listTileTheme: ListTileThemeData(
-        contentPadding: EdgeInsets.symmetric(horizontal: AppSpacing.md),
-        shape: RoundedRectangleBorder(borderRadius: AppRadii.md),
+        contentPadding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+        shape: RoundedRectangleBorder(borderRadius: AppRadius.md),
       ),
       switchTheme: SwitchThemeData(
         thumbColor: WidgetStateProperty.resolveWith((states) {

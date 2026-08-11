@@ -1,9 +1,12 @@
 // lib/features/settings/presentation/widgets/show_about_developer.dart
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
-import 'package:leave_manager/shared/widgets/current_version.dart';
+import 'package:leave_manager/features/settings/presentation/cubit/app_version_cubit.dart';
+import 'package:leave_manager/features/settings/presentation/cubit/app_version_state.dart';
+import 'package:leave_manager/shared/widgets/displays/app_version_display.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:leave_manager/features/splash/presentation/widgets/custom_app_logo_icon.dart';
 
@@ -55,7 +58,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -65,30 +68,47 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
             height: 5,
             decoration: BoxDecoration(
               color: context.colorScheme.onSurface.withOpacity(0.2),
-              borderRadius: AppRadii.sm,
+              borderRadius: AppRadius.sm,
             ),
           ),
-          SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.xl),
 
           // 2. شعار التطبيق
           const CustomAppLogoIcon(),
-          SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.md),
 
           // 3. اسم التطبيق وإصداره
           Text(
             'مدير اجازاتى',
             style: context.textTheme.headlineLarge,
           ),
-          SizedBox(height: AppSpacing.sm),
-          const CurrentVersion(),
-          SizedBox(height: AppSpacing.xl),
+          const SizedBox(height: AppSpacing.sm),
+          BlocProvider(
+            create: (context) => AppVersionCubit()..fetchVersion(),
+            child: BlocBuilder<AppVersionCubit, AppVersionState>(
+              builder: (context, state) {
+                if (state is AppVersionLoading) {
+                  return const AppVersionDisplay(
+                    version: '', 
+                    isLoading: true, // سيعرض مؤشر التحميل
+                  );
+                } else if (state is AppVersionLoaded) {
+                  return AppVersionDisplay(
+                    version: state.version, // سيعرض رقم الإصدار
+                  );
+                }
+                return const SizedBox.shrink();
+              },
+            ),
+          ),
+          const SizedBox(height: AppSpacing.xl),
 
           // 4. بطاقة معلومات المطور
           Container(
-            padding: EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
               color: context.colorScheme.surfaceContainerHighest.withOpacity(0.4),
-              borderRadius: AppRadii.lg,
+              borderRadius: AppRadius.lg,
               border: Border.all(color: context.colorScheme.outline.withOpacity(0.2)),
             ),
             child: Column(
@@ -101,9 +121,9 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
                     height: 1.5,
                   ),
                 ),
-                SizedBox(height: AppSpacing.md),
+                const SizedBox(height: AppSpacing.md),
                 const Divider(),
-                SizedBox(height: AppSpacing.sm),
+                const SizedBox(height: AppSpacing.sm),
                 Text(
                   'تطوير وتصميم',
                   style: context.textTheme.labelMedium?.copyWith(
@@ -119,7 +139,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
               ],
             ),
           ),
-          SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
 
           // 5. زر التواصل عبر واتساب
           ElevatedButton.icon(
@@ -132,7 +152,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
             label: const Text('تواصل عبر واتساب'),
             onPressed: _launchWhatsApp,
           ),
-          SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
 
           // 6. زر التواصل عبر البريد
           OutlinedButton.icon(
@@ -144,14 +164,14 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
             onPressed: _launchEmail,
           ),
           
-          SizedBox(height: AppSpacing.lg),
+          const SizedBox(height: AppSpacing.lg),
           
           // 7. حقوق الملكية
           Text(
             '© ${DateTime.now().year} جميع الحقوق محفوظة',
             style: context.textTheme.bodySmall,
           ),
-          SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.md),
         ],
       ),
     );

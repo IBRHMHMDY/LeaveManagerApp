@@ -1,42 +1,44 @@
-// lib/shared/widgets/custom_empty_state.dart
+// lib/shared/widgets/displays/app_empty_state.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
-class CustomEmptyState extends StatelessWidget {
-  final String titleEmpty;
-  final String contentEmpty;
+class AppEmptyState extends StatelessWidget {
+  final String title;
+  final String content;
+  final IconData icon;
 
-  const CustomEmptyState({
+  const AppEmptyState({
     super.key,
-    required this.titleEmpty,
-    required this.contentEmpty,
+    required this.title,
+    required this.content,
+    this.icon = Icons.event_busy_rounded, // توفير المرونة لتغيير الأيقونة
   });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.lg),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Icon(
-              Icons.event_busy_rounded, 
+              icon,
               size: 80,
-              color: context.colorScheme.outlineVariant, 
+              color: context.colorScheme.outlineVariant,
             ),
-            SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.lg),
             Text(
-              titleEmpty,
+              title,
               style: context.textTheme.titleMedium?.copyWith(
                 color: context.colorScheme.onSurfaceVariant,
               ),
               textAlign: TextAlign.center,
             ),
-            SizedBox(height: AppSpacing.sm),
+            const SizedBox(height: AppSpacing.sm),
             Text(
-              contentEmpty,
+              content,
               style: context.textTheme.bodyMedium?.copyWith(
                 color: context.colorScheme.outline,
               ),

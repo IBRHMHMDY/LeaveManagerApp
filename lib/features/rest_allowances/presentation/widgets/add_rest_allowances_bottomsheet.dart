@@ -10,18 +10,20 @@ import 'package:leave_manager/features/rest_allowances/domain/entities/extra_wor
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
-import 'package:leave_manager/shared/widgets/custom_date_range_picker_field.dart';
-import 'package:leave_manager/shared/widgets/custom_text_field.dart';
-import 'package:leave_manager/shared/widgets/show_bottom_sheet.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart';
+import 'package:leave_manager/shared/widgets/buttons/app_primary_button.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_date_range_picker.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_dropdown_field.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_text_field.dart';
+import 'package:leave_manager/shared/widgets/overlays/app_bottom_sheet.dart';
+import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 import 'package:leave_manager/core/utils/enums/work_reason.dart';
 
 void showRestAllowancesBottomSheet(BuildContext context) {
-  ShowBottomSheet.show(
+  AppBottomSheet.show(
     context: context,
-    title: 'استهلاك بدل راحة',
+    title: 'استهلاك رصيد',
     icon: Icons.event_available_rounded,
-    iconColor: context.leaveColors.restAllowance,
+    iconColor: context.colorScheme.primary,
     isScrollControlled: true,
     child: const _AddRestAllowancesForm(),
   );
@@ -48,11 +50,12 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
 
   @override
   Widget build(BuildContext context) {
-    final restColor = context.leaveColors.restAllowance; 
     final blockedDates = context.getBlockedDates();
-    DateTime effectiveFirstDate = FinancialYearCalculator.currentFinancialYearStart;
+    DateTime effectiveFirstDate =
+        FinancialYearCalculator.currentFinancialYearStart;
 
-    if (_selectedRecord != null && _selectedRecord!.workStartDate.isAfter(effectiveFirstDate)) {
+    if (_selectedRecord != null &&
+        _selectedRecord!.workStartDate.isAfter(effectiveFirstDate)) {
       effectiveFirstDate = _selectedRecord!.workStartDate;
     }
 
@@ -64,22 +67,25 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
           builder: (context, state) {
             if (state is RestAllowancesLoaded) {
               final availables = state.extrawork;
-              
-              final bool recordExists = availables.any((record) => record == _selectedRecord);
-              final ExtraWorkRecord? validSelectedRecord = recordExists ? _selectedRecord : null;
-              
+
+              final bool recordExists = availables.any(
+                (record) => record == _selectedRecord,
+              );
+              final ExtraWorkRecord? validSelectedRecord = recordExists
+                  ? _selectedRecord
+                  : null;
+
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  DropdownButtonFormField<ExtraWorkRecord>(
+                  AppDropdownField<ExtraWorkRecord>(
                     value: validSelectedRecord,
-                    dropdownColor: context.colorScheme.surface,
-                    decoration: InputDecoration(
-                      labelText: 'اختر الرصيد المراد استهلاكه',
-                      prefixIcon: Icon(Icons.link_rounded, color: restColor), 
-                    ),
+                    label: 'اختر الرصيد المراد استهلاكه',
+                    prefixIcon: Icons.link_rounded,
                     items: availables.map((record) {
-                      final title = record.workReason == WorkReason.holiday ? 'عطلة رسمية' : 'عمل إضافي';
+                      final title = record.workReason == WorkReason.holiday
+                          ? 'عطلة رسمية'
+                          : 'عمل إضافي';
                       return DropdownMenuItem<ExtraWorkRecord>(
                         value: record,
                         child: Text('$title (${record.daysCount} أيام)'),
@@ -93,16 +99,18 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                       });
                     },
                   ),
-                  SizedBox(height: AppSpacing.md),
-                  
-                  CustomDateRangePickerField(
+                  const SizedBox(height: AppSpacing.md),
+
+                  AppDateRangePicker(
                     startDate: _restStartDate,
                     endDate: _restEndDate,
                     hintText: 'حدد فترة الراحة',
                     firstDate: effectiveFirstDate,
                     lastDate: FinancialYearCalculator.currentFinancialYearEnd,
                     selectableDayPredicate: (day) {
-                      return !blockedDates.contains(DateTime(day.year, day.month, day.day));
+                      return !blockedDates.contains(
+                        DateTime(day.year, day.month, day.day),
+                      );
                     },
                     onDateSelected: (pickedRange) {
                       if (pickedRange != null) {
@@ -112,30 +120,37 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                         });
                       }
                     },
-                    colorIcon: restColor,
+                    colorIcon: context.colorScheme.primary,
                   ),
-                  SizedBox(height: AppSpacing.md),
-                  
-                  CustomTextField(
+                  const SizedBox(height: AppSpacing.md),
+
+                  AppTextField(
                     label: 'ملاحظات (اختياري)',
                     icon: Icons.notes_rounded,
                     controller: _notesController,
                   ),
-                  SizedBox(height: AppSpacing.lg),
-                  
-                  ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: restColor,
-                    ),
+                  const SizedBox(height: AppSpacing.lg),
+
+                  AppPrimaryButton(
+                    backgroundColor: context.colorScheme.primary,
                     onPressed: () {
-                      if (_selectedRecord == null || _restStartDate == null || _restEndDate == null) {
-                        AppToast.showError(context, 'الرجاء إكمال جميع البيانات.');
+                      if (_selectedRecord == null ||
+                          _restStartDate == null ||
+                          _restEndDate == null) {
+                        AppToast.showError(
+                          context,
+                          'الرجاء إكمال جميع البيانات.',
+                        );
                         return;
                       }
 
-                      final usedDaysCount = _restEndDate!.difference(_restStartDate!).inDays + 1;
+                      final usedDaysCount =
+                          _restEndDate!.difference(_restStartDate!).inDays + 1;
                       if (usedDaysCount > _selectedRecord!.daysCount) {
-                        AppToast.showError(context, 'أيام الراحة المطلوبة تتجاوز الرصيد المتاح.');
+                        AppToast.showError(
+                          context,
+                          'أيام الراحة المطلوبة تتجاوز الرصيد المتاح.',
+                        );
                         return;
                       }
 
@@ -150,7 +165,8 @@ class _AddRestAllowancesFormState extends State<_AddRestAllowancesForm> {
                       );
                       context.pop();
                     },
-                    child: const Text('تسجيل الاستهلاك'),
+                    label:'خصم رصيد',
+                    foregroundColor: context.colorScheme.onPrimary,
                   ),
                 ],
               );

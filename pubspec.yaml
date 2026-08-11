@@ -27,9 +27,10 @@ dependencies:
   package_info_plus: ^8.0.0     # لقراءة معلومات التطبيق برمجياً
   url_launcher: ^6.3.0          # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
   shimmer: ^3.0.0               # يعطى تاثير جمالى أثناء التحميل وقبل ظهور البيانات 
-  flutter_screenutil: ^5.9.0    # لجعل التطبيق متجاوب مع كافه الشاشات
+  # flutter_screenutil: ^5.9.0    # لجعل التطبيق متجاوب مع كافه الشاشات
   lottie: ^3.1.0
   injectable: ^2.6.0
+  calendar_date_picker2: ^3.0.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -45,13 +46,14 @@ flutter:
   # Material Icons font is
   uses-material-design: true
   assets:
+    - assets/google_fonts/
     - assets/json/animations/empty_leaves.json
     - assets/json/holidays.json
   fonts:
     - family: Cairo
       fonts:
-        - asset: assets/fonts/Cairo-Regular.ttf
-        - asset: assets/fonts/Cairo-Bold.ttf
+        - asset: assets/google_fonts/Cairo-Regular.ttf
+        - asset: assets/google_fonts/Cairo-Bold.ttf
           weight: 700
 
 flutter_native_splash:

@@ -11,9 +11,10 @@ import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
-import 'package:leave_manager/shared/widgets/custom_date_range_picker_field.dart';
-import 'package:leave_manager/shared/widgets/custom_text_field.dart';
-import 'package:leave_manager/shared/widgets/show_toast.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_date_range_picker.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_dropdown_field.dart';
+import 'package:leave_manager/shared/widgets/inputs/app_text_field.dart';
+import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 
 class AddLeaveForm extends StatefulWidget {
   const AddLeaveForm({super.key});
@@ -52,22 +53,18 @@ class AddLeaveFormState extends State<AddLeaveForm> {
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          DropdownButtonFormField<LeaveType>(
-            initialValue: _selectedType,
-            dropdownColor: context.colorScheme.surface,
-            // التنسيقات موروثة من AppTheme بالكامل
-            decoration: const InputDecoration(
-              labelText: 'نوع الإجازة',
-              prefixIcon: Icon(Icons.calendar_today),
-            ),
+          AppDropdownField<LeaveType>(
+            value: _selectedType,
+            label: 'نوع الإجازة',
+            prefixIcon: Icons.calendar_today,
             items: const [
               DropdownMenuItem(
                 value: LeaveType.regular,
-                child: Text('إجازة اعتيادية')
+                child: Text('إجازة اعتيادية'),
               ),
               DropdownMenuItem(
-                value: LeaveType.casual, 
-                child: Text('إجازة عارضة')
+                value: LeaveType.casual,
+                child: Text('إجازة عارضة'),
               ),
             ],
             onChanged: (val) {
@@ -78,13 +75,13 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               });
             },
           ),
-          SizedBox(height: AppSpacing.md),
-          CustomDateRangePickerField(
+          const SizedBox(height: AppSpacing.md),
+          AppDateRangePicker(
             startDate: _startDate,
             endDate: _endDate,
             hintText: 'حدد تاريخ البداية والنهاية',
             firstDate: FinancialYearCalculator.currentFinancialYearStart,
-            lastDate: DateTime(DateTime.now().year + 10),
+            lastDate: FinancialYearCalculator.currentFinancialYearEnd,
             selectableDayPredicate: (day) {
               final dateToCheck = DateTime(day.year, day.month, day.day);
               return !blockedDates.contains(dateToCheck);
@@ -98,13 +95,13 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               }
             },
           ),
-          SizedBox(height: AppSpacing.md),
-          CustomTextField(
+          const SizedBox(height: AppSpacing.md),
+          AppTextField(
             label: 'ملاحظات (اختياري)',
             icon: Icons.notes_rounded,
             controller: _notesController,
           ),
-          SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
           BlocBuilder<LeavesBloc, LeavesState>(
             bloc: context.read<LeavesBloc>(),
             builder: (context, state) {
@@ -142,7 +139,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
               );
             },
           ),
-          SizedBox(height: AppSpacing.md),
+          const SizedBox(height: AppSpacing.md),
         ],
       ),
     );

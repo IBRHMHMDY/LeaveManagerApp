@@ -26,7 +26,7 @@ class BalanceCircularIndicator extends StatelessWidget {
 
     return InkWell(
       onTap: () => context.go(AppRouter.leaves),
-      borderRadius: AppRadii.xl,
+      borderRadius: AppRadius.xl,
       child: Card(
         elevation: isDark ? 0 : 4,
         shadowColor: isDark ? Colors.transparent : context.colorScheme.shadow.withOpacity(0.08),
@@ -36,10 +36,10 @@ class BalanceCircularIndicator extends StatelessWidget {
             color: color.withOpacity(isDark ? 0.4 : 1.0),
             width: 1.5,
           ),
-          borderRadius: AppRadii.xl,
+          borderRadius: AppRadius.xl,
         ),
         child: Padding(
-          padding: EdgeInsets.symmetric(vertical: AppSpacing.lg, horizontal: AppSpacing.md),
+          padding: const EdgeInsets.symmetric(vertical: AppSpacing.lg, horizontal: AppSpacing.md),
           child: Column(
             children: [
               Text(
@@ -49,7 +49,7 @@ class BalanceCircularIndicator extends StatelessWidget {
                   color: context.colorScheme.onSurface,
                 ),
               ),
-              SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.md),
               Stack(
                 alignment: Alignment.center,
                 children: [

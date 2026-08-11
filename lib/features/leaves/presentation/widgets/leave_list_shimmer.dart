@@ -10,7 +10,7 @@ class LeaveListShimmer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView.builder(
-      padding: EdgeInsets.symmetric(
+      padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
@@ -20,11 +20,11 @@ class LeaveListShimmer extends StatelessWidget {
           baseColor: context.colorScheme.surfaceContainerHighest,
           highlightColor: context.colorScheme.surface,
           child: Container(
-            margin: EdgeInsets.only(bottom: AppSpacing.md),
+            margin: const EdgeInsets.only(bottom: AppSpacing.md),
             height: 100, // ارتفاع متوافق مع البطاقة القياسية
             decoration: BoxDecoration(
               color: context.colorScheme.surface,
-              borderRadius: AppRadii.lg, 
+              borderRadius: AppRadius.lg, 
             ),
           ),
         );

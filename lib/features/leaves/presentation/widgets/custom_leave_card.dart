@@ -9,7 +9,7 @@ import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
-import 'package:leave_manager/shared/widgets/confirm_delete_dialog.dart';
+import 'package:leave_manager/shared/widgets/widgets.dart';
 
 class CustomLeaveCard extends StatelessWidget {
   final LeaveRecord leave;
@@ -39,10 +39,12 @@ class CustomLeaveCard extends StatelessWidget {
   Future<bool?> _showConfirmDeleteDialog(BuildContext context) async {
     return await showDialog<bool>(
       context: context,
-      builder: (ctx) => ConfirmDeleteDialog(
-        titleDialog: 'حذف الإجازة',
-        contentDialog: 'هل أنت متأكد من رغبتك في حذف سجل الإجازة هذا؟ سيتم إعادة رصيد الأيام تلقائياً.',
-        onPressedButton: () => ctx.pop(true),
+      builder: (ctx) => AppConfirmDialog(
+        title: 'حذف الإجازة',
+        content: 'هل أنت متأكد من رغبتك في حذف سجل الإجازة هذا؟ سيتم إعادة رصيد الأيام تلقائياً.',
+        onConfirm: () => ctx.pop(true),
+        confirmText: 'حذف ',
+        cancelText: 'تراجع',
       ),
     );
   }
@@ -54,13 +56,13 @@ class _DismissibleBackground extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       decoration: BoxDecoration(
         color: context.colorScheme.error,
-        borderRadius: AppRadii.lg,
+        borderRadius: AppRadius.lg,
       ),
       alignment: AlignmentDirectional.centerEnd,
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
       child: Icon(Icons.delete_sweep_rounded, color: context.colorScheme.onError, size: 28),
     );
   }
@@ -80,11 +82,11 @@ class _LeaveCardContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(bottom: AppSpacing.md),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       clipBehavior: Clip.antiAlias,
       decoration: BoxDecoration(
         color: context.colorScheme.surface,
-        borderRadius: AppRadii.lg,
+        borderRadius: AppRadius.lg,
         border: Border.all(
           color: context.colorScheme.outline.withOpacity(0.15),
           width: 1,
@@ -97,7 +99,7 @@ class _LeaveCardContent extends StatelessWidget {
             Container(width: 6, color: color),
             Expanded(
               child: Padding(
-                padding: EdgeInsets.all(AppSpacing.md),
+                padding: const EdgeInsets.all(AppSpacing.md),
                 child: Row(
                   children: [
                     Expanded(
@@ -107,7 +109,7 @@ class _LeaveCardContent extends StatelessWidget {
                         isRegular: isRegular,
                       ),
                     ),
-                    SizedBox(width: AppSpacing.md),
+                    const SizedBox(width: AppSpacing.md),
                     _LeaveDaysBox(color: color, daysCount: leave.daysCount),
                   ],
                 ),
@@ -137,21 +139,21 @@ class _LeaveDetails extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Container(
-          padding: EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
           decoration: BoxDecoration(
             color: color.withOpacity(0.08),
-            borderRadius: AppRadii.xl,
+            borderRadius: AppRadius.xl,
           ),
           child: Text(
             isRegular ? 'إجازة اعتيادية' : 'إجازة عارضة',
             style: context.textTheme.labelMedium?.copyWith(color: color),
           ),
         ),
-        SizedBox(height: AppSpacing.sm),
+        const SizedBox(height: AppSpacing.sm),
         Row(
           children: [
             Icon(Icons.calendar_today_rounded, size: 16, color: context.colorScheme.onSurfaceVariant),
-            SizedBox(width: AppSpacing.xs),
+            const SizedBox(width: AppSpacing.xs),
             Expanded(
               child: Text(
                 leave.startDate.isAtSameMomentAs(leave.endDate)
@@ -165,18 +167,18 @@ class _LeaveDetails extends StatelessWidget {
           ],
         ),
         if (leave.notes != null && leave.notes!.isNotEmpty) ...[
-          SizedBox(height: AppSpacing.sm),
+          const SizedBox(height: AppSpacing.sm),
           Container(
-            padding: EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.all(AppSpacing.sm),
             decoration: BoxDecoration(
               color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
-              borderRadius: AppRadii.sm,
+              borderRadius: AppRadius.sm,
             ),
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Icon(Icons.notes_rounded, size: 14, color: context.colorScheme.onSurfaceVariant),
-                SizedBox(width: AppSpacing.xs),
+                const SizedBox(width: AppSpacing.xs),
                 Expanded(
                   child: Text(
                     '${leave.notes}',
@@ -203,10 +205,10 @@ class _LeaveDaysBox extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
       decoration: BoxDecoration(
         color: color.withOpacity(0.06),
-        borderRadius: AppRadii.lg,
+        borderRadius: AppRadius.lg,
         border: Border.all(color: color.withOpacity(0.12)),
       ),
       child: Column(
