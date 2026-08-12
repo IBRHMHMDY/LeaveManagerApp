@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 extension DateFormatting on DateTime {
   /// يُرجع التاريخ حسب هيئة التاريخ فى جهازك (مثال: 23-07-2026)
   String toFormatCurrentLocale() {
-    return DateFormat('yyyy-MM-dd', Intl.getCurrentLocale()).format(this);
+    return DateFormat('yyyy/MM/dd', Intl.getCurrentLocale()).format(this);
   }
 
   /// يُرجع التاريخ كامل مع اسم الشهر واليوم (مثال: الخميس 23 يوليو 2026)
@@ -31,5 +31,14 @@ extension DateFormatting on DateTime {
     return short
         ? '${toFormatDayMonth()} - ${end.toFormatDayMonth()}'
         : '${toFormatFull()} - ${end.toFormatFull()}';
+  }
+
+  /// يُرجع نطاق زمني بين تاريخين بصيغة ذكية بناءً على المعامل [short]
+  String toFullDateRangeString(DateTime end) {
+    // this تشير إلى كائن الـ DateTime الحالي الذي نستدعي منه الدالة (startDate)
+    if (isAtSameMomentAs(end)) {
+      return toFormatFullDaysDate();
+    }
+    return '${toFormatDayMonth()} - ${end.toFormatFull()}';
   }
 }

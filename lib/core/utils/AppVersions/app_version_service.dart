@@ -1,6 +1,6 @@
 import 'package:package_info_plus/package_info_plus.dart';
 
-class AppInfoHelper {
+class AppVersionService {
   /// جلب رقم الإصدار فقط
   static Future<String> getVersionOnly() async {
     final PackageInfo packageInfo = await PackageInfo.fromPlatform();

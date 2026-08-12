@@ -18,8 +18,8 @@ class DangerZoneSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        const SizedBox(height: AppSpacing.md),
         const Divider(),
         const SizedBox(height: AppSpacing.md),
         AppOutlinedButton(

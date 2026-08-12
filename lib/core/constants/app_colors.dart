@@ -6,7 +6,8 @@ class AppColors {
   // --- Primary Colors ---
   static const Color primaryTealLight = Color(0xFF008080);
   static const Color primaryTealDark = Color(0xFF4DB6AC); 
-  static const Color whatsappColor = Color(0xFF25D366);
+  static const Color whatsappBGColor = Color(0xFF128c7e);
+  static const Color whatsappFGColor = Color(0xFFFEFEFE);
 
   // --- Material 3 Surface Colors (Light) ---
   // تم تعريف الدرجات صراحة لتجنب استخدام withAlpha()

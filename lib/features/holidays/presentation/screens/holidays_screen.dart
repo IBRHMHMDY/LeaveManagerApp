@@ -2,10 +2,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/financial_year_calculator.dart';
+import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
-import 'package:intl/intl.dart';
+import 'package:leave_manager/shared/widgets/displays/app_app_bar.dart';
+import 'package:leave_manager/shared/widgets/displays/app_badge.dart';
+import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
 
 class HolidaysScreen extends StatelessWidget {
   const HolidaysScreen({super.key});
@@ -13,7 +18,24 @@ class HolidaysScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('العطلات الرسمية'), centerTitle: true),
+      appBar: AppAppBar(
+        customTitle: Column(
+          children: [
+            Text(
+              'العطلات الرسميه',
+              style: context.textTheme.displaySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: context.colorScheme.primary,
+              ),
+            ),
+            const SizedBox(height: 8),
+            AppBadge(
+              title: FinancialYearCalculator.financialYearString,
+              textColor: context.colorScheme.onSurface,
+            ),
+          ],
+        ),
+      ),
       body: BlocBuilder<HolidaysCubit, HolidaysState>(
         builder: (context, state) {
           if (state is HolidaysLoading || state is HolidaysInitial) {
@@ -25,13 +47,9 @@ class HolidaysScreen extends StatelessWidget {
           if (state is HolidaysLoaded) {
             final holidays = state.financialYearHolidays;
             if (holidays.isEmpty) {
-              return Center(
-                child: Text(
-                  'لا توجد عطلات مسجلة',
-                  style: context.textTheme.titleMedium?.copyWith(
-                    color: context.colorScheme.onSurfaceVariant,
-                  ),
-                ),
+              return const AppEmptyState(
+                title: 'فشل فى قراءه العطلات',
+                content: 'من فضلك اتصل بالدعم لإصلاح المشكله',
               );
             }
             return ListView.builder(
@@ -50,11 +68,11 @@ class HolidaysScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildHolidayCard(BuildContext context, holiday, bool isPast) {
+  Widget _buildHolidayCard(BuildContext context, Holiday holiday, bool isPast) {
     final cardColor = isPast
         ? context.colorScheme.surfaceContainerHighest.withOpacity(0.4)
         : context.colorScheme.surface;
-        
+
     final textColor = isPast
         ? context.colorScheme.onSurfaceVariant
         : context.colorScheme.onSurface;
@@ -93,7 +111,9 @@ class HolidaysScreen extends StatelessWidget {
                     const SizedBox(width: AppSpacing.xs),
                     Expanded(
                       child: Text(
-                        _formatDateRange(holiday.startDate, holiday.endDate),
+                        holiday.startDate.toFullDateRangeString(
+                          holiday.endDate,
+                        ),
                         style: context.textTheme.bodyMedium?.copyWith(
                           color: context.colorScheme.onSurfaceVariant,
                         ),
@@ -105,7 +125,10 @@ class HolidaysScreen extends StatelessWidget {
             ),
           ),
           Container(
-            padding: const EdgeInsets.all(AppSpacing.sm),
+            padding: const EdgeInsets.symmetric(
+              horizontal: AppSpacing.md,
+              vertical: AppSpacing.sm,
+            ),
             decoration: BoxDecoration(
               color: isPast
                   ? context.colorScheme.onSurface.withOpacity(0.06)
@@ -118,13 +141,17 @@ class HolidaysScreen extends StatelessWidget {
                 Text(
                   '${holiday.daysCount}',
                   style: context.textTheme.headlineMedium?.copyWith(
-                    color: isPast ? context.colorScheme.onSurfaceVariant : context.colorScheme.primary,
+                    color: isPast
+                        ? context.colorScheme.onSurfaceVariant
+                        : context.colorScheme.primary,
                   ),
                 ),
                 Text(
                   'أيام',
                   style: context.textTheme.labelSmall?.copyWith(
-                    color: isPast ? context.colorScheme.onSurfaceVariant : context.colorScheme.primary,
+                    color: isPast
+                        ? context.colorScheme.onSurfaceVariant
+                        : context.colorScheme.primary,
                   ),
                 ),
               ],
@@ -133,13 +160,5 @@ class HolidaysScreen extends StatelessWidget {
         ],
       ),
     );
-  }
-
-  String _formatDateRange(DateTime start, DateTime end) {
-    final format = DateFormat('d MMM yyyy', 'ar');
-    if (start.isAtSameMomentAs(end)) {
-      return format.format(start);
-    }
-    return '${format.format(start)} - ${format.format(end)}';
   }
 }

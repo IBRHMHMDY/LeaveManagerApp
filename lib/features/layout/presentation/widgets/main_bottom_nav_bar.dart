@@ -1,14 +1,17 @@
-// lib/app/layout/widgets/main_bottom_nav_bar.dart
+// lib/features/layout/presentation/widgets/main_bottom_nav_bar.dart
 import 'package:flutter/material.dart';
+import 'package:leave_manager/features/layout/domain/entities/navigation_tab_entity.dart';
 
 class MainBottomNavBar extends StatelessWidget {
   final int currentIndex;
   final ValueChanged<int> onTabChanged;
+  final List<NavigationTabEntity> tabs;
 
   const MainBottomNavBar({
     super.key,
     required this.currentIndex,
     required this.onTabChanged,
+    required this.tabs,
   });
 
   @override
@@ -16,28 +19,14 @@ class MainBottomNavBar extends StatelessWidget {
     return NavigationBar(
       selectedIndex: currentIndex,
       onDestinationSelected: onTabChanged,
-      destinations: const [
-        NavigationDestination(
-          icon: Icon(Icons.home_outlined),
-          selectedIcon: Icon(Icons.home_rounded),
-          label: 'الرئيسية',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.calendar_month_outlined),
-          selectedIcon: Icon(Icons.calendar_month_rounded),
-          label: 'الإجازات',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.workspace_premium_outlined),
-          selectedIcon: Icon(Icons.workspace_premium_rounded),
-          label: 'بدلات الراحة',
-        ),
-        NavigationDestination(
-          icon: Icon(Icons.settings_outlined),
-          selectedIcon: Icon(Icons.settings_rounded),
-          label: 'الإعدادات',
-        ),
-      ],
+      // توليد الوجهات ديناميكياً من القائمة
+      destinations: tabs.map((tab) {
+        return NavigationDestination(
+          icon: Icon(tab.icon),
+          selectedIcon: Icon(tab.selectedIcon),
+          label: tab.label,
+        );
+      }).toList(),
     );
   }
 }

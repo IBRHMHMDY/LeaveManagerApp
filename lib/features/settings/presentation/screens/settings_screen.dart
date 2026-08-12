@@ -16,6 +16,7 @@ import 'package:leave_manager/features/settings/presentation/bloc/settings_event
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/danger_zone_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_form_section.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/theme_selection_section.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 
@@ -105,12 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
       },
       child: Scaffold(
-        appBar: AppBar(
-          title: Text(
-            'الإعدادات',
-            style: context.textTheme.displaySmall,
-          ),
-        ),
+        appBar: const SettingsHeader(),
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Form(

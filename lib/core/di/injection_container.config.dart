@@ -28,6 +28,7 @@ import '../../features/holidays/domain/usecases/initialize_holidays_usecase.dart
 import '../../features/holidays/presentation/cubit/holidays_cubit.dart'
     as _i120;
 import '../../features/home/presentation/cubit/home_cubit.dart' as _i9;
+import '../../features/layout/presentation/cubit/layout_cubit.dart' as _i917;
 import '../../features/leaves/data/datasources/leaves_local_data_source.dart'
     as _i1005;
 import '../../features/leaves/data/repositories/leave_repository_impl.dart'
@@ -78,6 +79,7 @@ import '../../features/settings/presentation/bloc/settings_bloc.dart' as _i585;
 import '../../shared/themes/theme_cubit.dart' as _i202;
 import '../database/app_database.dart' as _i982;
 import '../usecases/check_date_overlap_usecase.dart' as _i707;
+import '../utils/share_service.dart' as _i518;
 import 'register_module.dart' as _i291;
 
 extension GetItInjectableX on _i174.GetIt {
@@ -92,7 +94,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => registerModule.prefs,
       preResolve: true,
     );
+    gh.factory<_i917.LayoutCubit>(() => _i917.LayoutCubit());
     gh.lazySingleton<_i982.AppDatabase>(() => registerModule.appDatabase);
+    gh.lazySingleton<_i518.ShareService>(() => _i518.ShareService());
     gh.lazySingleton<_i828.HolidaysLocalDataSource>(
       () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),
     );

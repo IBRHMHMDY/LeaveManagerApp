@@ -34,7 +34,7 @@ abstract final class DarkTheme {
         iconTheme: IconThemeData(color: colorScheme.onSurface),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.light,
+          statusBarIconBrightness: Brightness.dark,
         ),
       ),
 
@@ -104,7 +104,7 @@ abstract final class DarkTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: AppRadius.md,
-          borderSide: BorderSide(color: colorScheme.outline.withAlpha(40)),
+          borderSide: BorderSide(color: colorScheme.outline.withAlpha(80)),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: AppRadius.md,

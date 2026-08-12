@@ -45,12 +45,12 @@ class UpcomingHolidayCard extends StatelessWidget {
             Container(
               padding: const EdgeInsets.all(AppSpacing.sm),
               decoration: BoxDecoration(
-                color: context.colorScheme.primaryContainer.withOpacity(0.6),
+                color: context.colorScheme.primary.withAlpha(60),
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.celebration_rounded,
-                color: context.colorScheme.primary,
+                Icons.notification_important,
+                color: context.colorScheme.onSurface,
                 size: 28,
               ),
             ),

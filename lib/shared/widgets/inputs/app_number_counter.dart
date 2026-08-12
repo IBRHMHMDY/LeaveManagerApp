@@ -56,13 +56,13 @@ class AppNumberCounter extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
                 child: SizedBox(
-                  width: 20,
+                  width: 40,
                   child: Text(
                     '$value',
                     textAlign: TextAlign.center,
-                    style: context.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.bold,
-                      color: context.colorScheme.primary,
+                    style: context.textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: context.colorScheme.onSurface,
                     ),
                   ),
                 ),

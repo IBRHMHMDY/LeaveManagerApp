@@ -50,7 +50,7 @@ class AppFloatingButton extends StatelessWidget {
         icon: icon != null ? Icon(icon) : null,
         label: Text(
           label!, // آمن تماماً بفضل الـ Named Constructor
-          style: context.textTheme.labelLarge?.copyWith(color: fgColor),
+          style: context.textTheme.titleLarge?.copyWith(color: fgColor),
         ),
       );
     }

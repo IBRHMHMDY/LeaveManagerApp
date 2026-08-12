@@ -51,7 +51,7 @@ class AppPrimaryButton extends StatelessWidget {
               ],
               Text(
                 label,
-                style: context.textTheme.titleMedium?.copyWith(
+                style: context.textTheme.titleLarge?.copyWith(
                   color: foregroundColor ?? context.colorScheme.onPrimary,
                 ),
               ),

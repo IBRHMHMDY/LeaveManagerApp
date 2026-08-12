@@ -4,8 +4,11 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
-import 'package:leave_manager/features/settings/presentation/cubit/app_version_cubit.dart';
-import 'package:leave_manager/features/settings/presentation/cubit/app_version_state.dart';
+import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_cubit.dart';
+import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_state.dart';
+import 'package:leave_manager/shared/widgets/buttons/app_outlined_button.dart';
+import 'package:leave_manager/shared/widgets/buttons/app_primary_button.dart';
+import 'package:leave_manager/shared/widgets/buttons/app_share_button.dart';
 import 'package:leave_manager/shared/widgets/displays/app_version_display.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:leave_manager/features/splash/presentation/widgets/custom_app_logo_icon.dart';
@@ -31,14 +34,11 @@ class _AboutDeveloperContent extends StatefulWidget {
 }
 
 class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
-
   Future<void> _launchEmail() async {
     final Uri emailLaunchUri = Uri(
       scheme: 'mailto',
-      path: 'ibrhmhmdy@example.com', 
-      queryParameters: {
-        'subject': 'تطبيق متتبع الإجازات - تواصل',
-      },
+      path: 'ibrhmhmdy@example.com',
+      queryParameters: {'subject': 'تطبيق متتبع الإجازات - تواصل'},
     );
     if (!await launchUrl(emailLaunchUri)) {
       debugPrint('لا يمكن فتح البريد الإلكتروني');
@@ -46,9 +46,13 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
   }
 
   Future<void> _launchWhatsApp() async {
-    const String phoneNumber = '2001007576297'; 
-    final String message = Uri.encodeComponent('مرحباً، لدي استفسار بخصوص تطبيق مدير اجازاتى.');
-    final Uri whatsappUri = Uri.parse('https://wa.me/$phoneNumber?text=$message');
+    const String phoneNumber = '2001007576297';
+    final String message = Uri.encodeComponent(
+      'مرحباً، لدي استفسار بخصوص تطبيق مدير اجازاتى.',
+    );
+    final Uri whatsappUri = Uri.parse(
+      'https://wa.me/$phoneNumber?text=$message',
+    );
 
     if (!await launchUrl(whatsappUri, mode: LaunchMode.externalApplication)) {
       debugPrint('لا يمكن فتح الواتساب');
@@ -58,7 +62,10 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg, vertical: AppSpacing.md),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.lg,
+        vertical: AppSpacing.md,
+      ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
@@ -78,10 +85,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
           const SizedBox(height: AppSpacing.md),
 
           // 3. اسم التطبيق وإصداره
-          Text(
-            'مدير اجازاتى',
-            style: context.textTheme.headlineLarge,
-          ),
+          Text('مدير اجازاتى', style: context.textTheme.headlineLarge),
           const SizedBox(height: AppSpacing.sm),
           BlocProvider(
             create: (context) => AppVersionCubit()..fetchVersion(),
@@ -89,7 +93,7 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
               builder: (context, state) {
                 if (state is AppVersionLoading) {
                   return const AppVersionDisplay(
-                    version: '', 
+                    version: '',
                     isLoading: true, // سيعرض مؤشر التحميل
                   );
                 } else if (state is AppVersionLoaded) {
@@ -107,9 +111,13 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
           Container(
             padding: const EdgeInsets.all(AppSpacing.md),
             decoration: BoxDecoration(
-              color: context.colorScheme.surfaceContainerHighest.withOpacity(0.4),
+              color: context.colorScheme.surfaceContainerHighest.withOpacity(
+                0.4,
+              ),
               borderRadius: AppRadius.lg,
-              border: Border.all(color: context.colorScheme.outline.withOpacity(0.2)),
+              border: Border.all(
+                color: context.colorScheme.outline.withOpacity(0.2),
+              ),
             ),
             child: Column(
               children: [
@@ -140,38 +148,42 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const AppShareButton(buttonType: ShareButtonType.outline,),
+              const SizedBox(height: AppSpacing.sm),
+              // 5. زر التواصل عبر واتساب
+              AppPrimaryButton(
+                backgroundColor: AppColors.whatsappBGColor,
+                foregroundColor: AppColors.whatsappFGColor,
+                icon: Icons.chat_bubble_outline_rounded,
+                label: 'تواصل عبر واتساب',
+                onPressed: _launchWhatsApp,
+              ),
+              const SizedBox(height: AppSpacing.sm),
 
-          // 5. زر التواصل عبر واتساب
-          ElevatedButton.icon(
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 50),
-              backgroundColor: AppColors.whatsappColor,
-              foregroundColor: context.colorScheme.onSurface,
-            ),
-            icon: const Icon(Icons.chat_bubble_outline_rounded),
-            label: const Text('تواصل عبر واتساب'),
-            onPressed: _launchWhatsApp,
-          ),
-          const SizedBox(height: AppSpacing.sm),
+              // 6. زر التواصل عبر البريد
+              AppOutlinedButton(
+                foregroundColor: context.colorScheme.primary,
+                icon: Icons.mail_outline_rounded,
+                label: 'إرسال بريد إلكتروني',
+                onPressed: _launchEmail,
+              ),
 
-          // 6. زر التواصل عبر البريد
-          OutlinedButton.icon(
-            style: OutlinedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 50),
-            ),
-            icon: const Icon(Icons.mail_outline_rounded),
-            label: const Text('إرسال بريد إلكتروني'),
-            onPressed: _launchEmail,
+              const SizedBox(height: AppSpacing.lg),
+
+              // 7. حقوق الملكية
+              Center(
+                child: Text(
+                  '© ${DateTime.now().year} جميع الحقوق محفوظة',
+                  style: context.textTheme.bodySmall,
+                ),
+              ),
+              const SizedBox(height: AppSpacing.md),
+            ],
           ),
-          
-          const SizedBox(height: AppSpacing.lg),
-          
-          // 7. حقوق الملكية
-          Text(
-            '© ${DateTime.now().year} جميع الحقوق محفوظة',
-            style: context.textTheme.bodySmall,
-          ),
-          const SizedBox(height: AppSpacing.md),
         ],
       ),
     );

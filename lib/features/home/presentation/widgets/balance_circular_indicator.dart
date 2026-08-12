@@ -59,7 +59,7 @@ class BalanceCircularIndicator extends StatelessWidget {
                     child: CircularProgressIndicator(
                       value: progress,
                       strokeWidth: 10,
-                      backgroundColor: color.withOpacity(0.2),
+                      backgroundColor: color.withAlpha(60),
                       color: color,
                       strokeCap: StrokeCap.round,
                     ),
@@ -69,14 +69,15 @@ class BalanceCircularIndicator extends StatelessWidget {
                     children: [
                       Text(
                         '$remaining',
-                        style: context.textTheme.headlineLarge?.copyWith(
+                        style: context.textTheme.displayLarge?.copyWith(
                           fontWeight: FontWeight.w900,
                           color: color,
                         ),
                       ),
+                      const SizedBox(height: 8,),
                       Text(
                         '/ $total',
-                        style: context.textTheme.titleMedium?.copyWith(
+                        style: context.textTheme.titleLarge?.copyWith(
                           color: context.colorScheme.onSurfaceVariant, 
                           fontWeight: FontWeight.w700,
                         ),

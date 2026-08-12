@@ -1,6 +1,7 @@
+// lib/core/router/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leave_manager/features/layout/presentation/widgets/main_appbar.dart';
+
 import 'package:leave_manager/features/splash/presentation/screens/splash_screen.dart';
 import 'package:leave_manager/features/layout/presentation/screens/main_layout.dart';
 import 'package:leave_manager/features/holidays/presentation/screens/holidays_screen.dart';
@@ -8,10 +9,9 @@ import 'package:leave_manager/features/home/presentation/screens/home_screen.dar
 import 'package:leave_manager/features/leaves/presentation/screens/leave_screen.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/screens/rest_allowances_screen.dart';
 import 'package:leave_manager/features/settings/presentation/screens/settings_screen.dart';
+import 'package:leave_manager/shared/widgets/widgets.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
-  debugLabel: 'root',
-);
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
 class AppRouter {
   static const String splash = '/';
@@ -32,31 +32,36 @@ class AppRouter {
         builder: (context, state) => const Scaffold(
           appBar: PreferredSize(
             preferredSize: Size.fromHeight(80),
-            child: MainAppBar(),
+            child: AppAppBar(title: 'إعدادات الحساب'),
           ),
           body: SafeArea(child: SettingsScreen(isFirstTime: true)),
         ),
       ),
-      // إدارة الـ Bottom Navigation باستخدام StatefulShellRoute
+      
+      // ✅ الحل: وضع مسار العطلات كمسار رئيسي خارج الـ StatefulShellRoute
+      GoRoute(
+        path: holidays,
+        builder: (context, state) => const HolidaysScreen(),
+      ),
+
+      // Bottom Navigation باستخدام StatefulShellRoute
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainLayout(navigationShell: navigationShell);
         },
         branches: [
-          // الفرع الأول (0): الرئيسية 
+          // Branch (0): Home
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: home,
                 builder: (context, state) => const HomeScreen(),
               ),
-              GoRoute(
-                path: holidays,
-                builder: (context, state) => const HolidaysScreen(),
-              ),
+              // ❌ تمت إزالة مسار holidays من هنا
             ],
           ),
-          // الفرع الثاني (1): الإجازات
+          
+          // Branch (1): Leaves
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -65,7 +70,8 @@ class AppRouter {
               ),
             ],
           ),
-          // الفرع الثالث (2): بدلات الراحة
+          
+          // Branch (2): Rest Allowances
           StatefulShellBranch(
             routes: [
               GoRoute(
@@ -74,7 +80,8 @@ class AppRouter {
               ),
             ],
           ),
-          // الفرع الرابع (3): الإعدادات
+          
+          // Branch (3): Settings
           StatefulShellBranch(
             routes: [
               GoRoute(

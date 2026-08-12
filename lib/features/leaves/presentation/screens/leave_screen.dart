@@ -25,23 +25,8 @@ class _LeaveScreenState extends State<LeaveScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.calendar_month_rounded,
-              color: context.colorScheme.onSurface,
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Text(
-              'الاجازات',
-              style: context.textTheme.headlineMedium?.copyWith(
-                color: context.colorScheme.primary,
-              ),
-            ),
-          ],
-        ),
+      appBar: const AppAppBar(
+        title: 'الاجازات',
       ),
       body: BlocListener<LeavesBloc, LeavesState>(
         listener: (context, state) {

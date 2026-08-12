@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
+import 'package:leave_manager/features/home/presentation/widgets/home_header.dart';
 import 'package:leave_manager/features/home/presentation/widgets/upcoming_holiday_card.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_cubit.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_state.dart';
@@ -16,11 +17,10 @@ import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.
 import 'package:leave_manager/features/home/presentation/widgets/balances_loading_shimmer.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_balances_section.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_current_month_leaves.dart';
-import 'package:leave_manager/features/home/presentation/widgets/build_financialyear_card.dart';
 import 'package:leave_manager/features/home/presentation/widgets/welcome_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/features/home/presentation/widgets/build_alert_banners.dart';
-import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
+import 'package:leave_manager/shared/widgets/widgets.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -39,6 +39,15 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: const AppAppBar(
+        customTitle: HomeHeader(),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(left: 12),
+            child: AppShareButton(buttonType: ShareButtonType.icon),
+          ),
+        ],
+      ),
       body: MultiBlocListener(
         listeners: [
           BlocListener<LeavesBloc, LeavesState>(
@@ -86,13 +95,13 @@ class _HomeScreenState extends State<HomeScreen> {
                     vertical: AppSpacing.md,
                   ),
                   children: [
+                    // Welcome Employee
                     WelcomeCard(
                       employeeName: state.settings.employeeName,
                       role: state.settings.jobTitle,
                     ),
                     const SizedBox(height: AppSpacing.md),
-                    const BuildFinancialYearCard(),
-                    const SizedBox(height: AppSpacing.md),
+                    // Upcoming Holiday
                     BlocBuilder<HolidaysCubit, HolidaysState>(
                       builder: (context, holidayState) {
                         if (holidayState is HolidaysLoaded) {
@@ -113,6 +122,8 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                     ),
+                    const SizedBox(height: AppSpacing.md),
+                    // Alert Banner
                     const BuildAlertBanners(
                       alertType: AlertType.info,
                       message:
@@ -124,12 +135,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
-                      builder: (context, restState) { 
+                      builder: (context, restState) {
                         if (restState is RestAllowancesLoaded) {
                           return Column(
                             children: [
                               RestStatsCard(
-                                totalAvailableDays: restState.availables, 
+                                totalAvailableDays: restState.availables,
                                 totalConsumedDays: restState.usage,
                               ),
                             ],
@@ -139,7 +150,8 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     const SizedBox(height: AppSpacing.lg),
-    
+
+                    const SizedBox(height: AppSpacing.lg),
                     BuildCurrentMonthLeaves(
                       leaves: state.currentMonthLeaves,
                       restAllowances: state.currentMonthRestAllowances,

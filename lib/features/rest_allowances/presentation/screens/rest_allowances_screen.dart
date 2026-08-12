@@ -2,13 +2,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_action_buttons.dart';
+import 'package:leave_manager/shared/widgets/displays/app_app_bar.dart';
 import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
 import 'package:leave_manager/shared/widgets/inputs/app_segmented_tabs.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
@@ -32,24 +32,8 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              Icons.workspace_premium_outlined,
-              color: context.colorScheme.onSurface,
-            ),
-            const SizedBox(width: AppSpacing.sm),
-            Text(
-              'بدلات الراحة',
-              style: context.textTheme.headlineMedium?.copyWith(
-                color: context.leaveColors.rest,
-              ),
-            ),
-          ],
-        ),
-      ),
+      appBar: const AppAppBar(
+        title: 'بدلات الراحة',),
       body: BlocConsumer<RestAllowancesBloc, RestAllowancesState>(
         listener: (context, state) {
           if (state is RestAllowanceActionSuccess) {

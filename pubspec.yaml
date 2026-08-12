@@ -1,7 +1,7 @@
 name: leave_manager
 description: "Leave Manager App - مدير اجازاتى - تتبع إجازاتك بذكاء وسهولة."
 publish_to: 'none'
-version: 1.2.1+6 # previous Release: 1.1.2+4
+version: 1.2.1+6 # previous Release: 1.2.0+5
 
 environment:
   sdk: ^3.11.5
@@ -27,8 +27,6 @@ dependencies:
   package_info_plus: ^8.0.0     # لقراءة معلومات التطبيق برمجياً
   url_launcher: ^6.3.0          # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
   shimmer: ^3.0.0               # يعطى تاثير جمالى أثناء التحميل وقبل ظهور البيانات 
-  # flutter_screenutil: ^5.9.0    # لجعل التطبيق متجاوب مع كافه الشاشات
-  lottie: ^3.1.0
   injectable: ^2.6.0
   calendar_date_picker2: ^3.0.0
 dev_dependencies:
@@ -47,7 +45,6 @@ flutter:
   uses-material-design: true
   assets:
     - assets/google_fonts/
-    - assets/json/animations/empty_leaves.json
     - assets/json/holidays.json
   fonts:
     - family: Cairo
