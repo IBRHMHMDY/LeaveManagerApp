@@ -13,7 +13,7 @@ class AppShareButton extends StatelessWidget {
 
   const AppShareButton({
     super.key,
-    this.buttonType = ShareButtonType.listTile, // القيمة الافتراضية
+    this.buttonType = ShareButtonType.icon, // القيمة الافتراضية
   });
 
   @override
@@ -46,7 +46,7 @@ class AppShareButton extends StatelessWidget {
     final shareService = sl<ShareService>();
     await shareService.shareAppLink(
       appUrl: 'https://play.google.com/store/apps/details?id=com.ibrahimhamdy.leavemanager',
-      message: 'نظم إجازاتك بدلات الراحة بسهولة مع تطبيق Leave Manager!',
+      message: 'نظم إجازاتك وبدلاتك بسهولة مع تطبيق Leave Manager!',
     );
   }
 }

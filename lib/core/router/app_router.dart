@@ -1,6 +1,7 @@
 // lib/core/router/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
 
 import 'package:leave_manager/features/splash/presentation/screens/splash_screen.dart';
 import 'package:leave_manager/features/layout/presentation/screens/main_layout.dart';
@@ -9,7 +10,6 @@ import 'package:leave_manager/features/home/presentation/screens/home_screen.dar
 import 'package:leave_manager/features/leaves/presentation/screens/leave_screen.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/screens/rest_allowances_screen.dart';
 import 'package:leave_manager/features/settings/presentation/screens/settings_screen.dart';
-import 'package:leave_manager/shared/widgets/widgets.dart';
 
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
 
@@ -30,10 +30,7 @@ class AppRouter {
       GoRoute(
         path: setup,
         builder: (context, state) => const Scaffold(
-          appBar: PreferredSize(
-            preferredSize: Size.fromHeight(80),
-            child: AppAppBar(title: 'إعدادات الحساب'),
-          ),
+          appBar: SettingsHeader(),
           body: SafeArea(child: SettingsScreen(isFirstTime: true)),
         ),
       ),

@@ -31,7 +31,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _jobController = TextEditingController(text: 'مهندس برمجيات');
+  final _jobController = TextEditingController(text: 'موظف');
   final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
   late bool _isFirstTime;
@@ -106,7 +106,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         }
       },
       child: Scaffold(
-        appBar: const SettingsHeader(),
+        appBar: !widget.isFirstTime ? const SettingsHeader() : null,
         body: SingleChildScrollView(
           padding: const EdgeInsets.all(AppSpacing.md),
           child: Form(
@@ -135,8 +135,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: AppSpacing.xl),
-                const DangerZoneSection(),
+                const SizedBox(height: AppSpacing.md),
+                !widget.isFirstTime ? const DangerZoneSection(): const SizedBox.shrink(),
               ],
             ),
           ),
