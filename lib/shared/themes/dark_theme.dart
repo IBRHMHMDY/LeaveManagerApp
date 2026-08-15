@@ -34,7 +34,9 @@ abstract final class DarkTheme {
         iconTheme: IconThemeData(color: colorScheme.onSurface),
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
-          statusBarIconBrightness: Brightness.dark,
+          statusBarIconBrightness: Brightness.light,
+          systemNavigationBarColor: AppColors.darkSurface,
+          systemNavigationBarIconBrightness: Brightness.light,
         ),
       ),
 

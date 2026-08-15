@@ -7,8 +7,9 @@ import 'package:leave_manager/core/utils/extenstions/leave_filter_extension.dart
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
+import 'package:leave_manager/features/leaves/presentation/widgets/leaves_header.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/show_add_leave_bottomsheet.dart';
-import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
+import 'package:leave_manager/features/leaves/presentation/widgets/leave_card.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/leave_list_shimmer.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 
@@ -25,9 +26,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppAppBar(
-        title: 'الاجازات',
-      ),
+      appBar:  const AppAppBar(customTitle: LeavesHeader()),
       body: BlocListener<LeavesBloc, LeavesState>(
         listener: (context, state) {
           if (state is LeaveDeletedSuccess) {
@@ -81,9 +80,8 @@ class _LeaveScreenState extends State<LeaveScreen> {
                     }).toList();
                     if (filteredLeaves.isEmpty) {
                       return const AppEmptyState(
-                        title: 'لا توجد اجازات مسجله حتى الآن',
+                        title: 'السجل فارغ',
                         content: 'قم بتسجيل اجازتك الاولى',
-                        icon: Icons.import_contacts_outlined,
                       );
                     }
                     return ListView.builder(
@@ -94,7 +92,7 @@ class _LeaveScreenState extends State<LeaveScreen> {
                       itemCount: filteredLeaves.length,
                       itemBuilder: (context, index) {
                         final leave = filteredLeaves[index];
-                        return CustomLeaveCard(
+                        return LeaveCard(
                           key: ValueKey(leave.id),
                           leave: leave,
                         );

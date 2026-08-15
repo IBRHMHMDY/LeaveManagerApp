@@ -1,4 +1,4 @@
-// lib/features/home/presentation/widgets/build_balances_section.dart
+// lib/features/home/presentation/widgets/leaves_balances_section.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
@@ -6,11 +6,11 @@ import 'package:leave_manager/features/leaves/domain/entities/leave_balance_enti
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
 import 'balance_circular_indicator.dart';
 
-class BuildBalancesSection extends StatelessWidget {
+class LeavesBalancesSection extends StatelessWidget {
   final LeaveBalance balance;
   final Settings settings;
 
-  const BuildBalancesSection({
+  const LeavesBalancesSection({
     super.key,
     required this.balance,
     required this.settings,

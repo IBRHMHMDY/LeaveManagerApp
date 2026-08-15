@@ -7,7 +7,8 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_action_buttons.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_balance_button.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_header.dart';
 import 'package:leave_manager/shared/widgets/displays/app_app_bar.dart';
 import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
 import 'package:leave_manager/shared/widgets/inputs/app_segmented_tabs.dart';
@@ -32,8 +33,7 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: const AppAppBar(
-        title: 'بدلات الراحة',),
+      appBar: const AppAppBar(customTitle: RestHeader()),
       body: BlocConsumer<RestAllowancesBloc, RestAllowancesState>(
         listener: (context, state) {
           if (state is RestAllowanceActionSuccess) {
@@ -81,19 +81,18 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
               ],
             );
           }
-
           return const SizedBox.shrink();
         },
       ),
-      bottomNavigationBar: const RestActionButtons(),
+      bottomNavigationBar: const AddBalanceButton(),
     );
   }
 
   Widget _buildList(List<ExtraWorkRecord> extrawork) {
     if (extrawork.isEmpty) {
       return const AppEmptyState(
-        title: 'لا توجد بيانات',
-        content: 'لا توجد سجلات لعرضها هنا.',
+        title: 'السجل فارغ',
+        content: 'قم بإضافه ارصدتك لإستهلاكها لاحقا',
       );
     }
 

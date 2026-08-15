@@ -18,18 +18,19 @@ class WelcomeCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
+        horizontal: AppSpacing.sm,
         vertical: AppSpacing.sm,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.start,
         children: [
           Container(
-            width: 64,
-            height: 64,
+            width: 50,
+            height: 50,
             decoration: BoxDecoration(
               color: context.colorScheme.primary,
-              borderRadius: AppRadius.lg,
+              shape: BoxShape.circle,
+              // borderRadius: AppRadius.lg,
               boxShadow: [
                 BoxShadow(
                   color: context.colorScheme.shadow.withAlpha(20),
@@ -39,19 +40,19 @@ class WelcomeCard extends StatelessWidget {
               ],
             ),
             child: Icon(
-              Icons.person_outline_rounded,
+              Icons.person_outline,
               color: context.colorScheme.onPrimary,
-              size: 32,
+              size: 36,
             ),
           ),
-          const SizedBox(width: AppSpacing.md),
+          const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
                   'مرحبا، $employeeName',
-                  style: context.textTheme.headlineLarge?.copyWith(
+                  style: context.textTheme.headlineMedium?.copyWith(
                     color: context.colorScheme.onSurface,
                   ),
                   overflow: TextOverflow.ellipsis,

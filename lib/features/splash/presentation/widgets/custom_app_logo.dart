@@ -18,7 +18,7 @@ class CustomAppLogo extends StatelessWidget {
         gradient: LinearGradient(
           colors: [
             colorScheme.primary,
-            colorScheme.primary.withOpacity(0.6), // استبدال withAlpha بـ withOpacity
+            colorScheme.primary.withOpacity(0.6),
           ],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,

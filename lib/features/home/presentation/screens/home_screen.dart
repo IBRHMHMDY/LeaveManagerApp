@@ -15,11 +15,11 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/home/presentation/widgets/rest_stats_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/home/presentation/widgets/balances_loading_shimmer.dart';
-import 'package:leave_manager/features/home/presentation/widgets/build_balances_section.dart';
-import 'package:leave_manager/features/home/presentation/widgets/build_current_month_leaves.dart';
+import 'package:leave_manager/features/home/presentation/widgets/leaves_balances_section.dart';
+import 'package:leave_manager/features/home/presentation/widgets/current_month_leaves_section.dart';
 import 'package:leave_manager/features/home/presentation/widgets/welcome_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
-import 'package:leave_manager/features/home/presentation/widgets/build_alert_banners.dart';
+import 'package:leave_manager/features/home/presentation/widgets/alert_banners.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -124,12 +124,12 @@ class _HomeScreenState extends State<HomeScreen> {
                     ),
                     const SizedBox(height: AppSpacing.md),
                     // Alert Banner
-                    const BuildAlertBanners(
+                    const AlertBanners(
                       alertType: AlertType.info,
                       message:
                           'تنبيه: اقترب موعد نهاية السنة المالية، يرجى تسوية رصيد إجازاتك.',
                     ),
-                    BuildBalancesSection(
+                    LeavesBalancesSection(
                       balance: state.balance,
                       settings: state.settings,
                     ),
@@ -152,7 +152,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     const SizedBox(height: AppSpacing.lg),
 
                     const SizedBox(height: AppSpacing.lg),
-                    BuildCurrentMonthLeaves(
+                    CurrentMonthLeavesSection(
                       leaves: state.currentMonthLeaves,
                       restAllowances: state.currentMonthRestAllowances,
                     ),

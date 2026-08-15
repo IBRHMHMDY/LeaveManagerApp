@@ -8,11 +8,11 @@ import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.da
 
 enum AlertType { info, warning, error }
 
-class BuildAlertBanners extends StatelessWidget {
+class AlertBanners extends StatelessWidget {
   final String message;
   final AlertType alertType;
 
-  const BuildAlertBanners({
+  const AlertBanners({
     super.key,
     required this.alertType,
     required this.message,

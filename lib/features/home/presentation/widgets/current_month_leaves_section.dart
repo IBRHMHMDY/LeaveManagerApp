@@ -4,16 +4,16 @@ import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
-import 'package:leave_manager/features/leaves/presentation/widgets/custom_leave_card.dart';
+import 'package:leave_manager/features/leaves/presentation/widgets/leave_card.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
 import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
 
-class BuildCurrentMonthLeaves extends StatelessWidget {
+class CurrentMonthLeavesSection extends StatelessWidget {
   final List<LeaveRecord> leaves;
   final List<ExtraWorkRecord> restAllowances;
 
-  const BuildCurrentMonthLeaves({
+  const CurrentMonthLeavesSection({
     super.key,
     required this.leaves,
     required this.restAllowances,
@@ -22,7 +22,7 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final now = DateTime.now();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -32,29 +32,33 @@ class BuildCurrentMonthLeaves extends StatelessWidget {
             Text(
               'إجازات الشهر الحالى ',
               style: context.textTheme.titleLarge?.copyWith(
-                color: context.colorScheme.onSurface, 
+                color: context.colorScheme.onSurface,
               ),
             ),
             Text(
               now.toFormatCurrentMonthYear,
               style: context.textTheme.titleLarge?.copyWith(
-                color: context.colorScheme.primary, 
+                color: context.colorScheme.primary,
               ),
             ),
           ],
         ),
         const SizedBox(height: AppSpacing.md),
-        if(leaves.isEmpty && restAllowances.isEmpty)
-          const AppEmptyState(title: "لا توجد بيانات", content: "لا توجد اجازات لهذا الشهر"),
-        
+        if (leaves.isEmpty && restAllowances.isEmpty)
+          const AppEmptyState(
+            title: "السجل فارغ",
+            content: "قم بتسجيل اجازتك الاولى",
+          ),
         ...leaves.map((leave) {
-          return CustomLeaveCard(key: ValueKey('leave_${leave.id}'), leave: leave);
+          return LeaveCard(
+            key: ValueKey('leave_${leave.id}'),
+            leave: leave,
+          );
         }),
-        
-        ...restAllowances.map((allowance) {
+        ...restAllowances.map((rest) {
           return RestAllowancesCard(
-            key: ValueKey('extra_${allowance.id}'),
-            extrawork: allowance,
+            key: ValueKey('extra_${rest.id}'),
+            extrawork: rest,
           );
         }),
       ],

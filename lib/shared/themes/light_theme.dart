@@ -36,6 +36,8 @@ abstract final class LightTheme {
         systemOverlayStyle: const SystemUiOverlayStyle(
           statusBarColor: Colors.transparent,
           statusBarIconBrightness: Brightness.dark,
+          systemNavigationBarColor: AppColors.lightSurface,
+    systemNavigationBarIconBrightness: Brightness.dark,
         ),
       ),
 

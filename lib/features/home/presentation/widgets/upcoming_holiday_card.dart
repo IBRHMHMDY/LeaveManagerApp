@@ -49,7 +49,7 @@ class UpcomingHolidayCard extends StatelessWidget {
                 shape: BoxShape.circle,
               ),
               child: Icon(
-                Icons.notification_important,
+                Icons.celebration_rounded,
                 color: context.colorScheme.onSurface,
                 size: 28,
               ),

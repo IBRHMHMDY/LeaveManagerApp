@@ -79,7 +79,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
           AppDateRangePicker(
             startDate: _startDate,
             endDate: _endDate,
-            hintText: 'حدد تاريخ البداية والنهاية',
+            hintText: 'اختر تاريخ الاجازه',
             firstDate: FinancialYearCalculator.currentFinancialYearStart,
             lastDate: FinancialYearCalculator.currentFinancialYearEnd,
             selectableDayPredicate: (day) {

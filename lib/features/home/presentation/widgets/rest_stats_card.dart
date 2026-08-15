@@ -60,7 +60,7 @@ class RestStatsCard extends StatelessWidget {
                 _StatItem(
                   title: 'مستهلك',
                   value: totalConsumedDays,
-                  color: context.colorScheme.error,
+                  color: context.leaveColors.usedRest,
                 ),
               ],
             ),

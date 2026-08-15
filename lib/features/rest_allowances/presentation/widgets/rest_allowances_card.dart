@@ -6,203 +6,296 @@ import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/enums/work_reason.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
-import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
-import 'package:leave_manager/shared/widgets/overlays/app_confirm_dialog.dart';
+import 'package:leave_manager/shared/widgets/widgets.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/consume_rest_bottomsheet.dart';
 
 class RestAllowancesCard extends StatelessWidget {
   final ExtraWorkRecord extrawork;
+
   const RestAllowancesCard({super.key, required this.extrawork});
 
   @override
   Widget build(BuildContext context) {
-    final cardColor = context.leaveColors.rest;
+    // final isHoliday = extrawork.workReason == WorkReason.holiday;
+    final bool isUsed = extrawork.isUsed;
+    final cardColor = isUsed
+        ? context.leaveColors.usedRest
+        : context.leaveColors.rest;
 
     return Dismissible(
       key: ValueKey('extrawork_${extrawork.id}'),
       direction: DismissDirection.endToStart,
-      background: Container(
-        margin: const EdgeInsets.only(bottom: AppSpacing.md),
-        decoration: BoxDecoration(
-          color: context.colorScheme.error, 
-          borderRadius: AppRadius.lg,
-        ),
-        alignment: AlignmentDirectional.centerEnd,
-        padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
-        child: Icon(Icons.delete_sweep_rounded, color: context.colorScheme.onError, size: 28),
-      ),
-      confirmDismiss: (direction) async {
-        bool confirm = false;
-        await showDialog(
-          context: context,
-          builder: (ctx) => AppConfirmDialog(
-            title: 'حذف السجل',
-            content: 'هل أنت متأكد من رغبتك في حذف هذا السجل؟',
-            onConfirm: () {
-              confirm = true;
-              ctx.pop();
-            },
-            confirmText: 'حذف',
-            cancelText: 'تراجع',
-          ),
-        );
-        return confirm;
-      },
+      background: const _DismissibleBackground(),
+      confirmDismiss: (direction) => _showConfirmDeleteDialog(context),
       onDismissed: (direction) {
-        context.read<RestAllowancesBloc>().add(DeleteExtraWorkEvent(extrawork.id));
+        context.read<RestAllowancesBloc>().add(
+          DeleteExtraWorkEvent(extrawork.id),
+        );
       },
-      child: Container(
+      child: AppCard(
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
-        clipBehavior: Clip.antiAlias,
-        decoration: BoxDecoration(
-          color: context.colorScheme.surface,
-          borderRadius: AppRadius.lg,
-          border: Border.all(
-            color: context.colorScheme.outline.withOpacity(0.15), 
-            width: 1,
-          ),
-        ),
-        child: IntrinsicHeight(
-          child: Row(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Container(width: 6, color: cardColor),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppSpacing.md),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: BlocBuilder<HolidaysCubit, HolidaysState>(
-                          builder: (context, holidayState) {
-                            Holiday? associatedHoliday;
-                            if (extrawork.holidayId != null && holidayState is HolidaysLoaded) {
-                              try {
-                                associatedHoliday = holidayState.financialYearHolidays.firstWhere(
-                                  (h) => h.id == extrawork.holidayId,
-                                );
-                              } catch (_) {
-                                associatedHoliday = null;
-                              }
-                            }
-                            String pillText = '';
-                            String subtitleText = '';
-
-                            final workDateShort = extrawork.workStartDate.toDateRangeString(extrawork.workEndDate, short: true);
-                            final workDateFull = extrawork.workStartDate.toDateRangeString(extrawork.workEndDate, short: false);
-                            
-                            if (extrawork.isUsed) {
-                              final restStart = extrawork.restStartDate ?? extrawork.workStartDate;
-                              final restEnd = extrawork.restEndDate ?? extrawork.workEndDate;
-                              final restDateShort = restStart.toDateRangeString(restEnd, short: true);
-
-                              pillText = '$restDateShort بدل راحه عن $workDateShort';
-
-                              if (extrawork.workReason == WorkReason.holiday) {
-                                if (associatedHoliday != null) {
-                                  final holidayDateFull = associatedHoliday.startDate.toDateRangeString(associatedHoliday.endDate, short: false);
-                                  subtitleText = '${associatedHoliday.name} $holidayDateFull';
-                                } else {
-                                  subtitleText = 'عمل رسمي في عطلة $workDateFull';
-                                }
-                              } else {
-                                subtitleText = 'عمل إضافي';
-                              }
-                            } else {
-                              if (extrawork.workReason == WorkReason.holiday) {
-                                if (associatedHoliday != null) {
-                                  pillText = 'رصيد عطلة (${associatedHoliday.name})';
-                                } else {
-                                  pillText = 'رصيد عطلة رسمية';
-                                }
-                              } else {
-                                pillText = 'رصيد عمل إضافي';
-                              }
-                              subtitleText = workDateFull;
-                            }
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm, vertical: AppSpacing.xs),
-                                  decoration: BoxDecoration(
-                                    color: cardColor.withOpacity(0.08), 
-                                    borderRadius: AppRadius.xl,
-                                  ),
-                                  child: Text(
-                                    pillText,
-                                    style: context.textTheme.labelMedium?.copyWith(
-                                      color: cardColor,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.sm),
-                                Row(
-                                  children: [
-                                    Icon(Icons.calendar_today_rounded, size: 16, color: context.colorScheme.onSurfaceVariant),
-                                    const SizedBox(width: AppSpacing.xs),
-                                    Expanded(
-                                      child: Text(
-                                        subtitleText,
-                                        style: context.textTheme.titleMedium?.copyWith(
-                                          color: context.colorScheme.onSurface,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: AppSpacing.md),
-                      _LeaveDaysBox(color: cardColor, daysCount: extrawork.daysCount)
-                    ],
-                  ),
-                ),
-              ),
+        indicatorColor: cardColor,
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            _CardHeader(extrawork: extrawork, cardColor: cardColor),
+            const SizedBox(height: AppSpacing.sm),
+            _CardDates(extrawork: extrawork),
+            if (!extrawork.isUsed) ...[
+              const Divider(height: AppSpacing.xl),
+              _CardActions(extrawork: extrawork, cardColor: cardColor),
+            ] else if (extrawork.notes != null &&
+                extrawork.notes!.isNotEmpty) ...[
+              const SizedBox(height: AppSpacing.sm),
+              _CardNotes(notes: extrawork.notes!),
             ],
-          ),
+          ],
         ),
+      ),
+    );
+  }
+
+  Future<bool?> _showConfirmDeleteDialog(BuildContext context) async {
+    return await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AppConfirmDialog(
+        title: 'حذف السجل',
+        content: 'هل أنت متأكد من حذف هذا السجل نهائياً؟',
+        onConfirm: () => ctx.pop(true),
+        confirmText: 'حذف',
+        cancelText: 'إلغاء',
       ),
     );
   }
 }
 
-class _LeaveDaysBox extends StatelessWidget {
-  final Color color;
-  final int daysCount;
-  const _LeaveDaysBox({required this.color, required this.daysCount});
+class _DismissibleBackground extends StatelessWidget {
+  const _DismissibleBackground();
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+      margin: const EdgeInsets.only(bottom: AppSpacing.md),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.06),
+        color: context.colorScheme.error,
         borderRadius: AppRadius.lg,
-        border: Border.all(color: color.withOpacity(0.12)),
       ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '$daysCount',
-            style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 24, height: 1.1),
+      alignment: AlignmentDirectional.centerEnd,
+      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+      child: Icon(
+        Icons.delete_sweep_rounded,
+        color: context.colorScheme.onError,
+        size: 28,
+      ),
+    );
+  }
+}
+
+class _CardHeader extends StatelessWidget {
+  final ExtraWorkRecord extrawork;
+  final Color cardColor;
+
+  const _CardHeader({required this.extrawork, required this.cardColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Expanded(
+          child: BlocBuilder<HolidaysCubit, HolidaysState>(
+            builder: (context, holidayState) {
+              String pillText = extrawork.workReason == WorkReason.holiday
+                  ? 'عمل أيام عطلات'
+                  : 'عمل إضافي';
+
+              if (extrawork.workReason == WorkReason.holiday &&
+                  holidayState is HolidaysLoaded) {
+                // استخدام firstOrNull بدلاً من firstWhere مع try/catch لتجنب الـ Exceptions في طبقة العرض
+                final associatedHoliday = holidayState.financialYearHolidays
+                    .where((h) => h.id == extrawork.holidayId)
+                    .firstOrNull;
+
+                if (associatedHoliday != null) {
+                  pillText = 'عطلة: ${associatedHoliday.name}';
+                }
+              }
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  AppBadge(
+                    title: extrawork.isUsed ? 'مستهلك' : 'متاح للاستخدام',
+                    backgroundColor: extrawork.isUsed
+                        ? context.colorScheme.surfaceContainerHighest
+                        : cardColor.withOpacity(0.1),
+                    textColor: extrawork.isUsed
+                        ? context.colorScheme.onSurfaceVariant
+                        : cardColor,
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Text(
+                    pillText,
+                    style: context.textTheme.titleMedium?.copyWith(
+                      color: context.colorScheme.onSurface,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              );
+            },
           ),
-          Text(
-            'أيام',
-            style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
+        ),
+        AppNumberBox(
+          number: extrawork.daysCount,
+          label: 'أيام',
+          color: cardColor,
+        ),
+      ],
+    );
+  }
+}
+
+class _CardDates extends StatelessWidget {
+  final ExtraWorkRecord extrawork;
+
+  const _CardDates({required this.extrawork});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        _DateRow(
+          icon: Icons.work_history_rounded,
+          label: 'تاريخ العمل:',
+          dateText: extrawork.workStartDate.toDateRangeString(
+            extrawork.workEndDate,
+            short: false,
+          ),
+        ),
+        if (extrawork.isUsed && extrawork.restStartDate != null) ...[
+          const SizedBox(height: AppSpacing.xs),
+          _DateRow(
+            icon: Icons.event_available_rounded,
+            label: 'تاريخ الراحة:',
+            dateText: extrawork.restStartDate!.toDateRangeString(
+              extrawork.restEndDate!,
+              short: false,
+            ),
+            iconColor: context.colorScheme.primary,
+          ),
+        ],
+      ],
+    );
+  }
+}
+
+class _DateRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String dateText;
+  final Color? iconColor;
+
+  const _DateRow({
+    required this.icon,
+    required this.label,
+    required this.dateText,
+    this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 16,
+          color: iconColor ?? context.colorScheme.onSurfaceVariant,
+        ),
+        const SizedBox(width: AppSpacing.xs),
+        Text(
+          '$label ',
+          style: context.textTheme.labelMedium?.copyWith(
+            color: context.colorScheme.onSurfaceVariant,
+          ),
+        ),
+        Expanded(
+          child: Text(
+            dateText,
+            style: context.textTheme.labelMedium?.copyWith(
+              color: context.colorScheme.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _CardNotes extends StatelessWidget {
+  final String notes;
+
+  const _CardNotes({required this.notes});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.sm),
+      decoration: BoxDecoration(
+        color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
+        borderRadius: AppRadius.sm,
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            Icons.notes_rounded,
+            size: 14,
+            color: context.colorScheme.onSurfaceVariant,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Expanded(
+            child: Text(
+              notes,
+              style: context.textTheme.labelMedium?.copyWith(
+                color: context.colorScheme.onSurfaceVariant,
+                height: 1.4,
+              ),
+            ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _CardActions extends StatelessWidget {
+  final ExtraWorkRecord extrawork;
+  final Color cardColor;
+
+  const _CardActions({required this.extrawork, required this.cardColor});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.end,
+      children: [
+        AppOutlinedButton(
+          onPressed: () => showConsumeRestBottomSheet(context, extrawork),
+          label: 'استهلاك الرصيد',
+          icon: Icons.remove_circle_outline,
+          foregroundColor: cardColor,
+          width: double.infinity,
+        ),
+      ],
     );
   }
 }

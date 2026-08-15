@@ -86,9 +86,12 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
                 List<int> registeredHolidayIds = [];
 
                 if (restState is RestAllowancesLoaded) {
-                  registeredHolidayIds = restState.extrawork
-                      .where((ot) => ot.holidayId != null)
-                      .map((ot) => ot.holidayId!)
+                  // التعديل هنا: دمج السجلات المتاحة والمستهلكة في قائمة واحدة
+                  final allRecords = [...restState.extrawork, ...restState.rest];
+                  
+                  registeredHolidayIds = allRecords
+                      .where((record) => record.holidayId != null)
+                      .map((record) => record.holidayId!)
                       .toList();
                 }
 

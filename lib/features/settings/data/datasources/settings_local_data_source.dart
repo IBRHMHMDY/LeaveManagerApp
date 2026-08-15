@@ -1,3 +1,4 @@
+// lib/features/settings/data/datasources/settings_local_data_source.dart
 import 'package:drift/drift.dart';
 import 'package:flutter/material.dart' show debugPrint;
 import 'package:injectable/injectable.dart';
@@ -25,7 +26,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
       final result = await query.map((row) => row.read(countExp)).getSingle();
       return (result ?? 0) > 0;
     } catch (e) {
-      throw DatabaseException('فشل في التحقق من وجود الإعدادات');
+      throw DatabaseException('حدث خطأ أثناء التحقق من الإعدادات');
     }
   }
 
@@ -34,7 +35,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
     try {
       return await (db.select(db.settingsTable)..limit(1)).getSingle();
     } catch (e) {
-      throw DatabaseException('فشل في جلب بيانات الإعدادات');
+      throw DatabaseException('حدث خطأ أثناء جلب الإعدادات');
     }
   }
 
@@ -47,17 +48,20 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
       );
     } catch (e) {
       debugPrint('Database Error: $e');
-      throw DatabaseException('فشل في حفظ الإعدادات');
+      throw DatabaseException('حدث خطأ أثناء حفظ الإعدادات');
     }
   }
 
- 
   @override
   Future<void> resetBalances() async {
     try {
-      await db.delete(db.leaveRecordsTable).go();
+      // الاعتماد على transaction لمسح الجداول معاً وضمان الأداء وعدم حدوث Memory Leaks
+      await db.transaction(() async {
+        await db.delete(db.leaveRecordsTable).go();
+        await db.delete(db.restAllowancesTable).go();
+      });
     } catch (e) {
-      throw DatabaseException('فشل في مسح سجلات الإجازات');
+      throw DatabaseException('حدث خطأ أثناء مسح السجلات');
     }
   }
 }

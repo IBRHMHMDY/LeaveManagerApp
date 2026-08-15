@@ -157,8 +157,8 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                             child: Text(
                               'تتبع إجازاتك بذكاء وسهولة',
                               style: context.textTheme.titleSmall?.copyWith(
-                                    color: context.colorScheme.primary,
-                                    fontWeight: FontWeight.w600,
+                                    color: context.colorScheme.onSurface,
+                                    fontWeight: FontWeight.w900,
                                   ),
                             ),
                           ),

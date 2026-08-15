@@ -1,0 +1,1 @@
+enum RestFilter { all, available, used }

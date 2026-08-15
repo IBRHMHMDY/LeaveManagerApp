@@ -11,9 +11,9 @@ import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 
-class CustomLeaveCard extends StatelessWidget {
+class LeaveCard extends StatelessWidget {
   final LeaveRecord leave;
-  const CustomLeaveCard({super.key, required this.leave});
+  const LeaveCard({super.key, required this.leave});
 
   @override
   Widget build(BuildContext context) {
@@ -81,42 +81,25 @@ class _LeaveCardContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return AppCard(
       margin: const EdgeInsets.only(bottom: AppSpacing.md),
-      clipBehavior: Clip.antiAlias,
-      decoration: BoxDecoration(
-        color: context.colorScheme.surface,
-        borderRadius: AppRadius.lg,
-        border: Border.all(
-          color: context.colorScheme.outline.withOpacity(0.15),
-          width: 1,
-        ),
-      ),
-      child: IntrinsicHeight(
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Container(width: 6, color: color),
-            Expanded(
-              child: Padding(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: _LeaveDetails(
-                        leave: leave,
-                        color: color,
-                        isRegular: isRegular,
-                      ),
-                    ),
-                    const SizedBox(width: AppSpacing.md),
-                    _LeaveDaysBox(color: color, daysCount: leave.daysCount),
-                  ],
-                ),
-              ),
+      indicatorColor: color,
+      child: Row(
+        children: [
+          Expanded(
+            child: _LeaveDetails(
+              leave: leave,
+              color: color,
+              isRegular: isRegular,
             ),
-          ],
-        ),
+          ),
+          const SizedBox(width: AppSpacing.md),
+          AppNumberBox(
+            number: leave.daysCount,
+            label: 'يوم',
+            color: color,
+          ),
+        ],
       ),
     );
   }
@@ -193,38 +176,6 @@ class _LeaveDetails extends StatelessWidget {
           ),
         ],
       ],
-    );
-  }
-}
-
-class _LeaveDaysBox extends StatelessWidget {
-  final Color color;
-  final int daysCount;
-  const _LeaveDaysBox({required this.color, required this.daysCount});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.06),
-        borderRadius: AppRadius.lg,
-        border: Border.all(color: color.withOpacity(0.12)),
-      ),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            '$daysCount',
-            style: TextStyle(color: color, fontWeight: FontWeight.w900, fontSize: 24, height: 1.1),
-          ),
-          Text(
-            'أيام',
-            style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
-          ),
-        ],
-      ),
     );
   }
 }

@@ -12,14 +12,14 @@ class AppEmptyState extends StatelessWidget {
     super.key,
     required this.title,
     required this.content,
-    this.icon = Icons.event_busy_rounded, // توفير المرونة لتغيير الأيقونة
+    this.icon = Icons.event_busy_rounded,
   });
 
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.lg),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -28,13 +28,12 @@ class AppEmptyState extends StatelessWidget {
               size: 80,
               color: context.colorScheme.outlineVariant,
             ),
-            const SizedBox(height: AppSpacing.lg),
+            const SizedBox(height: AppSpacing.md),
             Text(
               title,
-              style: context.textTheme.titleMedium?.copyWith(
+              style: context.textTheme.titleLarge?.copyWith(
                 color: context.colorScheme.onSurfaceVariant,
               ),
-              textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppSpacing.sm),
             Text(

@@ -52,7 +52,7 @@ class SettingsFormSection extends StatelessWidget {
                 valueListenable: regularLeavesController,
                 builder: (context, value, child) {
                   final currentValue = int.tryParse(value.text) ?? 15;
-                  return AppNumberCounter(
+                  return AppCounterBox(
                     label: 'إجمالي الاعتيادي',
                     value: currentValue,
                     min: 15,
@@ -70,7 +70,7 @@ class SettingsFormSection extends StatelessWidget {
                 valueListenable: casualLeavesController,
                 builder: (context, value, child) {
                   final currentValue = int.tryParse(value.text) ?? 7;
-                  return AppNumberCounter(
+                  return AppCounterBox(
                     label: 'إجمالي العارضة',
                     value: currentValue,
                     min: 6,

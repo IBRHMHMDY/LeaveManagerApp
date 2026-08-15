@@ -102,7 +102,7 @@ class AppDateRangePicker extends StatelessWidget {
           horizontal: AppSpacing.md,
         ),
         decoration: BoxDecoration(
-          color: context.colorScheme.surfaceContainerHighest,
+          color: context.colorScheme.surfaceContainer,
           borderRadius: AppRadius.md,
           border: Border.all(
             color: hasDate ? context.colorScheme.primary : Colors.transparent,
