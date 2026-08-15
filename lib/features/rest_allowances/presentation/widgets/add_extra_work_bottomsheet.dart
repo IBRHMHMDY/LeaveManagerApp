@@ -200,7 +200,7 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
             );
           },
         ),
-        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+        // SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
       ],
     );
   }

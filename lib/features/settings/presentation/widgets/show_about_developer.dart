@@ -6,7 +6,6 @@ import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_cubit.dart';
 import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_state.dart';
-import 'package:leave_manager/shared/widgets/buttons/app_outlined_button.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_primary_button.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_share_button.dart';
 import 'package:leave_manager/shared/widgets/displays/app_version_display.dart';
@@ -34,16 +33,16 @@ class _AboutDeveloperContent extends StatefulWidget {
 }
 
 class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
-  Future<void> _launchEmail() async {
-    final Uri emailLaunchUri = Uri(
-      scheme: 'mailto',
-      path: 'ibrhmhmdy@example.com',
-      queryParameters: {'subject': 'تطبيق متتبع الإجازات - تواصل'},
-    );
-    if (!await launchUrl(emailLaunchUri)) {
-      debugPrint('لا يمكن فتح البريد الإلكتروني');
-    }
-  }
+  // Future<void> _launchEmail() async {
+  //   final Uri emailLaunchUri = Uri(
+  //     scheme: 'mailto',
+  //     path: 'ibrhmhmdy@example.com',
+  //     queryParameters: {'subject': 'تطبيق متتبع الإجازات - تواصل'},
+  //   );
+  //   if (!await launchUrl(emailLaunchUri)) {
+  //     debugPrint('لا يمكن فتح البريد الإلكتروني');
+  //   }
+  // }
 
   Future<void> _launchWhatsApp() async {
     const String phoneNumber = '2001007576297';
@@ -162,17 +161,17 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
                 label: 'تواصل عبر واتساب',
                 onPressed: _launchWhatsApp,
               ),
-              const SizedBox(height: AppSpacing.sm),
+              // const SizedBox(height: AppSpacing.sm),
 
-              // 6. زر التواصل عبر البريد
-              AppOutlinedButton(
-                foregroundColor: context.colorScheme.primary,
-                icon: Icons.mail_outline_rounded,
-                label: 'إرسال بريد إلكتروني',
-                onPressed: _launchEmail,
-              ),
+              // // 6. زر التواصل عبر البريد
+              // AppOutlinedButton(
+              //   foregroundColor: context.colorScheme.primary,
+              //   icon: Icons.mail_outline_rounded,
+              //   label: 'إرسال بريد إلكتروني',
+              //   onPressed: _launchEmail,
+              // ),
 
-              const SizedBox(height: AppSpacing.lg),
+              const SizedBox(height: AppSpacing.md),
 
               // 7. حقوق الملكية
               Center(

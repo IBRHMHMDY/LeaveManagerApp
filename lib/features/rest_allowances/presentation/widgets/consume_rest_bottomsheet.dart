@@ -152,7 +152,7 @@ class _ConsumeRestFormState extends State<_ConsumeRestForm> {
           label: 'خصم رصيد',
           foregroundColor: context.colorScheme.onPrimary,
         ),
-        SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+        // SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
       ],
     );
   }

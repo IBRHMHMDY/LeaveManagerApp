@@ -21,7 +21,6 @@ class RestAllowancesCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // final isHoliday = extrawork.workReason == WorkReason.holiday;
     final bool isUsed = extrawork.isUsed;
     final cardColor = isUsed
         ? context.leaveColors.usedRest
@@ -100,7 +99,6 @@ class _DismissibleBackground extends StatelessWidget {
 class _CardHeader extends StatelessWidget {
   final ExtraWorkRecord extrawork;
   final Color cardColor;
-
   const _CardHeader({required this.extrawork, required this.cardColor});
 
   @override
@@ -164,7 +162,6 @@ class _CardHeader extends StatelessWidget {
 
 class _CardDates extends StatelessWidget {
   final ExtraWorkRecord extrawork;
-
   const _CardDates({required this.extrawork});
 
   @override
@@ -242,7 +239,6 @@ class _DateRow extends StatelessWidget {
 
 class _CardNotes extends StatelessWidget {
   final String notes;
-
   const _CardNotes({required this.notes});
 
   @override
@@ -280,7 +276,6 @@ class _CardNotes extends StatelessWidget {
 class _CardActions extends StatelessWidget {
   final ExtraWorkRecord extrawork;
   final Color cardColor;
-
   const _CardActions({required this.extrawork, required this.cardColor});
 
   @override
@@ -293,7 +288,6 @@ class _CardActions extends StatelessWidget {
           label: 'استهلاك الرصيد',
           icon: Icons.remove_circle_outline,
           foregroundColor: cardColor,
-          width: double.infinity,
         ),
       ],
     );

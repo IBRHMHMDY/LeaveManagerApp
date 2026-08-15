@@ -18,8 +18,9 @@ class AppBottomSheet {
       isScrollControlled: isScrollControlled,
       isDismissible: isDismissible,
       backgroundColor: Colors.transparent,
-      useSafeArea: true,
+      useSafeArea: true, // يضمن عدم التداخل مع شريط الحالة (Status Bar)
       builder: (BuildContext ctx) {
+        // إدارة مساحة لوحة المفاتيح مركزياً هنا فقط
         return Padding(
           padding: EdgeInsets.only(bottom: MediaQuery.viewInsetsOf(ctx).bottom),
           child: _BottomSheetContent(
@@ -50,15 +51,16 @@ class _BottomSheetContent extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
+      // تعديل نسبة الارتفاع الأقصى لترك مساحة كافية بأمان على الشاشات الصغيرة
       constraints: BoxConstraints(
-        maxHeight: MediaQuery.sizeOf(context).height * 0.9,
+        maxHeight: MediaQuery.sizeOf(context).height * 0.85, 
       ),
       decoration: BoxDecoration(
         color: context.colorScheme.surface,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
       ),
       child: Column(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisSize: MainAxisSize.min, // للحفاظ على الحجم مضغوطاً حسب المحتوى
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           const SizedBox(height: 12),
@@ -92,6 +94,8 @@ class _BottomSheetContent extends StatelessWidget {
           const SizedBox(height: 16),
           Flexible(
             child: SingleChildScrollView(
+              // يفضل إضافة BouncingScrollPhysics لدعم السحب بمرونة أعلى على الأجهزة القديمة
+              physics: const BouncingScrollPhysics(),
               child: Padding(
                 padding: const EdgeInsets.all(AppSpacing.lg),
                 child: child,

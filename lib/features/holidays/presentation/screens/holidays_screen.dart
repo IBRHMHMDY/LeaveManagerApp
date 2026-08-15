@@ -17,53 +17,55 @@ class HolidaysScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppAppBar(
-        customTitle: Column(
-          children: [
-            Text(
-              'العطلات الرسميه',
-              style: context.textTheme.displaySmall?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: context.colorScheme.primary,
+    return SafeArea(
+      child: Scaffold(
+        appBar: AppAppBar(
+          customTitle: Column(
+            children: [
+              Text(
+                'العطلات الرسميه',
+                style: context.textTheme.displaySmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: context.colorScheme.primary,
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            AppBadge(
-              title: FinancialYearCalculator.financialYearString,
-              textColor: context.colorScheme.onSurface,
-            ),
-          ],
+              const SizedBox(height: 8),
+              AppBadge(
+                title: FinancialYearCalculator.financialYearString,
+                textColor: context.colorScheme.onSurface,
+              ),
+            ],
+          ),
         ),
-      ),
-      body: BlocBuilder<HolidaysCubit, HolidaysState>(
-        builder: (context, state) {
-          if (state is HolidaysLoading || state is HolidaysInitial) {
-            return const Center(child: CircularProgressIndicator());
-          }
-          if (state is HolidaysError) {
-            return Center(child: Text(state.message));
-          }
-          if (state is HolidaysLoaded) {
-            final holidays = state.financialYearHolidays;
-            if (holidays.isEmpty) {
-              return const AppEmptyState(
-                title: 'فشل فى قراءه العطلات',
-                content: 'من فضلك اتصل بالدعم لإصلاح المشكله',
+        body: BlocBuilder<HolidaysCubit, HolidaysState>(
+          builder: (context, state) {
+            if (state is HolidaysLoading || state is HolidaysInitial) {
+              return const Center(child: CircularProgressIndicator());
+            }
+            if (state is HolidaysError) {
+              return Center(child: Text(state.message));
+            }
+            if (state is HolidaysLoaded) {
+              final holidays = state.financialYearHolidays;
+              if (holidays.isEmpty) {
+                return const AppEmptyState(
+                  title: 'فشل فى قراءه العطلات',
+                  content: 'من فضلك اتصل بالدعم لإصلاح المشكله',
+                );
+              }
+              return ListView.builder(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                itemCount: holidays.length,
+                itemBuilder: (context, index) {
+                  final holiday = holidays[index];
+                  final isPast = holiday.endDate.isBefore(DateTime.now());
+                  return _buildHolidayCard(context, holiday, isPast);
+                },
               );
             }
-            return ListView.builder(
-              padding: const EdgeInsets.all(AppSpacing.md),
-              itemCount: holidays.length,
-              itemBuilder: (context, index) {
-                final holiday = holidays[index];
-                final isPast = holiday.endDate.isBefore(DateTime.now());
-                return _buildHolidayCard(context, holiday, isPast);
-              },
-            );
-          }
-          return const SizedBox.shrink();
-        },
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }
@@ -157,6 +159,7 @@ class HolidaysScreen extends StatelessWidget {
               ],
             ),
           ),
+          
         ],
       ),
     );
