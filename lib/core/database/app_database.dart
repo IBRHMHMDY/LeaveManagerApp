@@ -15,7 +15,7 @@ class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   @override
   MigrationStrategy get migration {
@@ -32,6 +32,12 @@ class AppDatabase extends _$AppDatabase {
         // schemaVersion => 3
         if (from < 3) {
           await m.createTable(restAllowancesTable);
+        }
+        if (from < 4) {
+          // إضافة عمود تفعيل الإشعارات
+          await m.addColumn(settingsTable, settingsTable.enableNotifications);
+          // إضافة عمود عدد أيام التنبيه قبل العطلة
+          await m.addColumn(settingsTable, settingsTable.daysBeforeHolidayAlert);
         }
       },
     );

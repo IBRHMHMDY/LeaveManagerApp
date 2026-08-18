@@ -83,10 +83,11 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           context.read<SettingsBloc>().add(LoadSettingsEvent());
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
           context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
+          
           SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.manual, 
-              overlays: SystemUiOverlay.values,
-            );
+            SystemUiMode.manual,
+            overlays: SystemUiOverlay.values,
+          );
           context.go(AppRouter.home);
         } else if (state is SettingsNotFound) {
           SystemChrome.setEnabledSystemUIMode(

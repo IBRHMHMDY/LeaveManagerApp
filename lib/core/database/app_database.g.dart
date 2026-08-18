@@ -61,6 +61,31 @@ class $SettingsTableTable extends SettingsTable
     type: DriftSqlType.int,
     requiredDuringInsert: true,
   );
+  static const VerificationMeta _enableNotificationsMeta =
+      const VerificationMeta('enableNotifications');
+  @override
+  late final GeneratedColumn<bool> enableNotifications = GeneratedColumn<bool>(
+    'enable_notifications',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("enable_notifications" IN (0, 1))',
+    ),
+    defaultValue: const Constant(true),
+  );
+  static const VerificationMeta _daysBeforeHolidayAlertMeta =
+      const VerificationMeta('daysBeforeHolidayAlert');
+  @override
+  late final GeneratedColumn<int> daysBeforeHolidayAlert = GeneratedColumn<int>(
+    'days_before_holiday_alert',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(2),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -68,6 +93,8 @@ class $SettingsTableTable extends SettingsTable
     jobTitle,
     totalRegularLeaves,
     totalCasualLeaves,
+    enableNotifications,
+    daysBeforeHolidayAlert,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -125,6 +152,24 @@ class $SettingsTableTable extends SettingsTable
     } else if (isInserting) {
       context.missing(_totalCasualLeavesMeta);
     }
+    if (data.containsKey('enable_notifications')) {
+      context.handle(
+        _enableNotificationsMeta,
+        enableNotifications.isAcceptableOrUnknown(
+          data['enable_notifications']!,
+          _enableNotificationsMeta,
+        ),
+      );
+    }
+    if (data.containsKey('days_before_holiday_alert')) {
+      context.handle(
+        _daysBeforeHolidayAlertMeta,
+        daysBeforeHolidayAlert.isAcceptableOrUnknown(
+          data['days_before_holiday_alert']!,
+          _daysBeforeHolidayAlertMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -154,6 +199,14 @@ class $SettingsTableTable extends SettingsTable
         DriftSqlType.int,
         data['${effectivePrefix}total_casual_leaves'],
       )!,
+      enableNotifications: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}enable_notifications'],
+      )!,
+      daysBeforeHolidayAlert: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}days_before_holiday_alert'],
+      )!,
     );
   }
 
@@ -169,12 +222,16 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
   final String jobTitle;
   final int totalRegularLeaves;
   final int totalCasualLeaves;
+  final bool enableNotifications;
+  final int daysBeforeHolidayAlert;
   const SettingModel({
     required this.id,
     required this.employeeName,
     required this.jobTitle,
     required this.totalRegularLeaves,
     required this.totalCasualLeaves,
+    required this.enableNotifications,
+    required this.daysBeforeHolidayAlert,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -184,6 +241,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     map['job_title'] = Variable<String>(jobTitle);
     map['total_regular_leaves'] = Variable<int>(totalRegularLeaves);
     map['total_casual_leaves'] = Variable<int>(totalCasualLeaves);
+    map['enable_notifications'] = Variable<bool>(enableNotifications);
+    map['days_before_holiday_alert'] = Variable<int>(daysBeforeHolidayAlert);
     return map;
   }
 
@@ -194,6 +253,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       jobTitle: Value(jobTitle),
       totalRegularLeaves: Value(totalRegularLeaves),
       totalCasualLeaves: Value(totalCasualLeaves),
+      enableNotifications: Value(enableNotifications),
+      daysBeforeHolidayAlert: Value(daysBeforeHolidayAlert),
     );
   }
 
@@ -208,6 +269,12 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       jobTitle: serializer.fromJson<String>(json['jobTitle']),
       totalRegularLeaves: serializer.fromJson<int>(json['totalRegularLeaves']),
       totalCasualLeaves: serializer.fromJson<int>(json['totalCasualLeaves']),
+      enableNotifications: serializer.fromJson<bool>(
+        json['enableNotifications'],
+      ),
+      daysBeforeHolidayAlert: serializer.fromJson<int>(
+        json['daysBeforeHolidayAlert'],
+      ),
     );
   }
   @override
@@ -219,6 +286,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       'jobTitle': serializer.toJson<String>(jobTitle),
       'totalRegularLeaves': serializer.toJson<int>(totalRegularLeaves),
       'totalCasualLeaves': serializer.toJson<int>(totalCasualLeaves),
+      'enableNotifications': serializer.toJson<bool>(enableNotifications),
+      'daysBeforeHolidayAlert': serializer.toJson<int>(daysBeforeHolidayAlert),
     };
   }
 
@@ -228,12 +297,17 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     String? jobTitle,
     int? totalRegularLeaves,
     int? totalCasualLeaves,
+    bool? enableNotifications,
+    int? daysBeforeHolidayAlert,
   }) => SettingModel(
     id: id ?? this.id,
     employeeName: employeeName ?? this.employeeName,
     jobTitle: jobTitle ?? this.jobTitle,
     totalRegularLeaves: totalRegularLeaves ?? this.totalRegularLeaves,
     totalCasualLeaves: totalCasualLeaves ?? this.totalCasualLeaves,
+    enableNotifications: enableNotifications ?? this.enableNotifications,
+    daysBeforeHolidayAlert:
+        daysBeforeHolidayAlert ?? this.daysBeforeHolidayAlert,
   );
   SettingModel copyWithCompanion(SettingsTableCompanion data) {
     return SettingModel(
@@ -248,6 +322,12 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       totalCasualLeaves: data.totalCasualLeaves.present
           ? data.totalCasualLeaves.value
           : this.totalCasualLeaves,
+      enableNotifications: data.enableNotifications.present
+          ? data.enableNotifications.value
+          : this.enableNotifications,
+      daysBeforeHolidayAlert: data.daysBeforeHolidayAlert.present
+          ? data.daysBeforeHolidayAlert.value
+          : this.daysBeforeHolidayAlert,
     );
   }
 
@@ -258,7 +338,9 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
           ..write('employeeName: $employeeName, ')
           ..write('jobTitle: $jobTitle, ')
           ..write('totalRegularLeaves: $totalRegularLeaves, ')
-          ..write('totalCasualLeaves: $totalCasualLeaves')
+          ..write('totalCasualLeaves: $totalCasualLeaves, ')
+          ..write('enableNotifications: $enableNotifications, ')
+          ..write('daysBeforeHolidayAlert: $daysBeforeHolidayAlert')
           ..write(')'))
         .toString();
   }
@@ -270,6 +352,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     jobTitle,
     totalRegularLeaves,
     totalCasualLeaves,
+    enableNotifications,
+    daysBeforeHolidayAlert,
   );
   @override
   bool operator ==(Object other) =>
@@ -279,7 +363,9 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
           other.employeeName == this.employeeName &&
           other.jobTitle == this.jobTitle &&
           other.totalRegularLeaves == this.totalRegularLeaves &&
-          other.totalCasualLeaves == this.totalCasualLeaves);
+          other.totalCasualLeaves == this.totalCasualLeaves &&
+          other.enableNotifications == this.enableNotifications &&
+          other.daysBeforeHolidayAlert == this.daysBeforeHolidayAlert);
 }
 
 class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
@@ -288,12 +374,16 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
   final Value<String> jobTitle;
   final Value<int> totalRegularLeaves;
   final Value<int> totalCasualLeaves;
+  final Value<bool> enableNotifications;
+  final Value<int> daysBeforeHolidayAlert;
   const SettingsTableCompanion({
     this.id = const Value.absent(),
     this.employeeName = const Value.absent(),
     this.jobTitle = const Value.absent(),
     this.totalRegularLeaves = const Value.absent(),
     this.totalCasualLeaves = const Value.absent(),
+    this.enableNotifications = const Value.absent(),
+    this.daysBeforeHolidayAlert = const Value.absent(),
   });
   SettingsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -301,6 +391,8 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     required String jobTitle,
     required int totalRegularLeaves,
     required int totalCasualLeaves,
+    this.enableNotifications = const Value.absent(),
+    this.daysBeforeHolidayAlert = const Value.absent(),
   }) : employeeName = Value(employeeName),
        jobTitle = Value(jobTitle),
        totalRegularLeaves = Value(totalRegularLeaves),
@@ -311,6 +403,8 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     Expression<String>? jobTitle,
     Expression<int>? totalRegularLeaves,
     Expression<int>? totalCasualLeaves,
+    Expression<bool>? enableNotifications,
+    Expression<int>? daysBeforeHolidayAlert,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -319,6 +413,10 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
       if (totalRegularLeaves != null)
         'total_regular_leaves': totalRegularLeaves,
       if (totalCasualLeaves != null) 'total_casual_leaves': totalCasualLeaves,
+      if (enableNotifications != null)
+        'enable_notifications': enableNotifications,
+      if (daysBeforeHolidayAlert != null)
+        'days_before_holiday_alert': daysBeforeHolidayAlert,
     });
   }
 
@@ -328,6 +426,8 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     Value<String>? jobTitle,
     Value<int>? totalRegularLeaves,
     Value<int>? totalCasualLeaves,
+    Value<bool>? enableNotifications,
+    Value<int>? daysBeforeHolidayAlert,
   }) {
     return SettingsTableCompanion(
       id: id ?? this.id,
@@ -335,6 +435,9 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
       jobTitle: jobTitle ?? this.jobTitle,
       totalRegularLeaves: totalRegularLeaves ?? this.totalRegularLeaves,
       totalCasualLeaves: totalCasualLeaves ?? this.totalCasualLeaves,
+      enableNotifications: enableNotifications ?? this.enableNotifications,
+      daysBeforeHolidayAlert:
+          daysBeforeHolidayAlert ?? this.daysBeforeHolidayAlert,
     );
   }
 
@@ -356,6 +459,14 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     if (totalCasualLeaves.present) {
       map['total_casual_leaves'] = Variable<int>(totalCasualLeaves.value);
     }
+    if (enableNotifications.present) {
+      map['enable_notifications'] = Variable<bool>(enableNotifications.value);
+    }
+    if (daysBeforeHolidayAlert.present) {
+      map['days_before_holiday_alert'] = Variable<int>(
+        daysBeforeHolidayAlert.value,
+      );
+    }
     return map;
   }
 
@@ -366,7 +477,9 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
           ..write('employeeName: $employeeName, ')
           ..write('jobTitle: $jobTitle, ')
           ..write('totalRegularLeaves: $totalRegularLeaves, ')
-          ..write('totalCasualLeaves: $totalCasualLeaves')
+          ..write('totalCasualLeaves: $totalCasualLeaves, ')
+          ..write('enableNotifications: $enableNotifications, ')
+          ..write('daysBeforeHolidayAlert: $daysBeforeHolidayAlert')
           ..write(')'))
         .toString();
   }
@@ -1794,6 +1907,8 @@ typedef $$SettingsTableTableCreateCompanionBuilder =
       required String jobTitle,
       required int totalRegularLeaves,
       required int totalCasualLeaves,
+      Value<bool> enableNotifications,
+      Value<int> daysBeforeHolidayAlert,
     });
 typedef $$SettingsTableTableUpdateCompanionBuilder =
     SettingsTableCompanion Function({
@@ -1802,6 +1917,8 @@ typedef $$SettingsTableTableUpdateCompanionBuilder =
       Value<String> jobTitle,
       Value<int> totalRegularLeaves,
       Value<int> totalCasualLeaves,
+      Value<bool> enableNotifications,
+      Value<int> daysBeforeHolidayAlert,
     });
 
 class $$SettingsTableTableFilterComposer
@@ -1835,6 +1952,16 @@ class $$SettingsTableTableFilterComposer
 
   ColumnFilters<int> get totalCasualLeaves => $composableBuilder(
     column: $table.totalCasualLeaves,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get enableNotifications => $composableBuilder(
+    column: $table.enableNotifications,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get daysBeforeHolidayAlert => $composableBuilder(
+    column: $table.daysBeforeHolidayAlert,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1872,6 +1999,16 @@ class $$SettingsTableTableOrderingComposer
     column: $table.totalCasualLeaves,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<bool> get enableNotifications => $composableBuilder(
+    column: $table.enableNotifications,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get daysBeforeHolidayAlert => $composableBuilder(
+    column: $table.daysBeforeHolidayAlert,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableTableAnnotationComposer
@@ -1901,6 +2038,16 @@ class $$SettingsTableTableAnnotationComposer
 
   GeneratedColumn<int> get totalCasualLeaves => $composableBuilder(
     column: $table.totalCasualLeaves,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get enableNotifications => $composableBuilder(
+    column: $table.enableNotifications,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get daysBeforeHolidayAlert => $composableBuilder(
+    column: $table.daysBeforeHolidayAlert,
     builder: (column) => column,
   );
 }
@@ -1941,12 +2088,16 @@ class $$SettingsTableTableTableManager
                 Value<String> jobTitle = const Value.absent(),
                 Value<int> totalRegularLeaves = const Value.absent(),
                 Value<int> totalCasualLeaves = const Value.absent(),
+                Value<bool> enableNotifications = const Value.absent(),
+                Value<int> daysBeforeHolidayAlert = const Value.absent(),
               }) => SettingsTableCompanion(
                 id: id,
                 employeeName: employeeName,
                 jobTitle: jobTitle,
                 totalRegularLeaves: totalRegularLeaves,
                 totalCasualLeaves: totalCasualLeaves,
+                enableNotifications: enableNotifications,
+                daysBeforeHolidayAlert: daysBeforeHolidayAlert,
               ),
           createCompanionCallback:
               ({
@@ -1955,12 +2106,16 @@ class $$SettingsTableTableTableManager
                 required String jobTitle,
                 required int totalRegularLeaves,
                 required int totalCasualLeaves,
+                Value<bool> enableNotifications = const Value.absent(),
+                Value<int> daysBeforeHolidayAlert = const Value.absent(),
               }) => SettingsTableCompanion.insert(
                 id: id,
                 employeeName: employeeName,
                 jobTitle: jobTitle,
                 totalRegularLeaves: totalRegularLeaves,
                 totalCasualLeaves: totalCasualLeaves,
+                enableNotifications: enableNotifications,
+                daysBeforeHolidayAlert: daysBeforeHolidayAlert,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

@@ -7,6 +7,8 @@ class SettingsTable extends Table {
   TextColumn get jobTitle => text()();
   IntColumn get totalRegularLeaves => integer()();
   IntColumn get totalCasualLeaves => integer()();
+  BoolColumn get enableNotifications => boolean().withDefault(const Constant(true))(); 
+  IntColumn get daysBeforeHolidayAlert => integer().withDefault(const Constant(2))();
 
   @override
   Set<Column> get primaryKey => {id};

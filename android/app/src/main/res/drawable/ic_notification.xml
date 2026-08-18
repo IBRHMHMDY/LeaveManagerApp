@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Calendar body -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M5,4h14a2,2 0 0 1 2,2v13a2,2 0 0 1 -2,2H5a2,2 0 0 1 -2,-2V6a2,2 0 0 1 2,-2z"/>
+
+    <!-- Calendar rings -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M8,2h2v4H8zM14,2h2v4h-2z"/>
+
+    <!-- Grid cutouts -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M7,9h2v2H7zM11,9h2v2h-2zM15,9h2v2h-2zM7,13h2v2H7zM11,13h2v2h-2zM15,13h2v2h-2z"/>
+
+    <!-- Notification bell -->
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M18.5,11c-1.4,0 -2.5,1.1 -2.5,2.5v1.4l-0.7,1.1c-0.1,0.2 0,0.5 0.3,0.5h5.8c0.3,0 0.4,-0.3 0.3,-0.5L21,14.9v-1.4c0,-1.4 -1.1,-2.5 -2.5,-2.5zM18.5,18.2a0.9,0.9 0 0 0 0.9,-0.9h-1.8a0.9,0.9 0 0 0 0.9,0.9z"/>
+</vector>

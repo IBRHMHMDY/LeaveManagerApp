@@ -1,3 +1,4 @@
+// lib/features/settings/data/models/settings_mapper.dart
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
 
@@ -9,6 +10,9 @@ extension SettingsMapper on SettingModel {
       jobTitle: jobTitle,
       totalRegularLeaves: totalRegularLeaves,
       totalCasualLeaves: totalCasualLeaves,
+      // --- الحقول الجديدة للربط مع Drift Model ---
+      enableNotifications: enableNotifications,
+      daysBeforeHolidayAlert: daysBeforeHolidayAlert,
     );
   }
 }

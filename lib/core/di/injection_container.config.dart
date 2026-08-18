@@ -67,8 +67,6 @@ import '../../features/settings/domain/repositories/settings_repository.dart'
     as _i674;
 import '../../features/settings/domain/usecases/check_settings_exist_usecase.dart'
     as _i787;
-import '../../features/settings/domain/usecases/check_settings_exit_usecase.dart'
-    as _i643;
 import '../../features/settings/domain/usecases/get_settings_usecase.dart'
     as _i1029;
 import '../../features/settings/domain/usecases/reset_balances_usecase.dart'
@@ -78,7 +76,16 @@ import '../../features/settings/domain/usecases/save_settings_usecase.dart'
 import '../../features/settings/presentation/bloc/settings_bloc.dart' as _i585;
 import '../../shared/themes/theme_cubit.dart' as _i202;
 import '../database/app_database.dart' as _i982;
+import '../notifications/data/repositories/notification_repository_impl.dart'
+    as _i388;
+import '../notifications/domain/repositories/notification_repository.dart'
+    as _i891;
+import '../notifications/domain/usecases/init_notifications_usecase.dart'
+    as _i568;
+import '../notifications/domain/usecases/request_notification_permissions_usecase.dart'
+    as _i355;
 import '../usecases/check_date_overlap_usecase.dart' as _i707;
+import '../utils/notification_service.dart' as _i275;
 import '../utils/share_service.dart' as _i518;
 import 'register_module.dart' as _i291;
 
@@ -96,12 +103,18 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i917.LayoutCubit>(() => _i917.LayoutCubit());
     gh.lazySingleton<_i982.AppDatabase>(() => registerModule.appDatabase);
+    gh.lazySingleton<_i275.NotificationService>(
+      () => _i275.NotificationService(),
+    );
     gh.lazySingleton<_i518.ShareService>(() => _i518.ShareService());
     gh.lazySingleton<_i828.HolidaysLocalDataSource>(
       () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),
     );
     gh.lazySingleton<_i599.SettingsLocalDataSource>(
       () => _i599.SettingsLocalDataSourceImpl(gh<_i982.AppDatabase>()),
+    );
+    gh.lazySingleton<_i891.NotificationRepository>(
+      () => _i388.NotificationRepositoryImpl(gh<_i275.NotificationService>()),
     );
     gh.lazySingleton<_i1005.LeavesLocalDataSource>(
       () => _i1005.LeavesLocalDataSourceImpl(gh<_i982.AppDatabase>()),
@@ -120,6 +133,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.factory<_i202.ThemeCubit>(
       () => _i202.ThemeCubit(sharedPreferences: gh<_i460.SharedPreferences>()),
     );
+    gh.lazySingleton<_i568.InitNotificationsUseCase>(
+      () => _i568.InitNotificationsUseCase(gh<_i891.NotificationRepository>()),
+    );
+    gh.lazySingleton<_i355.RequestNotificationPermissionsUseCase>(
+      () => _i355.RequestNotificationPermissionsUseCase(
+        gh<_i891.NotificationRepository>(),
+      ),
+    );
     gh.lazySingleton<_i171.HolidaysRepository>(
       () => _i106.HolidaysRepositoryImpl(gh<_i828.HolidaysLocalDataSource>()),
     );
@@ -136,13 +157,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i388.LeaveRepository>(
       () => _i408.LeaveRepositoryImpl(gh<_i1005.LeavesLocalDataSource>()),
-    );
-    gh.factory<_i120.HolidaysCubit>(
-      () => _i120.HolidaysCubit(
-        gh<_i606.InitializeHolidaysUseCase>(),
-        gh<_i11.GetUpcomingHolidayUseCase>(),
-        gh<_i1053.GetFinancialYearHolidaysUseCase>(),
-      ),
     );
     gh.lazySingleton<_i785.DeleteExtraWorkUseCase>(
       () => _i785.DeleteExtraWorkUseCase(gh<_i314.RestAllowancesRepository>()),
@@ -174,9 +188,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i787.CheckSettingsExistUseCase>(
       () => _i787.CheckSettingsExistUseCase(gh<_i674.SettingsRepository>()),
     );
-    gh.lazySingleton<_i643.CheckSettingsExistUseCase>(
-      () => _i643.CheckSettingsExistUseCase(gh<_i674.SettingsRepository>()),
-    );
     gh.lazySingleton<_i1029.GetSettingsUseCase>(
       () => _i1029.GetSettingsUseCase(gh<_i674.SettingsRepository>()),
     );
@@ -185,13 +196,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i109.SaveSettingsUseCase>(
       () => _i109.SaveSettingsUseCase(gh<_i674.SettingsRepository>()),
-    );
-    gh.factory<_i585.SettingsBloc>(
-      () => _i585.SettingsBloc(
-        checkSettingsExist: gh<_i643.CheckSettingsExistUseCase>(),
-        getSettings: gh<_i1029.GetSettingsUseCase>(),
-        saveSettings: gh<_i109.SaveSettingsUseCase>(),
-      ),
     );
     gh.lazySingleton<_i501.DeleteLeaveUseCase>(
       () => _i501.DeleteLeaveUseCase(gh<_i388.LeaveRepository>()),
@@ -205,6 +209,24 @@ extension GetItInjectableX on _i174.GetIt {
         addExtraWork: gh<_i693.AddExtraWorkUseCase>(),
         useRestAllowance: gh<_i474.UseRestAllowanceUseCase>(),
         deleteExtraWork: gh<_i785.DeleteExtraWorkUseCase>(),
+      ),
+    );
+    gh.factory<_i120.HolidaysCubit>(
+      () => _i120.HolidaysCubit(
+        gh<_i606.InitializeHolidaysUseCase>(),
+        gh<_i11.GetUpcomingHolidayUseCase>(),
+        gh<_i1053.GetFinancialYearHolidaysUseCase>(),
+        gh<_i1029.GetSettingsUseCase>(),
+        gh<_i275.NotificationService>(),
+      ),
+    );
+    gh.factory<_i585.SettingsBloc>(
+      () => _i585.SettingsBloc(
+        checkSettingsExist: gh<_i787.CheckSettingsExistUseCase>(),
+        getSettings: gh<_i1029.GetSettingsUseCase>(),
+        saveSettings: gh<_i109.SaveSettingsUseCase>(),
+        initNotifications: gh<_i568.InitNotificationsUseCase>(),
+        requestPermissions: gh<_i355.RequestNotificationPermissionsUseCase>(),
       ),
     );
     gh.lazySingleton<_i952.CalculateBalancesUseCase>(
