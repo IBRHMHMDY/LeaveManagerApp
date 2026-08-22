@@ -86,6 +86,18 @@ class $SettingsTableTable extends SettingsTable
     requiredDuringInsert: false,
     defaultValue: const Constant(2),
   );
+  static const VerificationMeta _notificationTimeMeta = const VerificationMeta(
+    'notificationTime',
+  );
+  @override
+  late final GeneratedColumn<String> notificationTime = GeneratedColumn<String>(
+    'notification_time',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('10:00'),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -95,6 +107,7 @@ class $SettingsTableTable extends SettingsTable
     totalCasualLeaves,
     enableNotifications,
     daysBeforeHolidayAlert,
+    notificationTime,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -170,6 +183,15 @@ class $SettingsTableTable extends SettingsTable
         ),
       );
     }
+    if (data.containsKey('notification_time')) {
+      context.handle(
+        _notificationTimeMeta,
+        notificationTime.isAcceptableOrUnknown(
+          data['notification_time']!,
+          _notificationTimeMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -207,6 +229,10 @@ class $SettingsTableTable extends SettingsTable
         DriftSqlType.int,
         data['${effectivePrefix}days_before_holiday_alert'],
       )!,
+      notificationTime: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}notification_time'],
+      )!,
     );
   }
 
@@ -224,6 +250,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
   final int totalCasualLeaves;
   final bool enableNotifications;
   final int daysBeforeHolidayAlert;
+  final String notificationTime;
   const SettingModel({
     required this.id,
     required this.employeeName,
@@ -232,6 +259,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     required this.totalCasualLeaves,
     required this.enableNotifications,
     required this.daysBeforeHolidayAlert,
+    required this.notificationTime,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -243,6 +271,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     map['total_casual_leaves'] = Variable<int>(totalCasualLeaves);
     map['enable_notifications'] = Variable<bool>(enableNotifications);
     map['days_before_holiday_alert'] = Variable<int>(daysBeforeHolidayAlert);
+    map['notification_time'] = Variable<String>(notificationTime);
     return map;
   }
 
@@ -255,6 +284,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       totalCasualLeaves: Value(totalCasualLeaves),
       enableNotifications: Value(enableNotifications),
       daysBeforeHolidayAlert: Value(daysBeforeHolidayAlert),
+      notificationTime: Value(notificationTime),
     );
   }
 
@@ -275,6 +305,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       daysBeforeHolidayAlert: serializer.fromJson<int>(
         json['daysBeforeHolidayAlert'],
       ),
+      notificationTime: serializer.fromJson<String>(json['notificationTime']),
     );
   }
   @override
@@ -288,6 +319,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       'totalCasualLeaves': serializer.toJson<int>(totalCasualLeaves),
       'enableNotifications': serializer.toJson<bool>(enableNotifications),
       'daysBeforeHolidayAlert': serializer.toJson<int>(daysBeforeHolidayAlert),
+      'notificationTime': serializer.toJson<String>(notificationTime),
     };
   }
 
@@ -299,6 +331,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     int? totalCasualLeaves,
     bool? enableNotifications,
     int? daysBeforeHolidayAlert,
+    String? notificationTime,
   }) => SettingModel(
     id: id ?? this.id,
     employeeName: employeeName ?? this.employeeName,
@@ -308,6 +341,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     enableNotifications: enableNotifications ?? this.enableNotifications,
     daysBeforeHolidayAlert:
         daysBeforeHolidayAlert ?? this.daysBeforeHolidayAlert,
+    notificationTime: notificationTime ?? this.notificationTime,
   );
   SettingModel copyWithCompanion(SettingsTableCompanion data) {
     return SettingModel(
@@ -328,6 +362,9 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       daysBeforeHolidayAlert: data.daysBeforeHolidayAlert.present
           ? data.daysBeforeHolidayAlert.value
           : this.daysBeforeHolidayAlert,
+      notificationTime: data.notificationTime.present
+          ? data.notificationTime.value
+          : this.notificationTime,
     );
   }
 
@@ -340,7 +377,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
           ..write('totalRegularLeaves: $totalRegularLeaves, ')
           ..write('totalCasualLeaves: $totalCasualLeaves, ')
           ..write('enableNotifications: $enableNotifications, ')
-          ..write('daysBeforeHolidayAlert: $daysBeforeHolidayAlert')
+          ..write('daysBeforeHolidayAlert: $daysBeforeHolidayAlert, ')
+          ..write('notificationTime: $notificationTime')
           ..write(')'))
         .toString();
   }
@@ -354,6 +392,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     totalCasualLeaves,
     enableNotifications,
     daysBeforeHolidayAlert,
+    notificationTime,
   );
   @override
   bool operator ==(Object other) =>
@@ -365,7 +404,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
           other.totalRegularLeaves == this.totalRegularLeaves &&
           other.totalCasualLeaves == this.totalCasualLeaves &&
           other.enableNotifications == this.enableNotifications &&
-          other.daysBeforeHolidayAlert == this.daysBeforeHolidayAlert);
+          other.daysBeforeHolidayAlert == this.daysBeforeHolidayAlert &&
+          other.notificationTime == this.notificationTime);
 }
 
 class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
@@ -376,6 +416,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
   final Value<int> totalCasualLeaves;
   final Value<bool> enableNotifications;
   final Value<int> daysBeforeHolidayAlert;
+  final Value<String> notificationTime;
   const SettingsTableCompanion({
     this.id = const Value.absent(),
     this.employeeName = const Value.absent(),
@@ -384,6 +425,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     this.totalCasualLeaves = const Value.absent(),
     this.enableNotifications = const Value.absent(),
     this.daysBeforeHolidayAlert = const Value.absent(),
+    this.notificationTime = const Value.absent(),
   });
   SettingsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -393,6 +435,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     required int totalCasualLeaves,
     this.enableNotifications = const Value.absent(),
     this.daysBeforeHolidayAlert = const Value.absent(),
+    this.notificationTime = const Value.absent(),
   }) : employeeName = Value(employeeName),
        jobTitle = Value(jobTitle),
        totalRegularLeaves = Value(totalRegularLeaves),
@@ -405,6 +448,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     Expression<int>? totalCasualLeaves,
     Expression<bool>? enableNotifications,
     Expression<int>? daysBeforeHolidayAlert,
+    Expression<String>? notificationTime,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -417,6 +461,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
         'enable_notifications': enableNotifications,
       if (daysBeforeHolidayAlert != null)
         'days_before_holiday_alert': daysBeforeHolidayAlert,
+      if (notificationTime != null) 'notification_time': notificationTime,
     });
   }
 
@@ -428,6 +473,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     Value<int>? totalCasualLeaves,
     Value<bool>? enableNotifications,
     Value<int>? daysBeforeHolidayAlert,
+    Value<String>? notificationTime,
   }) {
     return SettingsTableCompanion(
       id: id ?? this.id,
@@ -438,6 +484,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
       enableNotifications: enableNotifications ?? this.enableNotifications,
       daysBeforeHolidayAlert:
           daysBeforeHolidayAlert ?? this.daysBeforeHolidayAlert,
+      notificationTime: notificationTime ?? this.notificationTime,
     );
   }
 
@@ -467,6 +514,9 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
         daysBeforeHolidayAlert.value,
       );
     }
+    if (notificationTime.present) {
+      map['notification_time'] = Variable<String>(notificationTime.value);
+    }
     return map;
   }
 
@@ -479,7 +529,8 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
           ..write('totalRegularLeaves: $totalRegularLeaves, ')
           ..write('totalCasualLeaves: $totalCasualLeaves, ')
           ..write('enableNotifications: $enableNotifications, ')
-          ..write('daysBeforeHolidayAlert: $daysBeforeHolidayAlert')
+          ..write('daysBeforeHolidayAlert: $daysBeforeHolidayAlert, ')
+          ..write('notificationTime: $notificationTime')
           ..write(')'))
         .toString();
   }
@@ -1864,6 +1915,400 @@ class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
   }
 }
 
+class $NotificationsTableTable extends NotificationsTable
+    with TableInfo<$NotificationsTableTable, NotificationModel> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NotificationsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _payloadMeta = const VerificationMeta(
+    'payload',
+  );
+  @override
+  late final GeneratedColumn<String> payload = GeneratedColumn<String>(
+    'payload',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isReadMeta = const VerificationMeta('isRead');
+  @override
+  late final GeneratedColumn<bool> isRead = GeneratedColumn<bool>(
+    'is_read',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_read" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _createdAtMeta = const VerificationMeta(
+    'createdAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> createdAt = GeneratedColumn<DateTime>(
+    'created_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    title,
+    body,
+    payload,
+    isRead,
+    createdAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notifications_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NotificationModel> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('payload')) {
+      context.handle(
+        _payloadMeta,
+        payload.isAcceptableOrUnknown(data['payload']!, _payloadMeta),
+      );
+    }
+    if (data.containsKey('is_read')) {
+      context.handle(
+        _isReadMeta,
+        isRead.isAcceptableOrUnknown(data['is_read']!, _isReadMeta),
+      );
+    }
+    if (data.containsKey('created_at')) {
+      context.handle(
+        _createdAtMeta,
+        createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NotificationModel map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NotificationModel(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      payload: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload'],
+      ),
+      isRead: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_read'],
+      )!,
+      createdAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}created_at'],
+      )!,
+    );
+  }
+
+  @override
+  $NotificationsTableTable createAlias(String alias) {
+    return $NotificationsTableTable(attachedDatabase, alias);
+  }
+}
+
+class NotificationModel extends DataClass
+    implements Insertable<NotificationModel> {
+  final int id;
+  final String title;
+  final String body;
+  final String? payload;
+  final bool isRead;
+  final DateTime createdAt;
+  const NotificationModel({
+    required this.id,
+    required this.title,
+    required this.body,
+    this.payload,
+    required this.isRead,
+    required this.createdAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    map['title'] = Variable<String>(title);
+    map['body'] = Variable<String>(body);
+    if (!nullToAbsent || payload != null) {
+      map['payload'] = Variable<String>(payload);
+    }
+    map['is_read'] = Variable<bool>(isRead);
+    map['created_at'] = Variable<DateTime>(createdAt);
+    return map;
+  }
+
+  NotificationsTableCompanion toCompanion(bool nullToAbsent) {
+    return NotificationsTableCompanion(
+      id: Value(id),
+      title: Value(title),
+      body: Value(body),
+      payload: payload == null && nullToAbsent
+          ? const Value.absent()
+          : Value(payload),
+      isRead: Value(isRead),
+      createdAt: Value(createdAt),
+    );
+  }
+
+  factory NotificationModel.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NotificationModel(
+      id: serializer.fromJson<int>(json['id']),
+      title: serializer.fromJson<String>(json['title']),
+      body: serializer.fromJson<String>(json['body']),
+      payload: serializer.fromJson<String?>(json['payload']),
+      isRead: serializer.fromJson<bool>(json['isRead']),
+      createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'title': serializer.toJson<String>(title),
+      'body': serializer.toJson<String>(body),
+      'payload': serializer.toJson<String?>(payload),
+      'isRead': serializer.toJson<bool>(isRead),
+      'createdAt': serializer.toJson<DateTime>(createdAt),
+    };
+  }
+
+  NotificationModel copyWith({
+    int? id,
+    String? title,
+    String? body,
+    Value<String?> payload = const Value.absent(),
+    bool? isRead,
+    DateTime? createdAt,
+  }) => NotificationModel(
+    id: id ?? this.id,
+    title: title ?? this.title,
+    body: body ?? this.body,
+    payload: payload.present ? payload.value : this.payload,
+    isRead: isRead ?? this.isRead,
+    createdAt: createdAt ?? this.createdAt,
+  );
+  NotificationModel copyWithCompanion(NotificationsTableCompanion data) {
+    return NotificationModel(
+      id: data.id.present ? data.id.value : this.id,
+      title: data.title.present ? data.title.value : this.title,
+      body: data.body.present ? data.body.value : this.body,
+      payload: data.payload.present ? data.payload.value : this.payload,
+      isRead: data.isRead.present ? data.isRead.value : this.isRead,
+      createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationModel(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('payload: $payload, ')
+          ..write('isRead: $isRead, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(id, title, body, payload, isRead, createdAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NotificationModel &&
+          other.id == this.id &&
+          other.title == this.title &&
+          other.body == this.body &&
+          other.payload == this.payload &&
+          other.isRead == this.isRead &&
+          other.createdAt == this.createdAt);
+}
+
+class NotificationsTableCompanion extends UpdateCompanion<NotificationModel> {
+  final Value<int> id;
+  final Value<String> title;
+  final Value<String> body;
+  final Value<String?> payload;
+  final Value<bool> isRead;
+  final Value<DateTime> createdAt;
+  const NotificationsTableCompanion({
+    this.id = const Value.absent(),
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    this.payload = const Value.absent(),
+    this.isRead = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  });
+  NotificationsTableCompanion.insert({
+    this.id = const Value.absent(),
+    required String title,
+    required String body,
+    this.payload = const Value.absent(),
+    this.isRead = const Value.absent(),
+    this.createdAt = const Value.absent(),
+  }) : title = Value(title),
+       body = Value(body);
+  static Insertable<NotificationModel> custom({
+    Expression<int>? id,
+    Expression<String>? title,
+    Expression<String>? body,
+    Expression<String>? payload,
+    Expression<bool>? isRead,
+    Expression<DateTime>? createdAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (title != null) 'title': title,
+      if (body != null) 'body': body,
+      if (payload != null) 'payload': payload,
+      if (isRead != null) 'is_read': isRead,
+      if (createdAt != null) 'created_at': createdAt,
+    });
+  }
+
+  NotificationsTableCompanion copyWith({
+    Value<int>? id,
+    Value<String>? title,
+    Value<String>? body,
+    Value<String?>? payload,
+    Value<bool>? isRead,
+    Value<DateTime>? createdAt,
+  }) {
+    return NotificationsTableCompanion(
+      id: id ?? this.id,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      payload: payload ?? this.payload,
+      isRead: isRead ?? this.isRead,
+      createdAt: createdAt ?? this.createdAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (payload.present) {
+      map['payload'] = Variable<String>(payload.value);
+    }
+    if (isRead.present) {
+      map['is_read'] = Variable<bool>(isRead.value);
+    }
+    if (createdAt.present) {
+      map['created_at'] = Variable<DateTime>(createdAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('payload: $payload, ')
+          ..write('isRead: $isRead, ')
+          ..write('createdAt: $createdAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1873,6 +2318,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $HolidaysTableTable holidaysTable = $HolidaysTableTable(this);
   late final $RestAllowancesTableTable restAllowancesTable =
       $RestAllowancesTableTable(this);
+  late final $NotificationsTableTable notificationsTable =
+      $NotificationsTableTable(this);
   late final Index idxLeaveDates = Index(
     'idx_leave_dates',
     'CREATE INDEX idx_leave_dates ON leave_records_table (start_date, end_date)',
@@ -1894,6 +2341,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     leaveRecordsTable,
     holidaysTable,
     restAllowancesTable,
+    notificationsTable,
     idxLeaveDates,
     idxHolidayDates,
     idxExtraworkDates,
@@ -1909,6 +2357,7 @@ typedef $$SettingsTableTableCreateCompanionBuilder =
       required int totalCasualLeaves,
       Value<bool> enableNotifications,
       Value<int> daysBeforeHolidayAlert,
+      Value<String> notificationTime,
     });
 typedef $$SettingsTableTableUpdateCompanionBuilder =
     SettingsTableCompanion Function({
@@ -1919,6 +2368,7 @@ typedef $$SettingsTableTableUpdateCompanionBuilder =
       Value<int> totalCasualLeaves,
       Value<bool> enableNotifications,
       Value<int> daysBeforeHolidayAlert,
+      Value<String> notificationTime,
     });
 
 class $$SettingsTableTableFilterComposer
@@ -1962,6 +2412,11 @@ class $$SettingsTableTableFilterComposer
 
   ColumnFilters<int> get daysBeforeHolidayAlert => $composableBuilder(
     column: $table.daysBeforeHolidayAlert,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -2009,6 +2464,11 @@ class $$SettingsTableTableOrderingComposer
     column: $table.daysBeforeHolidayAlert,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableTableAnnotationComposer
@@ -2048,6 +2508,11 @@ class $$SettingsTableTableAnnotationComposer
 
   GeneratedColumn<int> get daysBeforeHolidayAlert => $composableBuilder(
     column: $table.daysBeforeHolidayAlert,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get notificationTime => $composableBuilder(
+    column: $table.notificationTime,
     builder: (column) => column,
   );
 }
@@ -2090,6 +2555,7 @@ class $$SettingsTableTableTableManager
                 Value<int> totalCasualLeaves = const Value.absent(),
                 Value<bool> enableNotifications = const Value.absent(),
                 Value<int> daysBeforeHolidayAlert = const Value.absent(),
+                Value<String> notificationTime = const Value.absent(),
               }) => SettingsTableCompanion(
                 id: id,
                 employeeName: employeeName,
@@ -2098,6 +2564,7 @@ class $$SettingsTableTableTableManager
                 totalCasualLeaves: totalCasualLeaves,
                 enableNotifications: enableNotifications,
                 daysBeforeHolidayAlert: daysBeforeHolidayAlert,
+                notificationTime: notificationTime,
               ),
           createCompanionCallback:
               ({
@@ -2108,6 +2575,7 @@ class $$SettingsTableTableTableManager
                 required int totalCasualLeaves,
                 Value<bool> enableNotifications = const Value.absent(),
                 Value<int> daysBeforeHolidayAlert = const Value.absent(),
+                Value<String> notificationTime = const Value.absent(),
               }) => SettingsTableCompanion.insert(
                 id: id,
                 employeeName: employeeName,
@@ -2116,6 +2584,7 @@ class $$SettingsTableTableTableManager
                 totalCasualLeaves: totalCasualLeaves,
                 enableNotifications: enableNotifications,
                 daysBeforeHolidayAlert: daysBeforeHolidayAlert,
+                notificationTime: notificationTime,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
@@ -3119,6 +3588,232 @@ typedef $$RestAllowancesTableTableProcessedTableManager =
       RestAllowanceModel,
       PrefetchHooks Function({bool holidayId})
     >;
+typedef $$NotificationsTableTableCreateCompanionBuilder =
+    NotificationsTableCompanion Function({
+      Value<int> id,
+      required String title,
+      required String body,
+      Value<String?> payload,
+      Value<bool> isRead,
+      Value<DateTime> createdAt,
+    });
+typedef $$NotificationsTableTableUpdateCompanionBuilder =
+    NotificationsTableCompanion Function({
+      Value<int> id,
+      Value<String> title,
+      Value<String> body,
+      Value<String?> payload,
+      Value<bool> isRead,
+      Value<DateTime> createdAt,
+    });
+
+class $$NotificationsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $NotificationsTableTable> {
+  $$NotificationsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isRead => $composableBuilder(
+    column: $table.isRead,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NotificationsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $NotificationsTableTable> {
+  $$NotificationsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payload => $composableBuilder(
+    column: $table.payload,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isRead => $composableBuilder(
+    column: $table.isRead,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get createdAt => $composableBuilder(
+    column: $table.createdAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NotificationsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NotificationsTableTable> {
+  $$NotificationsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<String> get payload =>
+      $composableBuilder(column: $table.payload, builder: (column) => column);
+
+  GeneratedColumn<bool> get isRead =>
+      $composableBuilder(column: $table.isRead, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get createdAt =>
+      $composableBuilder(column: $table.createdAt, builder: (column) => column);
+}
+
+class $$NotificationsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NotificationsTableTable,
+          NotificationModel,
+          $$NotificationsTableTableFilterComposer,
+          $$NotificationsTableTableOrderingComposer,
+          $$NotificationsTableTableAnnotationComposer,
+          $$NotificationsTableTableCreateCompanionBuilder,
+          $$NotificationsTableTableUpdateCompanionBuilder,
+          (
+            NotificationModel,
+            BaseReferences<
+              _$AppDatabase,
+              $NotificationsTableTable,
+              NotificationModel
+            >,
+          ),
+          NotificationModel,
+          PrefetchHooks Function()
+        > {
+  $$NotificationsTableTableTableManager(
+    _$AppDatabase db,
+    $NotificationsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NotificationsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NotificationsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NotificationsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<String?> payload = const Value.absent(),
+                Value<bool> isRead = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => NotificationsTableCompanion(
+                id: id,
+                title: title,
+                body: body,
+                payload: payload,
+                isRead: isRead,
+                createdAt: createdAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                required String title,
+                required String body,
+                Value<String?> payload = const Value.absent(),
+                Value<bool> isRead = const Value.absent(),
+                Value<DateTime> createdAt = const Value.absent(),
+              }) => NotificationsTableCompanion.insert(
+                id: id,
+                title: title,
+                body: body,
+                payload: payload,
+                isRead: isRead,
+                createdAt: createdAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NotificationsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NotificationsTableTable,
+      NotificationModel,
+      $$NotificationsTableTableFilterComposer,
+      $$NotificationsTableTableOrderingComposer,
+      $$NotificationsTableTableAnnotationComposer,
+      $$NotificationsTableTableCreateCompanionBuilder,
+      $$NotificationsTableTableUpdateCompanionBuilder,
+      (
+        NotificationModel,
+        BaseReferences<
+          _$AppDatabase,
+          $NotificationsTableTable,
+          NotificationModel
+        >,
+      ),
+      NotificationModel,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3131,4 +3826,6 @@ class $AppDatabaseManager {
       $$HolidaysTableTableTableManager(_db, _db.holidaysTable);
   $$RestAllowancesTableTableTableManager get restAllowancesTable =>
       $$RestAllowancesTableTableTableManager(_db, _db.restAllowancesTable);
+  $$NotificationsTableTableTableManager get notificationsTable =>
+      $$NotificationsTableTableTableManager(_db, _db.notificationsTable);
 }

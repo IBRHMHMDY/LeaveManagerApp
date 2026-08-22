@@ -1,7 +1,7 @@
 // lib/core/utils/app_bootstrapper.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
-import 'package:leave_manager/core/utils/notification_service.dart';
+import 'package:leave_manager/core/utils/notifications/notification_service.dart';
 
 abstract final class AppBootstrapper {
   /// دالة التهيئة المركزية التي سيتم استدعاؤها في الـ Main والـ Background Isolate

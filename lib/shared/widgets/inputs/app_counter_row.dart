@@ -4,14 +4,14 @@ import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
 /// ويدجت عام لعداد أرقام (زيادة ونقصان) يدعم الحدود الدنيا والقصوى
-class AppCounterBox extends StatelessWidget {
+class AppCounterRow extends StatelessWidget {
   final String label;
   final int value;
   final ValueChanged<int> onChanged;
   final int min;
   final int max;
 
-  const AppCounterBox({
+  const AppCounterRow({
     super.key,
     required this.label,
     required this.value,
@@ -22,7 +22,7 @@ class AppCounterBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
+    return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(

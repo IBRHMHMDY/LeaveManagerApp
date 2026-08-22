@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
-import 'package:leave_manager/core/utils/notification_service.dart';
+import 'package:leave_manager/core/utils/notifications/notification_service.dart';
 import 'package:leave_manager/features/holidays/domain/usecases/get_financial_year_holidays_usecase.dart';
 import 'package:leave_manager/features/holidays/domain/usecases/get_upcoming_holiday_usecase.dart';
 import 'package:leave_manager/features/holidays/domain/usecases/initialize_holidays_usecase.dart';

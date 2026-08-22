@@ -3,7 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/core/utils/notifications/battery_optimization_service.dart';
+import 'package:leave_manager/core/utils/notifications/notification_service.dart';
+import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/app_version.dart';
 import 'package:leave_manager/features/splash/presentation/widgets/custom_app_logo.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
@@ -61,12 +65,34 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
     );
     
     _animationController.forward();
+    _initializeApp();
     
-    Future.delayed(const Duration(milliseconds: 3000), () {
+  }
+
+  Future<void> _initializeApp() async {
+    try {
+      // 1. تهيئة الإشعارات وطلب صلاحياتها
+      final notificationService = sl<NotificationService>();
+      await notificationService.init();
+      await notificationService.requestPermissions();
+
+      // 2. طلب إيقاف تحسين البطارية وتفعيل التشغيل التلقائي
+      final batteryService = sl<BatteryOptimizationService>();
+      await batteryService.requestBatteryAndAutoStartPermissions();
+
+      // 3. تأخير بسيط للمظهر الجمالي 
+      await Future.delayed(const Duration(milliseconds: 3000));
+      
       if (mounted) {
+        // 4. التحقق من الإعدادات والانتقال للشاشة الرئيسية
         context.read<SettingsBloc>().add(CheckSettingsEvent());
       }
-    });
+    } catch (e) {
+      if (mounted) {
+        AppToast.showError(context, 'حدث خطأ أثناء التهيئة');
+        context.go(AppRouter.setup);
+      }
+    }
   }
 
   @override
@@ -83,6 +109,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           context.read<SettingsBloc>().add(LoadSettingsEvent());
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
           context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
+          context.read<HolidaysCubit>().loadHolidays();
           
           SystemChrome.setEnabledSystemUIMode(
             SystemUiMode.manual,

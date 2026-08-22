@@ -7,7 +7,8 @@ import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
-import 'package:leave_manager/core/utils/notification_service.dart';
+import 'package:leave_manager/core/utils/notifications/notification_service.dart';
+import 'package:leave_manager/features/backup_restore/presentation/widgets/backup_settings_section.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
@@ -36,14 +37,14 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _jobController = TextEditingController(text: '');
+  final _jobController = TextEditingController(text: 'موظف');
   final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
 
   // --- متغيرات حالة الإشعارات الجديدة ---
   bool _enableNotifications = true;
   int _daysBeforeHolidayAlert = 2;
-
+  String _notificationTime = '10:00';
   late bool _isFirstTime;
 
   @override
@@ -64,7 +65,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   @override
   void dispose() {
-    // التأكد من عدم وجود Memory Leaks تنفيذاً لمعايير AMD
     _nameController.dispose();
     _jobController.dispose();
     _regularLeavesController.dispose();
@@ -78,10 +78,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _regularLeavesController.text = settings.totalRegularLeaves.toString();
     _casualLeavesController.text = settings.totalCasualLeaves.toString();
 
-    // --- تعبئة بيانات الإشعارات من الكيان ---
     setState(() {
       _enableNotifications = settings.enableNotifications;
       _daysBeforeHolidayAlert = settings.daysBeforeHolidayAlert;
+      _notificationTime = settings.notificationTime;
     });
   }
 
@@ -95,9 +95,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
         jobTitle: _jobController.text.trim(),
         totalRegularLeaves: _regularLeavesController.text.toIntSafely(),
         totalCasualLeaves: _casualLeavesController.text.toIntSafely(),
-        // --- إرفاق قيم الإشعارات الجديدة ليتم حفظها ---
         enableNotifications: _enableNotifications,
         daysBeforeHolidayAlert: _daysBeforeHolidayAlert,
+        notificationTime: _notificationTime,
       );
 
       context.read<SettingsBloc>().add(SaveSettingsEvent(settings));
@@ -108,7 +108,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   Widget build(BuildContext context) {
     return BlocListener<SettingsBloc, SettingsState>(
       listener: (context, state) {
-        // ... (نفس المستمعين كما كانوا بالضبط بدون تغيير)[cite: 1]
         if (state is SettingsLoaded && !_isFirstTime) {
           if (_nameController.text.isEmpty) {
             _populateFields(state.settings);
@@ -138,6 +137,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                // --- Data Personality Form ---
                 SettingsFormSection(
                   nameController: _nameController,
                   jobController: _jobController,
@@ -145,43 +145,53 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   casualLeavesController: _casualLeavesController,
                 ),
                 const SizedBox(height: AppSpacing.lg),
-
-                // --- قسم إعدادات الإشعارات الجديد ---
+                // --- Notifications ---
                 NotificationSettingsSection(
                   isEnabled: _enableNotifications,
                   daysBefore: _daysBeforeHolidayAlert,
-                  onToggle: (value) =>
-                      setState(() => _enableNotifications = value),
-                  onDaysChanged: (value) =>
-                      setState(() => _daysBeforeHolidayAlert = value),
+                  notificationTime: _notificationTime,
+                  onToggle: (value) => setState(() => _enableNotifications = value),
+                  onDaysChanged: (value) => setState(() => _daysBeforeHolidayAlert = value),
+                  onTimeChanged: (value) => setState(() => _notificationTime = value),
                 ),
                 const SizedBox(height: AppSpacing.lg),
-
-                // ------------------------------------
+                // --- Dark & Light Themes ---
                 const ThemeSelectionSection(),
-
+                const SizedBox(height: AppSpacing.lg),
+                // --- Backup & Restore ---
+                const BackupSettingsSection(),
                 const SizedBox(height: AppSpacing.xl),
-                
+
                 // ---------------------------------------------------------
                 // 🧪 زر مؤقت لاختبار الإشعارات (يُحذف قبل الإنتاج)
                 // ---------------------------------------------------------
                 BlocBuilder<HolidaysCubit, HolidaysState>(
                   builder: (context, holidayState) {
                     return AppOutlinedButton(
-                      label: 'اختبار الإشعارات (بعد 5 ثوانٍ) 🧪',
+                      label: 'اختبار الإشعارات (تجريبي)',
                       icon: Icons.notifications_active_outlined,
                       foregroundColor: context.colorScheme.secondary,
                       onPressed: () {
-                        if (holidayState is HolidaysLoaded && holidayState.financialYearHolidays.isNotEmpty) {
-                          // نأخذ ID أول عطلة في القائمة لتمريره في الـ Payload
-                          final firstHolidayId = holidayState.financialYearHolidays.first.id;
+                        if (holidayState is HolidaysLoaded &&
+                            holidayState.financialYearHolidays.isNotEmpty) {
+                          // استخراج ID الإجازة لربطها بالـ Payload
+                          final firstHolidayId =
+                              holidayState.financialYearHolidays.first.id;
                           
-                          // استدعاء دالة الاختبار من الخدمة
-                          sl<NotificationService>().showTestNotification(firstHolidayId);
+                          // استدعاء دالة الاختبار عبر الـ Service Locator
+                          sl<NotificationService>().showTestNotification(
+                            firstHolidayId,
+                          );
                           
-                          AppToast.showSuccess(context, 'تمت الجدولة! اخرج من التطبيق وانتظر 10 ثوانٍ.');
+                          AppToast.showSuccess(
+                            context,
+                            'سيصلك إشعار تجريبي خلال 5 ثوانٍ',
+                          );
                         } else {
-                          AppToast.showWarning(context, 'لا توجد عطلات في قاعدة البيانات لاختبارها.');
+                          AppToast.showWarning(
+                            context,
+                            'لا توجد إجازات مجدولة لاختبار الإشعارات',
+                          );
                         }
                       },
                     );
@@ -189,8 +199,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 ),
                 const SizedBox(height: AppSpacing.md),
                 // ---------------------------------------------------------
-
-
                 const SizedBox(height: AppSpacing.xl),
 
                 BlocBuilder<SettingsBloc, SettingsState>(

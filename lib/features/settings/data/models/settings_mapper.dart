@@ -10,9 +10,9 @@ extension SettingsMapper on SettingModel {
       jobTitle: jobTitle,
       totalRegularLeaves: totalRegularLeaves,
       totalCasualLeaves: totalCasualLeaves,
-      // --- الحقول الجديدة للربط مع Drift Model ---
       enableNotifications: enableNotifications,
       daysBeforeHolidayAlert: daysBeforeHolidayAlert,
+      notificationTime: notificationTime,
     );
   }
 }

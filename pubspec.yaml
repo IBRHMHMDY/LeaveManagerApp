@@ -30,11 +30,18 @@ dependencies:
   injectable: ^2.6.0
   calendar_date_picker2: ^3.0.0
   cupertino_icons: ^1.0.8
-  flutter_local_notifications: ^22.3.0
-  timezone: ^0.11.1
-  flutter_timezone: ^5.1.0
-  permission_handler: ^13.0.1
-
+  flutter_local_notifications: ^22.3.0 # ادارة الاشعارات المحليه
+  timezone: ^0.11.1             
+  flutter_timezone: ^5.1.0      # قراءه المنطقه الزمنيه على الهاتف
+  permission_handler: ^13.0.1   # لاعطاء الصلاحيات
+  google_sign_in: ^6.2.0        #لتسجيل دخول من جوجل
+  googleapis: ^13.1.0           #للوصول الى google Drive API
+  googleapis_auth: ^1.4.1       #للمصادقه من جوجل
+  file_picker: ^8.0.0           # لتحديد مسار النسخ الاحتياطى المحلى
+  http: ^1.6.0
+  connectivity_plus: ^7.3.1
+  disable_battery_optimization: ^1.1.2
+  
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -43,21 +50,30 @@ dev_dependencies:
   injectable_generator: ^2.6.0
   flutter_lints: ^3.0.1           # قواعد تحليل الكود القياسية للحفاظ على نظافة الكود
   flutter_native_splash: ^2.4.7   # لتسريع عرض الشاشه الاساسيه عند بدء التطبيق
-  change_app_package_name: ^1.5.0
-  flutter_launcher_icons: ^0.14.4
+  change_app_package_name: ^1.5.0 # تغيير اسم المكتبه الخاص بالتطبيق
+  flutter_launcher_icons: ^0.14.4 #التحكم فى ايقونه التطبيق
 
 flutter:
   # Material Icons font is
   uses-material-design: true
   assets:
-    - assets/google_fonts/
+    - assets/fonts/
     - assets/json/holidays.json
   fonts:
     - family: Cairo
       fonts:
-        - asset: assets/google_fonts/Cairo-Regular.ttf
-        - asset: assets/google_fonts/Cairo-Bold.ttf
+        - asset: assets/fonts/Cairo-ExtraLight.ttf
+          weight: 200
+        - asset: assets/fonts/Cairo-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Cairo-Medium.ttf
+          weight: 500
+        - asset: assets/fonts/Cairo-SemiBold.ttf
+          weight: 600
+        - asset: assets/fonts/Cairo-Bold.ttf
           weight: 700
+        - asset: assets/fonts/Cairo-Black.ttf
+          weight: 900
 
 flutter_native_splash:
   color: "#F8F9FA" # لون الخلفية للوضع النهاري (Light Background)

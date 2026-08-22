@@ -1,10 +1,15 @@
 import 'dart:convert';
 import 'package:drift/drift.dart';
-import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
+
+List<Map<String, dynamic>> _parseJsonInBackground(String jsonString) {
+  final decoded = json.decode(jsonString) as List<dynamic>;
+  return decoded.cast<Map<String, dynamic>>();
+}
 
 abstract class HolidaysLocalDataSource {
   Future<bool> hasHolidays();
@@ -34,11 +39,13 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
   @override
   Future<void> seedHolidaysFromJson() async {
     try {
-      // قراءة الملف من الـ Assets
+      // قراءة الملف كنص
       final String jsonString = await rootBundle.loadString('assets/json/holidays.json');
-      final List<dynamic> jsonResponse = json.decode(jsonString);
+      
+      // معالجة الـ JSON في Isolate منفصل لمنع تجميد الشاشة
+      final List<Map<String, dynamic>> jsonResponse = await compute(_parseJsonInBackground, jsonString);
 
-      // تحويل الـ JSON إلى Companion Objects للإدخال المجمع
+      // تحويل البيانات إلى كائنات Drift على الخيط الرئيسي (عملية خفيفة جداً)
       final List<HolidaysTableCompanion> holidays = jsonResponse.map((json) {
         return HolidaysTableCompanion.insert(
           name: json['name'],
@@ -48,13 +55,13 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
         );
       }).toList();
 
-      // استخدام batch لإدخال البيانات دفعة واحدة لضمان أعلى أداء
+      // إدراج البيانات دفعة واحدة (Batch Insert)
       await db.batch((batch) {
         batch.insertAll(db.holidaysTable, holidays);
       });
-    } catch (e) {
-      debugPrint('❌ JSON Seeding Error: $e');
-      throw DatabaseException('فشل في قراءة أو حفظ ملف العطلات');
+    } catch (e, stackTrace) {
+      debugPrint('JSON Seeding Error: $e\n$stackTrace');
+      throw DatabaseException('حدث خطأ أثناء تحميل بيانات الإجازات الأولية.');
     }
   }
 

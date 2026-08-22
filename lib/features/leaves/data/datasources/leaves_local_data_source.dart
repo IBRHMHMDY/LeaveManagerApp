@@ -1,7 +1,8 @@
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
-import '../../../../core/database/app_database.dart';
-import '../../../../core/errors/exceptions.dart';
+import 'package:leave_manager/core/database/app_database.dart';
+import 'package:leave_manager/core/errors/exceptions.dart';
+
 
 abstract class LeavesLocalDataSource {
 

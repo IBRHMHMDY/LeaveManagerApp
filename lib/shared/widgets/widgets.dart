@@ -23,7 +23,7 @@ export 'inputs/app_dropdown_field.dart';
 export 'inputs/app_date_range_picker.dart';
 export 'inputs/app_filter_chips.dart';
 export 'inputs/app_segmented_tabs.dart';
-export 'inputs/app_number_counter.dart';
+export 'inputs/app_counter_column.dart';
 
 // --- Overlays ---
 export 'overlays/app_confirm_dialog.dart';

@@ -55,7 +55,6 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
   @override
   Future<void> resetBalances() async {
     try {
-      // الاعتماد على transaction لمسح الجداول معاً وضمان الأداء وعدم حدوث Memory Leaks
       await db.transaction(() async {
         await db.delete(db.leaveRecordsTable).go();
         await db.delete(db.restAllowancesTable).go();

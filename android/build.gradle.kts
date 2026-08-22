@@ -3,6 +3,20 @@ allprojects {
         google()
         mavenCentral()
     }
+
+    // إضافة هذه الكتلة لفرض إصدار Java 17 وكتم التحذيرات
+    tasks.withType<JavaCompile> {
+        sourceCompatibility = "17"
+        targetCompatibility = "17"
+        options.compilerArgs.add("-Xlint:-options")
+    }
+    
+    // لضمان توافق مكتبات Kotlin أيضاً مع إصدار 17
+    tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile> {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        }
+    }
 }
 
 val newBuildDir: Directory =

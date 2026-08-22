@@ -1,6 +1,7 @@
 // lib/core/router/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
 
 import 'package:leave_manager/features/splash/presentation/screens/splash_screen.dart';
@@ -11,7 +12,9 @@ import 'package:leave_manager/features/leaves/presentation/screens/leave_screen.
 import 'package:leave_manager/features/rest_allowances/presentation/screens/rest_allowances_screen.dart';
 import 'package:leave_manager/features/settings/presentation/screens/settings_screen.dart';
 
-final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(debugLabel: 'root');
+final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
+  debugLabel: 'root',
+);
 
 class AppRouter {
   static const String splash = '/';
@@ -21,6 +24,7 @@ class AppRouter {
   static const String restAllowances = '/rest_allowances';
   static const String settings = '/settings';
   static const String setup = '/setup';
+  static const String notifications = '/notifications';
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -34,13 +38,16 @@ class AppRouter {
           body: SafeArea(child: SettingsScreen(isFirstTime: true)),
         ),
       ),
-      
+
       // ✅ الحل: وضع مسار العطلات كمسار رئيسي خارج الـ StatefulShellRoute
       GoRoute(
         path: holidays,
         builder: (context, state) => const HolidaysScreen(),
       ),
-
+      GoRoute(
+        path: notifications,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
       // Bottom Navigation باستخدام StatefulShellRoute
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
@@ -57,7 +64,7 @@ class AppRouter {
               // ❌ تمت إزالة مسار holidays من هنا
             ],
           ),
-          
+
           // Branch (1): Leaves
           StatefulShellBranch(
             routes: [
@@ -67,7 +74,7 @@ class AppRouter {
               ),
             ],
           ),
-          
+
           // Branch (2): Rest Allowances
           StatefulShellBranch(
             routes: [
@@ -77,7 +84,7 @@ class AppRouter {
               ),
             ],
           ),
-          
+
           // Branch (3): Settings
           StatefulShellBranch(
             routes: [

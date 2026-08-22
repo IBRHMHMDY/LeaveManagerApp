@@ -39,14 +39,14 @@ class SettingsRepositoryImpl implements SettingsRepository {
   Future<Either<Failure, Unit>> saveSettings(Settings settings) async {
     try {
       final companion = SettingsTableCompanion(
-        id: const Value(1), // ID الثابت[cite: 1]
+        id: const Value(1),
         employeeName: Value(settings.employeeName),
         jobTitle: Value(settings.jobTitle),
         totalRegularLeaves: Value(settings.totalRegularLeaves),
         totalCasualLeaves: Value(settings.totalCasualLeaves),
-        // --- تحديث الـ Companion بالقيم الجديدة ---
         enableNotifications: Value(settings.enableNotifications),
         daysBeforeHolidayAlert: Value(settings.daysBeforeHolidayAlert),
+        notificationTime: Value(settings.notificationTime),
       );
       
       await localDataSource.saveSettings(companion);
