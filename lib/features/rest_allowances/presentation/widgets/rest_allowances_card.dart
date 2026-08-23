@@ -40,21 +40,44 @@ class RestAllowancesCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: AppSpacing.md),
         indicatorColor: cardColor,
         padding: const EdgeInsets.all(AppSpacing.md),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            _CardHeader(extrawork: extrawork, cardColor: cardColor),
-            const SizedBox(height: AppSpacing.sm),
-            _CardDates(extrawork: extrawork),
-            if (!extrawork.isUsed) ...[
-              const Divider(height: AppSpacing.xl),
-              _CardActions(extrawork: extrawork, cardColor: cardColor),
-            ] else if (extrawork.notes != null &&
-                extrawork.notes!.isNotEmpty) ...[
+        child: AnimatedSize(
+          duration: const Duration(milliseconds: 350),
+          curve: Curves.easeInOutBack,
+          alignment: Alignment.topCenter,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              _CardHeader(extrawork: extrawork, cardColor: cardColor),
               const SizedBox(height: AppSpacing.sm),
-              _CardNotes(notes: extrawork.notes!),
+              _CardDates(extrawork: extrawork),
+
+              AnimatedSwitcher(
+                duration: const Duration(milliseconds: 300),
+                transitionBuilder: (child, animation) =>
+                    FadeTransition(opacity: animation, child: child),
+                child: !extrawork.isUsed
+                    ? Column(
+                        key: const ValueKey('actions_state'),
+                        children: [
+                          const Divider(height: AppSpacing.xl),
+                          _CardActions(
+                            extrawork: extrawork,
+                            cardColor: cardColor,
+                          ),
+                        ],
+                      )
+                    : (extrawork.notes != null && extrawork.notes!.isNotEmpty)
+                    ? Column(
+                        key: const ValueKey('notes_state'),
+                        children: [
+                          const SizedBox(height: AppSpacing.sm),
+                          _CardNotes(notes: extrawork.notes!),
+                        ],
+                      )
+                    : const SizedBox.shrink(key: ValueKey('empty_state')),
+              ),
             ],
-          ],
+          ),
         ),
       ),
     );
@@ -76,7 +99,6 @@ class RestAllowancesCard extends StatelessWidget {
 
 class _DismissibleBackground extends StatelessWidget {
   const _DismissibleBackground();
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -100,7 +122,7 @@ class _CardHeader extends StatelessWidget {
   final ExtraWorkRecord extrawork;
   final Color cardColor;
   const _CardHeader({required this.extrawork, required this.cardColor});
-
+  
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -110,32 +132,32 @@ class _CardHeader extends StatelessWidget {
           child: BlocBuilder<HolidaysCubit, HolidaysState>(
             builder: (context, holidayState) {
               String pillText = extrawork.workReason == WorkReason.holiday
-                  ? 'عمل أيام عطلات'
+                  ? 'عطلة رسمية'
                   : 'عمل إضافي';
-
               if (extrawork.workReason == WorkReason.holiday &&
                   holidayState is HolidaysLoaded) {
-                // استخدام firstOrNull بدلاً من firstWhere مع try/catch لتجنب الـ Exceptions في طبقة العرض
                 final associatedHoliday = holidayState.financialYearHolidays
                     .where((h) => h.id == extrawork.holidayId)
                     .firstOrNull;
-
                 if (associatedHoliday != null) {
                   pillText = 'عطلة: ${associatedHoliday.name}';
                 }
               }
-
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  AppBadge(
-                    title: extrawork.isUsed ? 'مستهلك' : 'متاح للاستخدام',
-                    backgroundColor: extrawork.isUsed
-                        ? context.colorScheme.surfaceContainerHighest
-                        : cardColor.withOpacity(0.1),
-                    textColor: extrawork.isUsed
-                        ? context.colorScheme.onSurfaceVariant
-                        : cardColor,
+                  AnimatedSwitcher(
+                    duration: const Duration(milliseconds: 300),
+                    child: AppBadge(
+                      key: ValueKey('badge_${extrawork.isUsed}'),
+                      title: extrawork.isUsed ? 'رصيد مستهلك' : 'رصيد متاح',
+                      backgroundColor: extrawork.isUsed
+                          ? context.colorScheme.surfaceContainerHighest
+                          : cardColor.withOpacity(0.1),
+                      textColor: extrawork.isUsed
+                          ? context.colorScheme.onSurfaceVariant
+                          : cardColor,
+                    ),
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(
@@ -163,7 +185,6 @@ class _CardHeader extends StatelessWidget {
 class _CardDates extends StatelessWidget {
   final ExtraWorkRecord extrawork;
   const _CardDates({required this.extrawork});
-
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -181,7 +202,7 @@ class _CardDates extends StatelessWidget {
           const SizedBox(height: AppSpacing.xs),
           _DateRow(
             icon: Icons.event_available_rounded,
-            label: 'تاريخ الراحة:',
+            label: 'تاريخ الاستهلاك:',
             dateText: extrawork.restStartDate!.toDateRangeString(
               extrawork.restEndDate!,
               short: false,
@@ -199,14 +220,12 @@ class _DateRow extends StatelessWidget {
   final String label;
   final String dateText;
   final Color? iconColor;
-
   const _DateRow({
     required this.icon,
     required this.label,
     required this.dateText,
     this.iconColor,
   });
-
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -240,7 +259,6 @@ class _DateRow extends StatelessWidget {
 class _CardNotes extends StatelessWidget {
   final String notes;
   const _CardNotes({required this.notes});
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -277,15 +295,14 @@ class _CardActions extends StatelessWidget {
   final ExtraWorkRecord extrawork;
   final Color cardColor;
   const _CardActions({required this.extrawork, required this.cardColor});
-
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
       children: [
-        AppOutlinedButton(
+        AppTextButton(
           onPressed: () => showConsumeRestBottomSheet(context, extrawork),
-          label: 'استهلاك الرصيد',
+          label: 'استهلاك رصيد',
           icon: Icons.remove_circle_outline,
           foregroundColor: cardColor,
         ),

@@ -33,16 +33,6 @@ class _AboutDeveloperContent extends StatefulWidget {
 }
 
 class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
-  // Future<void> _launchEmail() async {
-  //   final Uri emailLaunchUri = Uri(
-  //     scheme: 'mailto',
-  //     path: 'ibrhmhmdy@example.com',
-  //     queryParameters: {'subject': 'تطبيق متتبع الإجازات - تواصل'},
-  //   );
-  //   if (!await launchUrl(emailLaunchUri)) {
-  //     debugPrint('لا يمكن فتح البريد الإلكتروني');
-  //   }
-  // }
 
   Future<void> _launchWhatsApp() async {
     const String phoneNumber = '2001007576297';

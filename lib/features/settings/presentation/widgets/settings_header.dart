@@ -1,6 +1,6 @@
 // lib/features/settings/presentation/widgets/settings_header.dart
 import 'package:flutter/material.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/show_about_developer.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/about_developer_bottomsheet.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 
 class SettingsHeader extends StatelessWidget implements PreferredSizeWidget {
@@ -17,7 +17,6 @@ class SettingsHeader extends StatelessWidget implements PreferredSizeWidget {
         const SizedBox(width: 8),
       ],
       title: 'إعدادات التطبيق', 
-      leading: const AppShareButton(),
       centerTitle: true,
     );
   }

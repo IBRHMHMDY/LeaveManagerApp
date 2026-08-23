@@ -9,22 +9,22 @@ class LayoutCubit extends Cubit<LayoutState> {
 
   LayoutCubit() : super(LayoutInitial());
 
-  /// معالجة طلب الرجوع للخلف (محاولة الخروج من التطبيق)
   void handlePopRequest() {
     final now = DateTime.now();
-
-    // إذا لم تكن هناك نقرة سابقة، أو مر أكثر من ثانيتين على النقرة السابقة
+    
+    // إذا كانت هذه هي الضغطة الأولى، أو مر أكثر من ثانيتين على الضغطة السابقة
     if (_lastBackPressTime == null ||
         now.difference(_lastBackPressTime!) > const Duration(seconds: 2)) {
-      _lastBackPressTime = now;
-      emit(const LayoutExitWarning('اضغط مرة أخرى للخروج من التطبيق'));
       
-      // إعادة الحالة إلى Initial بصمت لضمان القدرة على إرسال التحذير مجدداً إذا لزم الأمر
+      _lastBackPressTime = now;
+      emit(const LayoutExitWarning('اضغط مرة أخرى للخروج'));
+      
+      // إعادة الحالة إلى Initial لتجنب تكرار التنبيهات
       Future.delayed(const Duration(milliseconds: 100), () {
         if (!isClosed) emit(LayoutInitial());
       });
     } else {
-      // السماح بالخروج إذا تم النقر مرتين خلال ثانيتين
+      // إذا تم الضغط مرتين متتاليتين خلال ثانيتين
       emit(LayoutExitApproved());
     }
   }

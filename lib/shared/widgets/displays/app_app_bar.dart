@@ -1,5 +1,7 @@
 // lib/shared/widgets/displays/app_app_bar.dart
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 
 /// ويدجت عامة لـ AppBar تدعم التخصيص الكامل للعنوان، الأيقونات، والتوسيط.
@@ -28,14 +30,17 @@ class AppAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isNotHome = GoRouterState.of(context).uri.toString() != AppRouter.home;
     return AppBar(
       toolbarHeight: toolbarHeight,
       elevation: elevation,
       backgroundColor: backgroundColor ?? Colors.transparent,
       centerTitle: centerTitle,
-      leading: leading,
+      leading: leading ?? (isNotHome ? IconButton(
+        icon: Icon(Icons.arrow_back, color: context.colorScheme.primary),
+        onPressed: () => context.go(AppRouter.home),
+      ) : null),
       actions: actions,
-      // إذا تم تمرير customTitle سيتم استخدامه، وإلا سيتم استخدام title النصي بالتنسيق الموحد
       title: customTitle ??
           (title != null
               ? Text(

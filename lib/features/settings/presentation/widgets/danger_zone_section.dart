@@ -8,7 +8,7 @@ import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dar
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/show_about_developer.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/about_developer_bottomsheet.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_outlined_button.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_text_button.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_confirm_dialog.dart';

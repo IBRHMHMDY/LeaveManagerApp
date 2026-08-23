@@ -3,14 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
-import 'package:leave_manager/core/utils/notifications/notification_service.dart';
 import 'package:leave_manager/features/backup_restore/presentation/widgets/backup_settings_section.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
-import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
@@ -137,7 +134,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // --- Data Personality Form ---
+                // --- Data Form ---
                 SettingsFormSection(
                   nameController: _nameController,
                   jobController: _jobController,
@@ -150,57 +147,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   isEnabled: _enableNotifications,
                   daysBefore: _daysBeforeHolidayAlert,
                   notificationTime: _notificationTime,
-                  onToggle: (value) => setState(() => _enableNotifications = value),
-                  onDaysChanged: (value) => setState(() => _daysBeforeHolidayAlert = value),
-                  onTimeChanged: (value) => setState(() => _notificationTime = value),
+                  onToggle: (value) =>
+                      setState(() => _enableNotifications = value),
+                  onDaysChanged: (value) =>
+                      setState(() => _daysBeforeHolidayAlert = value),
+                  onTimeChanged: (value) =>
+                      setState(() => _notificationTime = value),
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                // --- Dark & Light Themes ---
-                const ThemeSelectionSection(),
-                const SizedBox(height: AppSpacing.lg),
-                // --- Backup & Restore ---
-                const BackupSettingsSection(),
                 const SizedBox(height: AppSpacing.xl),
-
-                // ---------------------------------------------------------
-                // 🧪 زر مؤقت لاختبار الإشعارات (يُحذف قبل الإنتاج)
-                // ---------------------------------------------------------
-                BlocBuilder<HolidaysCubit, HolidaysState>(
-                  builder: (context, holidayState) {
-                    return AppOutlinedButton(
-                      label: 'اختبار الإشعارات (تجريبي)',
-                      icon: Icons.notifications_active_outlined,
-                      foregroundColor: context.colorScheme.secondary,
-                      onPressed: () {
-                        if (holidayState is HolidaysLoaded &&
-                            holidayState.financialYearHolidays.isNotEmpty) {
-                          // استخراج ID الإجازة لربطها بالـ Payload
-                          final firstHolidayId =
-                              holidayState.financialYearHolidays.first.id;
-                          
-                          // استدعاء دالة الاختبار عبر الـ Service Locator
-                          sl<NotificationService>().showTestNotification(
-                            firstHolidayId,
-                          );
-                          
-                          AppToast.showSuccess(
-                            context,
-                            'سيصلك إشعار تجريبي خلال 5 ثوانٍ',
-                          );
-                        } else {
-                          AppToast.showWarning(
-                            context,
-                            'لا توجد إجازات مجدولة لاختبار الإشعارات',
-                          );
-                        }
-                      },
-                    );
-                  },
-                ),
-                const SizedBox(height: AppSpacing.md),
-                // ---------------------------------------------------------
-                const SizedBox(height: AppSpacing.xl),
-
+                // Save Settings button
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
                     final isLoading = state is SettingsLoading;
@@ -212,6 +167,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                 ),
+                const SizedBox(height: AppSpacing.lg),
+                // --- Backup & Restore ---
+                const BackupSettingsSection(),
+                const SizedBox(height: AppSpacing.lg),
+                // --- Dark & Light Themes ---
+                const ThemeSelectionSection(),
                 const SizedBox(height: AppSpacing.md),
                 !widget.isFirstTime
                     ? const DangerZoneSection()

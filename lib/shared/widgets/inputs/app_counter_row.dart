@@ -10,6 +10,7 @@ class AppCounterRow extends StatelessWidget {
   final ValueChanged<int> onChanged;
   final int min;
   final int max;
+  final String? afterCounter;
 
   const AppCounterRow({
     super.key,
@@ -18,6 +19,7 @@ class AppCounterRow extends StatelessWidget {
     required this.onChanged,
     this.min = 0,
     this.max = 45,
+    this.afterCounter
   });
 
   @override
@@ -31,7 +33,7 @@ class AppCounterRow extends StatelessWidget {
             color: context.colorScheme.onSurface,
           ),
         ),
-        const SizedBox(height: 8,),
+        const SizedBox(height: 8),
         Container(
           decoration: BoxDecoration(
             color: context.colorScheme.surfaceContainerHighest.withOpacity(0.3),
@@ -51,23 +53,20 @@ class AppCounterRow extends StatelessWidget {
                 color: context.colorScheme.error,
                 disabledColor: context.colorScheme.outlineVariant,
               ),
-              
+
               // عرض الرقم الحالي
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: AppSpacing.sm),
-                child: SizedBox(
-                  width: 40,
-                  child: Text(
-                    '$value',
-                    textAlign: TextAlign.center,
-                    style: context.textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.w900,
-                      color: context.colorScheme.onSurface,
-                    ),
+                child: Text(
+                  '$value',
+                  textAlign: TextAlign.center,
+                  style: context.textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    color: context.colorScheme.onSurface,
                   ),
                 ),
               ),
-              
+
               // زر الزيادة
               IconButton(
                 icon: const Icon(Icons.add_rounded),
@@ -77,6 +76,13 @@ class AppCounterRow extends StatelessWidget {
                 disabledColor: context.colorScheme.outlineVariant,
               ),
             ],
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          afterCounter!,
+          style: context.textTheme.titleMedium?.copyWith(
+            color: context.colorScheme.onSurface,
           ),
         ),
       ],

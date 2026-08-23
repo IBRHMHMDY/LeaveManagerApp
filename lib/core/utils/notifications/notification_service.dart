@@ -196,39 +196,4 @@ class NotificationService {
       );
     }
   }
-
-  Future<void> showTestNotification(int holidayId) async {
-    try {
-      final now = tz.TZDateTime.now(tz.local);
-      final scheduled = now.add(const Duration(seconds: 5));
-
-      const title = 'إشعار تجريبي';
-      const body = 'هذا إشعار تجريبي لتأكيد عمل النظام.';
-      final payload = 'holiday_$holidayId';
-
-      await _notificationsPlugin.zonedSchedule(
-        id: 999,
-        title: title,
-        body: body,
-        scheduledDate: scheduled,
-        notificationDetails: const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'test_channel',
-            'قناة تجريبية',
-            importance: Importance.max,
-            priority: Priority.high,
-            icon: '@mipmap/ic_launcher',
-          ),
-        ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        payload: payload,
-      );
-
-      await saveNotification(
-        SaveNotificationParams(title: title, body: body, payload: payload),
-      );
-    } catch (e, stackTrace) {
-      debugPrint('Error showing test notification: $e\n$stackTrace');
-    }
-  }
 }

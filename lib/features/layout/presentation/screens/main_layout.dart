@@ -26,14 +26,12 @@ class _MainLayoutState extends State<MainLayout> {
   @override
   void initState() {
     super.initState();
-    // تهيئة مدير تدفق الإشعارات المستقل
     _flowManager = sl<NotificationFlowManager>();
     _flowManager.init();
   }
 
   @override
   void dispose() {
-    // إغلاق الاستماع لضمان عدم تسرب الذاكرة
     _flowManager.dispose();
     super.dispose();
   }
@@ -47,28 +45,40 @@ class _MainLayoutState extends State<MainLayout> {
           final isDark = context.isDarkMode;
           final iconBrightness = isDark ? Brightness.light : Brightness.dark;
 
-          return AnnotatedRegion<SystemUiOverlayStyle>(
-            value: SystemUiOverlayStyle(
-              statusBarColor: Colors.transparent,
-              statusBarIconBrightness: iconBrightness,
-              statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
-              systemNavigationBarColor: context.colorScheme.surface,
-              systemNavigationBarIconBrightness: iconBrightness,
-            ),
-            child: BlocListener<LayoutCubit, LayoutState>(
-              listener: (context, state) {
-                if (state is LayoutExitWarning) {
-                  AppToast.showWarning(context, state.message);
-                } else if (state is LayoutExitApproved) {
-                  SystemNavigator.pop();
+          return BlocListener<LayoutCubit, LayoutState>(
+            listener: (context, state) {
+              if (state is LayoutExitWarning) {
+                AppToast.showWarning(context, state.message);
+              } else if (state is LayoutExitApproved) {
+                SystemNavigator.pop();
+              }
+            },
+            child: PopScope(
+              // 1. منع الخروج التلقائي نهائياً لإعطاء الأولوية للتحكم اليدوي
+              canPop: false, 
+              onPopInvokedWithResult: (bool didPop, Object? result) {
+                if (didPop) return;
+                
+                // 2. التحقق من التبويب الحالي
+                if (widget.navigationShell.currentIndex != 0) {
+                  // 3. العودة للرئيسية إذا لم نكن فيها (Index 0)
+                  widget.navigationShell.goBranch(
+                    0,
+                    initialLocation: true,
+                  );
+                } else {
+                  // 4. طلب الخروج عبر Cubit إذا كنا في الرئيسية بالفعل
+                  context.read<LayoutCubit>().handlePopRequest();
                 }
               },
-              child: PopScope(
-                canPop: false,
-                onPopInvokedWithResult: (didPop, result) {
-                  if (didPop) return;
-                  context.read<LayoutCubit>().handlePopRequest();
-                },
+              child: AnnotatedRegion<SystemUiOverlayStyle>(
+                value: SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness: iconBrightness,
+                  statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+                  systemNavigationBarColor: context.colorScheme.surface,
+                  systemNavigationBarIconBrightness: iconBrightness,
+                ),
                 child: Scaffold(
                   body: SafeArea(child: widget.navigationShell),
                   bottomNavigationBar: MainBottomNavBar(

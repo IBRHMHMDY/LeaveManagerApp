@@ -11,7 +11,6 @@ import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_header.dart';
 import 'package:leave_manager/shared/widgets/displays/app_app_bar.dart';
 import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
-import 'package:leave_manager/shared/widgets/inputs/app_segmented_tabs.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 
 class RestAllowancesScreen extends StatefulWidget {
@@ -22,8 +21,6 @@ class RestAllowancesScreen extends StatefulWidget {
 }
 
 class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
-  bool _showAvailables = true;
-
   @override
   void initState() {
     super.initState();
@@ -45,42 +42,25 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
         buildWhen: (previous, current) =>
             current is RestAllowancesLoaded || current is RestAllowancesLoading,
         builder: (context, state) {
-          if (state is RestAllowancesLoading ||
-              state is RestAllowancesInitial) {
+          if (state is RestAllowancesLoading || state is RestAllowancesInitial) {
             return const Center(child: CircularProgressIndicator());
           }
-
+          
           if (state is RestAllowancesLoaded) {
+            // دمج السجلات المتاحة والمستهلكة وترتيبها تنازلياً حسب تاريخ العمل
+            final allRecords = [...state.extrawork, ...state.rest]
+              ..sort((a, b) => b.workStartDate.compareTo(a.workStartDate));
+
             return Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // داخل دالة build في شاشة RestAllowancesScreen
-                AppSegmentedTabs<bool>(
-                  selectedValue: _showAvailables,
-                  onChanged: (isAvailable) {
-                    setState(() {
-                      _showAvailables = isAvailable;
-                    });
-                  },
-                  tabs: [
-                    AppTabItem(
-                      value: true,
-                      label: 'رصيد متاح (${state.availables})',
-                    ),
-                    AppTabItem(
-                      value: false,
-                      label: 'رصيد مستهلك (${state.usage})',
-                    ),
-                  ],
-                ),
                 Expanded(
-                  child: _buildList(
-                    _showAvailables ? state.extrawork : state.rest,
-                  ),
+                  child: _buildList(allRecords),
                 ),
               ],
             );
           }
+          
           return const SizedBox.shrink();
         },
       ),
@@ -88,22 +68,25 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
     );
   }
 
-  Widget _buildList(List<ExtraWorkRecord> extrawork) {
-    if (extrawork.isEmpty) {
+  Widget _buildList(List<ExtraWorkRecord> records) {
+    if (records.isEmpty) {
       return const AppEmptyState(
-        title: 'السجل فارغ',
-        content: 'قم بإضافه ارصدتك لإستهلاكها لاحقا',
+        title: 'لا يوجد بدلات راحة',
+        content: 'قم بإضافة أيام العمل الإضافية أو العطلات التي عملت بها.',
       );
     }
-
+    
     return ListView.builder(
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
         vertical: AppSpacing.sm,
       ),
-      itemCount: extrawork.length,
+      itemCount: records.length,
       itemBuilder: (context, index) {
-        return RestAllowancesCard(extrawork: extrawork[index]);
+        return RestAllowancesCard(
+          key: ValueKey('extrawork_card_${records[index].id}'),
+          extrawork: records[index],
+        );
       },
     );
   }

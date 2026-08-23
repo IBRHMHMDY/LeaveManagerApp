@@ -103,13 +103,15 @@ class NotificationSettingsSection extends StatelessWidget {
                 Padding(
                   padding: const EdgeInsets.all(AppSpacing.md),
                   child: AppCounterRow(
-                    label: 'عدد ايام التنبيه',
+                    label: 'تنبيه قبل العطله ',
                     value: daysBefore,
                     min: 1,
                     max: 7,
                     onChanged: onDaysChanged,
+                    afterCounter: 'يوم/أيام',
                   ),
                 ),
+
                 Divider(color: context.colorScheme.outline.withOpacity(0.1), height: 1),
                 // [إضافة] واجهة اختيار الوقت
                 ListTile(
