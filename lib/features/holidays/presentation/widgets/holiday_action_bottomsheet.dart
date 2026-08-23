@@ -26,6 +26,7 @@ void showHolidayActionBottomSheet(BuildContext context, Holiday holiday) {
 class _HolidayActionForm extends StatelessWidget {
   final Holiday holiday;
   final BuildContext parentContext;
+  
   const _HolidayActionForm({
     required this.holiday,
     required this.parentContext,
@@ -51,8 +52,8 @@ class _HolidayActionForm extends StatelessWidget {
             icon: Icons.work_history_rounded,
             backgroundColor: context.colorScheme.primary,
             onPressed: () {
-              // إضافة الرصيد إلى البدلات
-              context.read<RestAllowancesBloc>().add(
+              // إضافة الرصيد إلى البدلات باستخدام السياق الآمن
+              parentContext.read<RestAllowancesBloc>().add(
                 AddExtraWorkEvent(
                   workStartDate: holiday.startDate,
                   workEndDate: holiday.endDate,
@@ -62,28 +63,27 @@ class _HolidayActionForm extends StatelessWidget {
                 ),
               );
               context.pop(); // إغلاق الـ BottomSheet
-              context.go(AppRouter.restAllowances);
-              AppToast.showSuccess(
-                context,
-                'تم إضافة أيام العطلة إلى رصيد بدلات الراحة بنجاح.',
-              );
+              parentContext.go(AppRouter.restAllowances); // الانتقال للشاشة المطلوبة
+              // لا حاجة لـ AppToast هنا، الـ BLoC سيتكفل بالأمر
             },
           ),
           const SizedBox(height: AppSpacing.md),
+          
           // الخيار الثاني: ترحيل العطلة (يفتح نافذة الترحيل مع تمرير العطلة)
           AppOutlinedButton(
             label: 'ترحيل العطلة',
             icon: Icons.edit_calendar_rounded,
             foregroundColor: context.colorScheme.primary,
             onPressed: () {
-              context.pop();
-              // 2. استخدام سياق الشاشة الأصلية (Parent Context) لفتح الـ BottomSheet الجديد
+              context.pop(); // إغلاق النافذة الحالية
+              parentContext.go(AppRouter.restAllowances); // الانتقال للشاشة المستهدفة
+              
+              // فتح نافذة الإضافة الجديدة بعد التأكد من الانتقال
               Future.delayed(const Duration(milliseconds: 300), () {
                 if (parentContext.mounted) {
                   showAddExtraWorkBottomSheet(parentContext, initialHoliday: holiday);
                 }
               });
-              context.go(AppRouter.restAllowances);
             },
           ),
           const SizedBox(height: AppSpacing.md),
@@ -94,7 +94,7 @@ class _HolidayActionForm extends StatelessWidget {
             icon: Icons.weekend_rounded,
             foregroundColor: context.colorScheme.onSurfaceVariant,
             onPressed: () {
-              context.pop(); // نغلق النافذة فقط
+              context.pop(); // إغلاق النافذة فقط (سيبقى الإشعار غير مقروء في DB)
             },
           ),
         ],

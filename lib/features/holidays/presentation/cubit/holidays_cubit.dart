@@ -10,7 +10,7 @@ import 'package:leave_manager/features/holidays/domain/usecases/initialize_holid
 import 'package:leave_manager/features/settings/domain/usecases/get_settings_usecase.dart';
 import 'holidays_state.dart';
 
-@injectable // Auto DI code generation[cite: 2]
+@injectable
 class HolidaysCubit extends Cubit<HolidaysState> {
   final InitializeHolidaysUseCase _initializeHolidays;
   final GetUpcomingHolidayUseCase _getUpcomingHoliday;
@@ -43,7 +43,7 @@ class HolidaysCubit extends Cubit<HolidaysState> {
         final results = await Future.wait([
           _getUpcomingHoliday(today),
           _getFinancialYearHolidays(params),
-          _getSettings(const NoParams()), // جلب الإعدادات الحالية لجدولة الإشعارات
+          _getSettings(const NoParams()),
         ]);
 
         final upcomingResult = results[0] as dynamic; 
@@ -60,8 +60,8 @@ class HolidaysCubit extends Cubit<HolidaysState> {
                 settingsResult.fold(
                   (failure) {}, // نتجاهل الخطأ هنا كي لا يتوقف تدفق التطبيق الأساسي
                   (settings) {
-                    _notificationService.scheduleHolidayNotifications(
-                      holidays: holidaysList,
+                    _notificationService.scheduleUpcomingHolidayNotification(
+                      upcomingHoliday: upcomingHoliday,
                       settings: settings,
                     );
                   }

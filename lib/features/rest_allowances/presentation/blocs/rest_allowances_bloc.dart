@@ -68,7 +68,7 @@ class RestAllowancesBloc extends Bloc<RestAllowancesEvent, RestAllowancesState> 
       workStartDate: event.workStartDate,
       workEndDate: event.workEndDate,
       daysCount: event.daysCount,
-      isUsed: false, // متاح كافتراضي
+      isUsed: false,
       holidayId: event.holidayId,
       notes: event.notes,
     );

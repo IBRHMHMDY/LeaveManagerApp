@@ -5,16 +5,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:injectable/injectable.dart';
+import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/core/utils/app_bootstrapper.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
+import 'package:leave_manager/features/notifications/domain/usecases/get_notifications_usecase.dart';
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/save_notification_usecase.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 
-final StreamController<String?> selectNotificationStream =
-    StreamController<String?>.broadcast();
+final StreamController<NotificationResponse> selectNotificationStream =
+    StreamController<NotificationResponse>.broadcast();
 
 @pragma('vm:entry-point')
 Future<void> notificationTapBackground(
@@ -29,17 +31,18 @@ Future<void> notificationTapBackground(
 @lazySingleton
 class NotificationService {
   final SaveNotificationUseCase saveNotification;
+  final GetNotificationsUseCase getNotifications;
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
-  String? initialPayload;
 
-  NotificationService(this.saveNotification);
+  NotificationResponse? initialNotificationResponse;
+
+  NotificationService(this.saveNotification, this.getNotifications);
 
   Future<void> init() async {
     tz.initializeTimeZones();
     String timeZoneId;
     try {
-      // تم إرجاع الكود الخاص بنسختك لتفادي خطأ TimezoneInfo
       final TimezoneInfo timeZoneInfo =
           await FlutterTimezone.getLocalTimezone();
       timeZoneId = timeZoneInfo.identifier;
@@ -48,15 +51,15 @@ class NotificationService {
     }
     tz.setLocalLocation(tz.getLocation(timeZoneId));
 
-    // تم التعديل: استخدام @mipmap/ic_launcher كأيقونة افتراضية لمنع الانهيار الصامت
     const AndroidInitializationSettings androidInitSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
+
     const DarwinInitializationSettings iosInitSettings =
         DarwinInitializationSettings(
-          requestAlertPermission: false,
-          requestBadgePermission: false,
-          requestSoundPermission: false,
-        );
+      requestAlertPermission: false,
+      requestBadgePermission: false,
+      requestSoundPermission: false,
+    );
 
     const InitializationSettings initSettings = InitializationSettings(
       android: androidInitSettings,
@@ -66,14 +69,14 @@ class NotificationService {
     final NotificationAppLaunchDetails? notificationAppLaunchDetails =
         await _notificationsPlugin.getNotificationAppLaunchDetails();
     if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
-      initialPayload =
-          notificationAppLaunchDetails?.notificationResponse?.payload;
+      initialNotificationResponse =
+          notificationAppLaunchDetails?.notificationResponse;
     }
 
     await _notificationsPlugin.initialize(
       settings: initSettings,
       onDidReceiveNotificationResponse: (NotificationResponse response) {
-        selectNotificationStream.add(response.payload);
+        selectNotificationStream.add(response);
       },
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
@@ -84,8 +87,7 @@ class NotificationService {
       if (Platform.isAndroid) {
         final androidImplementation = _notificationsPlugin
             .resolvePlatformSpecificImplementation<
-              AndroidFlutterLocalNotificationsPlugin
-            >();
+                AndroidFlutterLocalNotificationsPlugin>();
         if (androidImplementation != null) {
           await androidImplementation.requestNotificationsPermission();
         }
@@ -95,11 +97,9 @@ class NotificationService {
           await Permission.scheduleExactAlarm.request();
         }
       } else if (Platform.isIOS) {
-        // تم إضافة طلب صلاحيات نظام iOS لتجنب تجاهلها
         final iosImplementation = _notificationsPlugin
             .resolvePlatformSpecificImplementation<
-              IOSFlutterLocalNotificationsPlugin
-            >();
+                IOSFlutterLocalNotificationsPlugin>();
         await iosImplementation?.requestPermissions(
           alert: true,
           badge: true,
@@ -115,13 +115,14 @@ class NotificationService {
     await _notificationsPlugin.cancel(id: id);
   }
 
-  Future<void> scheduleHolidayNotifications({
-    required List<Holiday> holidays,
+  // التعديل هنا: دالة لجدولة العطلة القادمة فقط
+  Future<void> scheduleUpcomingHolidayNotification({
+    required Holiday? upcomingHoliday,
     required Settings settings,
   }) async {
-    // 1. التحقق من تفعيل الإشعارات
-    if (!settings.enableNotifications) {
-      debugPrint('⚠️ الإشعارات مغلقة من الإعدادات.');
+    // إلغاء الجدولة إذا كانت الإشعارات معطلة أو لا توجد عطلة قادمة
+    if (!settings.enableNotifications || upcomingHoliday == null) {
+      await _notificationsPlugin.cancelAll(); // مسح أي جدولة سابقة
       return;
     }
 
@@ -137,63 +138,62 @@ class NotificationService {
       debugPrint('Time Parsing Error: $e');
     }
 
-    debugPrint(
-      '⏳ جاري جدولة الإشعارات... التنبيه قبل: ${settings.daysBeforeHolidayAlert} أيام، الساعة: $targetHour:$targetMinute',
+    // إلغاء كافة الإشعارات المجدولة مسبقاً لضمان وجود إشعار واحد فقط نشط
+    await _notificationsPlugin.cancelAll();
+
+    final int alertId = upcomingHoliday.id * 10;
+
+    final alertDate = upcomingHoliday.startDate.subtract(
+      Duration(days: settings.daysBeforeHolidayAlert),
     );
 
-    for (final holiday in holidays) {
-      final int alertId = holiday.id * 10;
-      await cancelNotification(alertId);
+    final alertScheduleTime = tz.TZDateTime(
+      tz.local,
+      alertDate.year,
+      alertDate.month,
+      alertDate.day,
+      targetHour,
+      targetMinute,
+    );
 
-      // حساب التاريخ المستهدف بناءً على تاريخ العطلة ناقص الأيام المحددة
-      final alertDate = holiday.startDate.subtract(
-        Duration(days: settings.daysBeforeHolidayAlert),
+    const title = 'تذكير بعطلة قادمة';
+    final body =
+        'عطلة "${upcomingHoliday.name}" تبدأ بعد ${settings.daysBeforeHolidayAlert} أيام.';
+    final payload = 'holiday_${upcomingHoliday.id}';
+
+    if (alertScheduleTime.isAfter(now)) {
+      // التحقق مما إذا كان الإشعار قد حُفظ مسبقاً
+      bool isAlreadySaved = false;
+      final result = await getNotifications(const NoParams());
+      result.fold(
+        (failure) => debugPrint('Error fetching notifications: ${failure.message}'),
+        (notifications) => isAlreadySaved = notifications.any((n) => n.payload == payload),
       );
 
-      // دمج التاريخ مع الساعة المحددة
-      final alertScheduleTime = tz.TZDateTime(
-        tz.local,
-        alertDate.year,
-        alertDate.month,
-        alertDate.day,
-        targetHour,
-        targetMinute,
-      );
-
-      if (alertScheduleTime.isAfter(now)) {
-        const title = 'تذكير بعطلة قادمة';
-        final body =
-            'عطلة "${holiday.name}" تبدأ بعد ${settings.daysBeforeHolidayAlert} أيام.';
-        final payload = 'holiday_${holiday.id}';
-
-        debugPrint(
-          '✅ سيتم إطلاق إشعار العطلة "${holiday.name}" في هذا الوقت الدقيق: $alertScheduleTime',
-        );
-
-        await _notificationsPlugin.zonedSchedule(
-          id: alertId,
-          title: title,
-          body: body,
-          scheduledDate: alertScheduleTime,
-          notificationDetails: const NotificationDetails(
-            android: AndroidNotificationDetails(
-              'holiday_alerts_channel',
-              'إشعارات العطلات',
-              importance: Importance.max, // رفع الأهمية للدرجة القصوى
-              priority: Priority.max, // رفع الأولوية للدرجة القصوى
-              icon: '@mipmap/ic_launcher',
-              groupKey: 'holiday_group',
-            ),
-          ),
-          // تم التحويل إلى Exact لضمان الانطلاق الفوري في نفس الدقيقة
-          androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-          payload: payload,
-        );
-      } else {
-        debugPrint(
-          '❌ تجاهل: وقت الإشعار للعطلة "${holiday.name}" ($alertScheduleTime) قد مضى.',
+      if (!isAlreadySaved) {
+        await saveNotification(
+          SaveNotificationParams(title: title, body: body, payload: payload),
         );
       }
+
+      await _notificationsPlugin.zonedSchedule(
+        id: alertId,
+        title: title,
+        body: body,
+        scheduledDate: alertScheduleTime,
+        notificationDetails: const NotificationDetails(
+          android: AndroidNotificationDetails(
+            'holiday_alerts_channel',
+            'تنبيهات العطلات',
+            importance: Importance.max,
+            priority: Priority.max,
+            icon: '@mipmap/ic_launcher',
+            groupKey: 'holiday_group',
+          ),
+        ),
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+        payload: payload,
+      );
     }
   }
 
@@ -202,8 +202,8 @@ class NotificationService {
       final now = tz.TZDateTime.now(tz.local);
       final scheduled = now.add(const Duration(seconds: 5));
 
-      const title = 'إختبار الإشعارات';
-      const body = 'هذا إشعار تجريبي للتأكد من عمل الخدمة.';
+      const title = 'إشعار تجريبي';
+      const body = 'هذا إشعار تجريبي لتأكيد عمل النظام.';
       final payload = 'holiday_$holidayId';
 
       await _notificationsPlugin.zonedSchedule(
@@ -214,13 +214,13 @@ class NotificationService {
         notificationDetails: const NotificationDetails(
           android: AndroidNotificationDetails(
             'test_channel',
-            'إختبار الإشعارات',
+            'قناة تجريبية',
             importance: Importance.max,
             priority: Priority.high,
-            icon: '@mipmap/ic_launcher', // استخدام الأيقونة الافتراضية
+            icon: '@mipmap/ic_launcher',
           ),
         ),
-        androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
         payload: payload,
       );
 

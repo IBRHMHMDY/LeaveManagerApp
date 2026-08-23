@@ -285,7 +285,10 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i109.SaveSettingsUseCase(gh<_i674.SettingsRepository>()),
     );
     gh.lazySingleton<_i1043.NotificationService>(
-      () => _i1043.NotificationService(gh<_i740.SaveNotificationUseCase>()),
+      () => _i1043.NotificationService(
+        gh<_i740.SaveNotificationUseCase>(),
+        gh<_i587.GetNotificationsUseCase>(),
+      ),
     );
     gh.factory<_i877.BackupCubit>(
       () => _i877.BackupCubit(
