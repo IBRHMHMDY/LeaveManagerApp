@@ -11,7 +11,15 @@ import 'tables/rest_allowances_table.dart';
 
 part 'app_database.g.dart';
 
-@DriftDatabase(tables: [SettingsTable, LeaveRecordsTable, HolidaysTable,RestAllowancesTable,NotificationsTable])
+@DriftDatabase(
+  tables: [
+    SettingsTable,
+    LeaveRecordsTable,
+    HolidaysTable,
+    RestAllowancesTable,
+    NotificationsTable,
+  ],
+)
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
@@ -39,7 +47,12 @@ class AppDatabase extends _$AppDatabase {
           // إضافة عمود تفعيل الإشعارات
           await m.addColumn(settingsTable, settingsTable.enableNotifications);
           // إضافة عمود عدد أيام التنبيه قبل العطلة
-          await m.addColumn(settingsTable, settingsTable.daysBeforeHolidayAlert);
+          await m.addColumn(
+            settingsTable,
+            settingsTable.daysBeforeHolidayAlert,
+          );
+          // إضافة عمود وقت الإشعار الناقص
+          await m.addColumn(settingsTable, settingsTable.notificationTime);
           // إنشاء جدول الإشعارات للمستخدمين الحاليين عند التحديث
           await m.createTable(notificationsTable);
         }

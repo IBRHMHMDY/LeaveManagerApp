@@ -1,6 +1,6 @@
 // lib/core/constants/app_colors.dart
 import 'package:flutter/material.dart';
-import '../../shared/themes/leave_colors.dart';
+import 'package:leave_manager/shared/themes/leave_colors.dart';
 
 class AppColors {
   // --- Primary Colors ---
@@ -11,7 +11,6 @@ class AppColors {
   static const Color whatsappFGColor = Color(0xFFFEFEFE);
 
   // --- Material 3 Surface Colors (Light) ---
-  // تم تعريف الدرجات صراحة لتجنب استخدام withAlpha()
   static const Color lightBackground = Color(0xFFF5F3F3);
   static const Color lightSurface = Color(0xFFFDFDFD);
   static const Color lightSurfaceContainerLow = Color(0xFFF5F5F5);
