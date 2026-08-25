@@ -1,23 +1,29 @@
 // lib/core/utils/app_bootstrapper.dart
 import 'package:flutter/material.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:leave_manager/firebase_options.dart'; // تأكد من مسار الملف المولد
 import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/utils/notifications/notification_service.dart';
+import 'package:leave_manager/core/utils/notifications/fcm_service.dart';
 
 abstract final class AppBootstrapper {
-  /// دالة التهيئة المركزية التي سيتم استدعاؤها في الـ Main والـ Background Isolate
+  /// التهيئة الأساسية للتطبيق قبل دالة runApp
   static Future<void> init() async {
-    // 1. ربط محرك Flutter بالواجهة الأصلية (Native)
+    // 1. تهيئة بيئة فلاتر (Native)
     WidgetsFlutterBinding.ensureInitialized();
 
-    // 2. تهيئة حقن التبعيات (DI) عبر get_it و injectable
-    // حماية إضافية: نتحقق من عدم تهيئتها مسبقاً لتفادي أخطاء الذاكرة
+    // 2. تهيئة Firebase باستخدام الخيارات المولدة للمنصة الحالية
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+
+    // 3. تهيئة حقن التبعيات (DI)
     if (!sl.isRegistered<NotificationService>()) {
       await configureDependencies();
     }
 
-    // 3. تهيئة الخدمات الأساسية المطلوبة قبل بدء الواجهة الرسومية
+    // 4. تهيئة خدمات الإشعارات (المحلية والسحابية)
     await sl<NotificationService>().init();
-    
-    // يمكنك إضافة أي خدمات أخرى هنا مستقبلاً (مثل Firebase, Hive, SharedPreferences)
+    await sl<FCMService>().init(); // <-- إضافة تهيئة خدمة FCM هنا
   }
 }

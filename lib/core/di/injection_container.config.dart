@@ -76,6 +76,10 @@ import '../../features/notifications/domain/usecases/mark_notification_as_read_u
     as _i889;
 import '../../features/notifications/domain/usecases/save_notification_usecase.dart'
     as _i740;
+import '../../features/notifications/domain/usecases/subscribe_to_topic_usecase.dart'
+    as _i391;
+import '../../features/notifications/domain/usecases/unsubscribe_from_topic_usecase.dart'
+    as _i181;
 import '../../features/notifications/presentation/bloc/notifications_bloc.dart'
     as _i1041;
 import '../../features/rest_allowances/data/datasources/rest_allowances_local_data_source.dart'
@@ -114,6 +118,7 @@ import '../database/app_database.dart' as _i982;
 import '../usecases/check_date_overlap_usecase.dart' as _i707;
 import '../utils/check_network_info.dart' as _i496;
 import '../utils/notifications/battery_optimization_service.dart' as _i692;
+import '../utils/notifications/fcm_service.dart' as _i1008;
 import '../utils/notifications/notification_flow_manager.dart' as _i292;
 import '../utils/notifications/notification_service.dart' as _i1043;
 import '../utils/share_service.dart' as _i518;
@@ -137,6 +142,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i692.BatteryOptimizationService>(
       () => _i692.BatteryOptimizationService(),
     );
+    gh.lazySingleton<_i1008.FCMService>(() => _i1008.FCMService());
     gh.lazySingleton<_i518.ShareService>(() => _i518.ShareService());
     gh.lazySingleton<_i828.HolidaysLocalDataSource>(
       () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),
@@ -152,6 +158,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i599.SettingsLocalDataSource>(
       () => _i599.SettingsLocalDataSourceImpl(gh<_i982.AppDatabase>()),
+    );
+    gh.lazySingleton<_i367.NotificationRepository>(
+      () => _i361.NotificationRepositoryImpl(
+        gh<_i1034.NotificationsLocalDataSource>(),
+        gh<_i1008.FCMService>(),
+      ),
     );
     gh.lazySingleton<_i1005.LeavesLocalDataSource>(
       () => _i1005.LeavesLocalDataSourceImpl(gh<_i982.AppDatabase>()),
@@ -209,11 +221,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i290.RestoreFromLocalUseCase>(
       () => _i290.RestoreFromLocalUseCase(gh<_i137.BackupRepository>()),
     );
-    gh.lazySingleton<_i367.NotificationRepository>(
-      () => _i361.NotificationRepositoryImpl(
-        gh<_i1034.NotificationsLocalDataSource>(),
-      ),
-    );
     gh.lazySingleton<_i169.DeleteNotificationUseCase>(
       () => _i169.DeleteNotificationUseCase(gh<_i367.NotificationRepository>()),
     );
@@ -230,6 +237,13 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i740.SaveNotificationUseCase>(
       () => _i740.SaveNotificationUseCase(gh<_i367.NotificationRepository>()),
+    );
+    gh.lazySingleton<_i391.SubscribeToTopicUseCase>(
+      () => _i391.SubscribeToTopicUseCase(gh<_i367.NotificationRepository>()),
+    );
+    gh.lazySingleton<_i181.UnsubscribeFromTopicUseCase>(
+      () =>
+          _i181.UnsubscribeFromTopicUseCase(gh<_i367.NotificationRepository>()),
     );
     gh.lazySingleton<_i1053.GetFinancialYearHolidaysUseCase>(
       () => _i1053.GetFinancialYearHolidaysUseCase(
@@ -336,6 +350,15 @@ extension GetItInjectableX on _i174.GetIt {
         deleteExtraWork: gh<_i785.DeleteExtraWorkUseCase>(),
       ),
     );
+    gh.factory<_i585.SettingsBloc>(
+      () => _i585.SettingsBloc(
+        checkSettingsExist: gh<_i787.CheckSettingsExistUseCase>(),
+        getSettings: gh<_i1029.GetSettingsUseCase>(),
+        saveSettings: gh<_i109.SaveSettingsUseCase>(),
+        subscribeToTopic: gh<_i391.SubscribeToTopicUseCase>(),
+        unsubscribeFromTopic: gh<_i181.UnsubscribeFromTopicUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i952.CalculateBalancesUseCase>(
       () => _i952.CalculateBalancesUseCase(
         getSettingsUseCase: gh<_i1029.GetSettingsUseCase>(),
@@ -348,13 +371,6 @@ extension GetItInjectableX on _i174.GetIt {
         calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
         getCurrentYearLeaves: gh<_i972.GetCurrentYearLeavesUseCase>(),
         getExtraWorkRecords: gh<_i804.GetExtraWorkRecordsUseCase>(),
-      ),
-    );
-    gh.factory<_i585.SettingsBloc>(
-      () => _i585.SettingsBloc(
-        checkSettingsExist: gh<_i787.CheckSettingsExistUseCase>(),
-        getSettings: gh<_i1029.GetSettingsUseCase>(),
-        saveSettings: gh<_i109.SaveSettingsUseCase>(),
       ),
     );
     gh.lazySingleton<_i442.AddLeaveUseCase>(

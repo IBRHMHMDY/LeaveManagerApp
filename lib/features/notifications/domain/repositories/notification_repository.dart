@@ -12,4 +12,7 @@ abstract class NotificationRepository {
   Future<Either<Failure, Unit>> markAsRead(int id);
   Future<Either<Failure, int>> getUnreadCount();
   Future<Either<Failure, Unit>> deleteNotification(int id);
+
+  Future<Either<Failure, Unit>> subscribeToTopic(String topic);
+  Future<Either<Failure, Unit>> unsubscribeFromTopic(String topic);
 }
