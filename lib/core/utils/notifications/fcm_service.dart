@@ -1,28 +1,23 @@
-// lib/core/utils/notifications/fcm_service.dart
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
+import 'package:leave_manager/core/utils/notifications/notification_service.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/save_notification_usecase.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_event.dart';
 
-/// الاستماع للإشعارات في الخلفية (Background)
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
   await Firebase.initializeApp();
-  
-  // تهيئة حقن التبعيات لأن الخلفية تعمل في مساحة ذاكرة (Isolate) مستقلة
   if (!sl.isRegistered<SaveNotificationUseCase>()) {
     await configureDependencies();
   }
-
   final saveNotification = sl<SaveNotificationUseCase>();
-  
   await saveNotification(
     SaveNotificationParams(
-      title: message.notification?.title ?? 'إشعار إداري',
+      title: message.notification?.title ?? 'إشعار جديد',
       body: message.notification?.body ?? '',
       payload: message.data['payload'],
     ),
@@ -33,35 +28,40 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
 class FCMService {
   final FirebaseMessaging _firebaseMessaging = FirebaseMessaging.instance;
 
-  // تم إزالة SaveNotificationUseCase من المُنشئ لكسر التبعية الدائرية
-
   Future<void> init() async {
-    await _requestPermissions();
-
-    // تسجيل مستمع الخلفية
     FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-
-    // الاستماع للإشعارات أثناء استخدام التطبيق (Foreground)
+    
     FirebaseMessaging.onMessage.listen((RemoteMessage message) async {
       debugPrint("Foreground message received: ${message.messageId}");
       
-      // جلب الـ UseCase ديناميكياً لكسر التبعية
       final saveNotification = sl<SaveNotificationUseCase>();
       
+      // 1. حفظ الإشعار في قاعدة البيانات (الكود الخاص بك)[cite: 2]
       final result = await saveNotification(
         SaveNotificationParams(
-          title: message.notification?.title ?? 'إشعار إداري',
+          title: message.notification?.title ?? 'بدون عنوان',
           body: message.notification?.body ?? '',
           payload: message.data['payload'],
         ),
       );
 
-      // تحديث حالة الواجهة باستخدام BLoC في حال النجاح
       result.fold(
         (failure) => debugPrint('Error saving notification: ${failure.message}'),
         (_) {
+          // 2. تحديث عداد الإشعارات في الـ UI[cite: 2]
           if (sl.isRegistered<NotificationsBloc>()) {
             sl<NotificationsBloc>().add(LoadNotificationsEvent());
+          }
+          
+          // 3. إضافة: إظهار الإشعار المرئي للمستخدم في الـ Foreground
+          if (message.notification != null) {
+            final localNotificationService = sl<NotificationService>();
+            localNotificationService.showNotification(
+              id: message.messageId.hashCode,
+              title: message.notification!.title ?? 'إشعار جديد',
+              body: message.notification!.body ?? '',
+              payload: message.data['payload'],
+            );
           }
         },
       );
@@ -75,7 +75,8 @@ class FCMService {
     }
   }
 
-  Future<void> _requestPermissions() async {
+  // ✅ تحويل الدالة إلى Public لكي نناديها متى شئنا
+  Future<void> requestPermissions() async {
     final settings = await _firebaseMessaging.requestPermission(
       alert: true,
       badge: true,

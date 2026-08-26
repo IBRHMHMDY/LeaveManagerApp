@@ -45,8 +45,6 @@ class SettingsRepositoryImpl implements SettingsRepository {
         totalRegularLeaves: Value(settings.totalRegularLeaves),
         totalCasualLeaves: Value(settings.totalCasualLeaves),
         enableNotifications: Value(settings.enableNotifications),
-        daysBeforeHolidayAlert: Value(settings.daysBeforeHolidayAlert),
-        notificationTime: Value(settings.notificationTime),
       );
       
       await localDataSource.saveSettings(companion);

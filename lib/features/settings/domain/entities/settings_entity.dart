@@ -8,8 +8,6 @@ class Settings extends Equatable {
   final int totalRegularLeaves;
   final int totalCasualLeaves;
   final bool enableNotifications;
-  final int daysBeforeHolidayAlert;
-  final String notificationTime;
 
   const Settings({
     required this.id,
@@ -19,8 +17,6 @@ class Settings extends Equatable {
     required this.totalCasualLeaves,
     // --- الحقول الجديدة بقيم افتراضية لتفادي أخطاء الـ null ---
     this.enableNotifications = true,
-    this.daysBeforeHolidayAlert = 2,
-    this.notificationTime = '10:00',
   });
 
   @override
@@ -30,8 +26,6 @@ class Settings extends Equatable {
     jobTitle,
     totalRegularLeaves,
     totalCasualLeaves,
-    enableNotifications, // إضافة الخصائص الجديدة هنا
-    daysBeforeHolidayAlert,
-    notificationTime
+    enableNotifications,
   ];
 }

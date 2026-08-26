@@ -3,17 +3,10 @@ import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:injectable/injectable.dart';
-import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/core/utils/app_bootstrapper.dart';
-import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/get_notifications_usecase.dart';
-import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/save_notification_usecase.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:timezone/timezone.dart' as tz;
 
 final StreamController<NotificationResponse> selectNotificationStream =
     StreamController<NotificationResponse>.broadcast();
@@ -34,33 +27,22 @@ class NotificationService {
   final GetNotificationsUseCase getNotifications;
   final FlutterLocalNotificationsPlugin _notificationsPlugin =
       FlutterLocalNotificationsPlugin();
-
+      
   NotificationResponse? initialNotificationResponse;
 
   NotificationService(this.saveNotification, this.getNotifications);
 
   Future<void> init() async {
-    tz.initializeTimeZones();
-    String timeZoneId;
-    try {
-      final TimezoneInfo timeZoneInfo =
-          await FlutterTimezone.getLocalTimezone();
-      timeZoneId = timeZoneInfo.identifier;
-    } catch (e) {
-      timeZoneId = 'Africa/Cairo';
-    }
-    tz.setLocalLocation(tz.getLocation(timeZoneId));
-
     const AndroidInitializationSettings androidInitSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
-
+        
     const DarwinInitializationSettings iosInitSettings =
         DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
-
+    
     const InitializationSettings initSettings = InitializationSettings(
       android: androidInitSettings,
       iOS: iosInitSettings,
@@ -68,6 +50,7 @@ class NotificationService {
 
     final NotificationAppLaunchDetails? notificationAppLaunchDetails =
         await _notificationsPlugin.getNotificationAppLaunchDetails();
+        
     if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
       initialNotificationResponse =
           notificationAppLaunchDetails?.notificationResponse;
@@ -80,6 +63,9 @@ class NotificationService {
       },
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
+
+    // إلغاء أي إشعارات محلية مجدولة مسبقاً لتفادي التكرار مع FCM
+    await _notificationsPlugin.cancelAll();
   }
 
   Future<void> requestPermissions() async {
@@ -91,11 +77,7 @@ class NotificationService {
         if (androidImplementation != null) {
           await androidImplementation.requestNotificationsPermission();
         }
-        final isExactAlarmGranted =
-            await Permission.scheduleExactAlarm.isGranted;
-        if (!isExactAlarmGranted) {
-          await Permission.scheduleExactAlarm.request();
-        }
+        // تم إزالة طلب صلاحية scheduleExactAlarm لعدم الحاجة إليها
       } else if (Platform.isIOS) {
         final iosImplementation = _notificationsPlugin
             .resolvePlatformSpecificImplementation<
@@ -115,85 +97,29 @@ class NotificationService {
     await _notificationsPlugin.cancel(id: id);
   }
 
-  // التعديل هنا: دالة لجدولة العطلة القادمة فقط
-  Future<void> scheduleUpcomingHolidayNotification({
-    required Holiday? upcomingHoliday,
-    required Settings settings,
+  Future<void> showNotification({
+    required int id,
+    required String title,
+    required String body,
+    String? payload,
   }) async {
-    // إلغاء الجدولة إذا كانت الإشعارات معطلة أو لا توجد عطلة قادمة
-    if (!settings.enableNotifications || upcomingHoliday == null) {
-      await _notificationsPlugin.cancelAll(); // مسح أي جدولة سابقة
-      return;
-    }
-
-    final now = tz.TZDateTime.now(tz.local);
-    int targetHour = 10;
-    int targetMinute = 0;
-
-    try {
-      final timeParts = settings.notificationTime.split(':');
-      if (timeParts.isNotEmpty) targetHour = int.parse(timeParts[0]);
-      if (timeParts.length > 1) targetMinute = int.parse(timeParts[1]);
-    } catch (e) {
-      debugPrint('Time Parsing Error: $e');
-    }
-
-    // إلغاء كافة الإشعارات المجدولة مسبقاً لضمان وجود إشعار واحد فقط نشط
-    await _notificationsPlugin.cancelAll();
-
-    final int alertId = upcomingHoliday.id * 10;
-
-    final alertDate = upcomingHoliday.startDate.subtract(
-      Duration(days: settings.daysBeforeHolidayAlert),
+    const androidDetails = AndroidNotificationDetails(
+      'leave_manager_high_importance_channel',
+      'تنبيهات هامة',
+      channelDescription: 'هذه القناة مخصصة للإشعارات الهامة والعاجلة.',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+    );
+    
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
     );
 
-    final alertScheduleTime = tz.TZDateTime(
-      tz.local,
-      alertDate.year,
-      alertDate.month,
-      alertDate.day,
-      targetHour,
-      targetMinute,
-    );
+    const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
-    const title = 'تذكير بعطلة قادمة';
-    final body =
-        'عطلة "${upcomingHoliday.name}" تبدأ بعد ${settings.daysBeforeHolidayAlert} أيام.';
-    final payload = 'holiday_${upcomingHoliday.id}';
-
-    if (alertScheduleTime.isAfter(now)) {
-      // التحقق مما إذا كان الإشعار قد حُفظ مسبقاً
-      bool isAlreadySaved = false;
-      final result = await getNotifications(const NoParams());
-      result.fold(
-        (failure) => debugPrint('Error fetching notifications: ${failure.message}'),
-        (notifications) => isAlreadySaved = notifications.any((n) => n.payload == payload),
-      );
-
-      if (!isAlreadySaved) {
-        await saveNotification(
-          SaveNotificationParams(title: title, body: body, payload: payload),
-        );
-      }
-
-      await _notificationsPlugin.zonedSchedule(
-        id: alertId,
-        title: title,
-        body: body,
-        scheduledDate: alertScheduleTime,
-        notificationDetails: const NotificationDetails(
-          android: AndroidNotificationDetails(
-            'holiday_alerts_channel',
-            'تنبيهات العطلات',
-            importance: Importance.max,
-            priority: Priority.max,
-            icon: '@mipmap/ic_launcher',
-            groupKey: 'holiday_group',
-          ),
-        ),
-        androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-        payload: payload,
-      );
-    }
+    await _notificationsPlugin.show(id: id, title: title, body:body, notificationDetails: details, payload: payload);
   }
 }

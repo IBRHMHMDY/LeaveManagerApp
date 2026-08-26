@@ -1,4 +1,5 @@
 // lib/features/settings/presentation/bloc/settings_bloc.dart
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
@@ -15,9 +16,8 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
   final CheckSettingsExistUseCase checkSettingsExist;
   final GetSettingsUseCase getSettings;
   final SaveSettingsUseCase saveSettings;
-  final SubscribeToTopicUseCase subscribeToTopic; // <-- إضافة UseCase
-  final UnsubscribeFromTopicUseCase unsubscribeFromTopic; // <-- إضافة UseCase
-
+  final SubscribeToTopicUseCase subscribeToTopic;
+  final UnsubscribeFromTopicUseCase unsubscribeFromTopic;
 
   SettingsBloc({
     required this.checkSettingsExist,
@@ -29,7 +29,6 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
     
     on<CheckSettingsEvent>((event, emit) async {
       emit(SettingsLoading());
-
       final result = await checkSettingsExist(const NoParams());
       result.fold(
         (failure) => emit(SettingsError(failure.message)),
@@ -48,17 +47,17 @@ class SettingsBloc extends Bloc<SettingsEvent, SettingsState> {
 
     on<SaveSettingsEvent>((event, emit) async {
       emit(SettingsLoading());
-      
-      // 1. حفظ الإعدادات في قاعدة البيانات (Drift)
-      final result = await saveSettings(event.settings);
-      
-      // 2. تحديث حالة اشتراك Firebase Topic بناءً على خيار المستخدم
-      if (event.settings.enableNotifications) {
-        await subscribeToTopic('holidays_alerts');
-      } else {
-        await unsubscribeFromTopic('holidays_alerts');
-      }
 
+      // 1. حفظ الإعدادات محلياً (Drift)
+      final result = await saveSettings(event.settings);
+
+      // 2. تحديث إعدادات Firebase Topic في الخلفية (بدون await)
+      // هذا التعديل يمنع تجميد التطبيق في حال انقطاع الإنترنت أو عدم جاهزية FCM
+      if (event.settings.enableNotifications) {
+        subscribeToTopic('holidays_alerts').ignore();
+      } else {
+        unsubscribeFromTopic('holidays_alerts').ignore();
+      }
       result.fold(
         (failure) => emit(SettingsError(failure.message)),
         (_) => emit(SettingsSavedSuccess()),

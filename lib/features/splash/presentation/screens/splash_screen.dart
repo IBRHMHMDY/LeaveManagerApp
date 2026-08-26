@@ -5,7 +5,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
-import 'package:leave_manager/core/utils/notifications/battery_optimization_service.dart';
+import 'package:leave_manager/core/utils/notifications/notification_permission_manager.dart';
 import 'package:leave_manager/core/utils/notifications/notification_service.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/app_version.dart';
@@ -18,6 +18,7 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -27,7 +28,8 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _logoScaleAnimation;
   late Animation<Offset> _textSlideAnimation;
@@ -37,59 +39,69 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   void initState() {
     super.initState();
     SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersiveSticky);
-    
+
     _animationController = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 2000), 
+      duration: const Duration(milliseconds: 2000),
     );
-    
+
     _logoScaleAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.0, 0.6, curve: Curves.elasticOut),
       ),
     );
-    
-    _textSlideAnimation = Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
-      ),
-    );
-    
+
+    _textSlideAnimation =
+        Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+          ),
+        );
+
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
         curve: const Interval(0.2, 1.0, curve: Curves.easeIn),
       ),
     );
-    
+
     _animationController.forward();
     _initializeApp();
-    
   }
 
   Future<void> _initializeApp() async {
     try {
-      // 1. تهيئة الإشعارات وطلب صلاحياتها
+      // 1. تهيئة الخدمات
       final notificationService = sl<NotificationService>();
       await notificationService.init();
-      await notificationService.requestPermissions();
 
-      // 2. طلب إيقاف تحسين البطارية وتفعيل التشغيل التلقائي
-      final batteryService = sl<BatteryOptimizationService>();
-      await batteryService.requestBatteryAndAutoStartPermissions();
+      // 2. قراءة التفضيلات المخزنة
+    final prefs = sl<SharedPreferences>();
+    final hasRequestedNotifications = prefs.getBool('has_requested_notifications') ?? false;
 
-      // 3. تأخير بسيط للمظهر الجمالي 
+    // 3. عرض مربع الحوار إذا لم يتم الطلب مسبقاً
+    if (!hasRequestedNotifications && mounted) {
+      // ✅ استدعاء مدير الصلاحيات الموحد
+      final isGranted = await sl<NotificationPermissionManager>()
+          .requestPermissionsWithDialog(context);
+          
+      // حفظ قرار المستخدم כقيمة ابتدائية لشاشة الإعدادات
+      await prefs.setBool('notifications_enabled_initial', isGranted);
+      await prefs.setBool('has_requested_notifications', true);
+    }
+
+      // 4. تأخير العرض
       await Future.delayed(const Duration(milliseconds: 3000));
-      
+
+      // 5. فحص الإعدادات والانتقال
       if (mounted) {
-        // 4. التحقق من الإعدادات والانتقال للشاشة الرئيسية
         context.read<SettingsBloc>().add(CheckSettingsEvent());
       }
     } catch (e) {
       if (mounted) {
-        AppToast.showError(context, 'حدث خطأ أثناء التهيئة');
+        AppToast.showError(context, 'حدث خطأ غير متوقع');
         context.go(AppRouter.setup);
       }
     }
@@ -104,13 +116,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
   @override
   Widget build(BuildContext context) {
     return BlocListener<SettingsBloc, SettingsState>(
-      listener: (context, state) { 
+      listener: (context, state) {
         if (state is SettingsExists) {
           context.read<SettingsBloc>().add(LoadSettingsEvent());
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
           context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
           context.read<HolidaysCubit>().loadHolidays();
-          
+
           SystemChrome.setEnabledSystemUIMode(
             SystemUiMode.manual,
             overlays: SystemUiOverlay.values,
@@ -118,13 +130,13 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           context.go(AppRouter.home);
         } else if (state is SettingsNotFound) {
           SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.manual, 
-              overlays: SystemUiOverlay.values,
-            );
-          context.go(AppRouter.setup); 
+            SystemUiMode.manual,
+            overlays: SystemUiOverlay.values,
+          );
+          context.go(AppRouter.setup);
         } else if (state is SettingsError) {
           AppToast.showError(context, state.message);
-          context.go(AppRouter.setup); 
+          context.go(AppRouter.setup);
         }
       },
       child: Scaffold(
@@ -139,7 +151,9 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                 height: 250,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: context.colorScheme.primary.withOpacity(0.06), // بديل withAlpha(15)
+                  color: context.colorScheme.primary.withOpacity(
+                    0.06,
+                  ), // بديل withAlpha(15)
                 ),
               ),
             ),
@@ -173,10 +187,10 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                           Text(
                             'مدير إجازاتي',
                             style: context.textTheme.headlineMedium?.copyWith(
-                                  fontWeight: FontWeight.w900,
-                                  color: context.colorScheme.primary,
-                                  letterSpacing: 1.2,
-                                ),
+                              fontWeight: FontWeight.w900,
+                              color: context.colorScheme.primary,
+                              letterSpacing: 1.2,
+                            ),
                           ),
                           const SizedBox(height: 12),
                           Container(
@@ -185,15 +199,16 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                               vertical: 6,
                             ),
                             decoration: BoxDecoration(
-                              color: context.colorScheme.primaryContainer.withOpacity(0.6), // بديل withAlpha(150)
+                              color: context.colorScheme.primaryContainer
+                                  .withOpacity(0.6), // بديل withAlpha(150)
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
                               'تتبع إجازاتك بذكاء وسهولة',
                               style: context.textTheme.titleSmall?.copyWith(
-                                    color: context.colorScheme.onSurface,
-                                    fontWeight: FontWeight.w900,
-                                  ),
+                                color: context.colorScheme.onSurface,
+                                fontWeight: FontWeight.w900,
+                              ),
                             ),
                           ),
                         ],

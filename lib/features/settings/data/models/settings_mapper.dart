@@ -11,8 +11,6 @@ extension SettingsMapper on SettingModel {
       totalRegularLeaves: totalRegularLeaves,
       totalCasualLeaves: totalCasualLeaves,
       enableNotifications: enableNotifications,
-      daysBeforeHolidayAlert: daysBeforeHolidayAlert,
-      notificationTime: notificationTime,
     );
   }
 }

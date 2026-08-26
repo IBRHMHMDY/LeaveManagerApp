@@ -46,13 +46,6 @@ class AppDatabase extends _$AppDatabase {
         if (from < 4) {
           // إضافة عمود تفعيل الإشعارات
           await m.addColumn(settingsTable, settingsTable.enableNotifications);
-          // إضافة عمود عدد أيام التنبيه قبل العطلة
-          await m.addColumn(
-            settingsTable,
-            settingsTable.daysBeforeHolidayAlert,
-          );
-          // إضافة عمود وقت الإشعار الناقص
-          await m.addColumn(settingsTable, settingsTable.notificationTime);
           // إنشاء جدول الإشعارات للمستخدمين الحاليين عند التحديث
           await m.createTable(notificationsTable);
         }

@@ -3,9 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/notifications/notification_permission_manager.dart';
 import 'package:leave_manager/features/backup_restore/presentation/widgets/backup_settings_section.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
@@ -22,6 +24,7 @@ import 'package:leave_manager/features/settings/presentation/widgets/settings_he
 import 'package:leave_manager/features/settings/presentation/widgets/theme_selection_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/notification_settings_section.dart'; // المكون الجديد
 import 'package:leave_manager/shared/widgets/widgets.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isFirstTime;
@@ -37,17 +40,23 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _jobController = TextEditingController(text: 'موظف');
   final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
-
-  // --- متغيرات حالة الإشعارات الجديدة ---
   bool _enableNotifications = true;
-  int _daysBeforeHolidayAlert = 2;
-  String _notificationTime = '10:00';
   late bool _isFirstTime;
 
   @override
   void initState() {
     super.initState();
     _isFirstTime = widget.isFirstTime;
+
+    // ✅ إذا كان المستخدم يدخل لأول مرة، نقرأ اختياره من نافذة Splash
+    if (_isFirstTime) {
+      _enableNotifications =
+          sl<SharedPreferences>().getBool('notifications_enabled_initial') ??
+          false;
+    } else {
+      _enableNotifications = true;
+    }
+
     _loadInitialData();
   }
 
@@ -74,11 +83,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _jobController.text = settings.jobTitle;
     _regularLeavesController.text = settings.totalRegularLeaves.toString();
     _casualLeavesController.text = settings.totalCasualLeaves.toString();
-
     setState(() {
       _enableNotifications = settings.enableNotifications;
-      _daysBeforeHolidayAlert = settings.daysBeforeHolidayAlert;
-      _notificationTime = settings.notificationTime;
     });
   }
 
@@ -93,8 +99,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         totalRegularLeaves: _regularLeavesController.text.toIntSafely(),
         totalCasualLeaves: _casualLeavesController.text.toIntSafely(),
         enableNotifications: _enableNotifications,
-        daysBeforeHolidayAlert: _daysBeforeHolidayAlert,
-        notificationTime: _notificationTime,
       );
 
       context.read<SettingsBloc>().add(SaveSettingsEvent(settings));
@@ -145,14 +149,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 // --- Notifications ---
                 NotificationSettingsSection(
                   isEnabled: _enableNotifications,
-                  daysBefore: _daysBeforeHolidayAlert,
-                  notificationTime: _notificationTime,
-                  onToggle: (value) =>
-                      setState(() => _enableNotifications = value),
-                  onDaysChanged: (value) =>
-                      setState(() => _daysBeforeHolidayAlert = value),
-                  onTimeChanged: (value) =>
-                      setState(() => _notificationTime = value),
+                  onToggle: (value) async {
+                    if (value == true) {
+                      // ✅ المستخدم يريد التفعيل: نظهر له مربع الحوار ثم صلاحيات النظام
+                      final isGranted = await sl<NotificationPermissionManager>()
+                          .requestPermissionsWithDialog(context);
+                          
+                      if (mounted) {
+                        setState(() => _enableNotifications = isGranted);
+                      }
+                    } else {
+                      // ✅ المستخدم يريد الإلغاء: نلغي التفعيل مباشرة بدون أسئلة
+                      if (mounted) {
+                        setState(() => _enableNotifications = false);
+                      }
+                    }
+                  },
                 ),
                 const SizedBox(height: AppSpacing.xl),
                 // Save Settings button
