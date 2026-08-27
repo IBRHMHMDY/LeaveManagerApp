@@ -1,59 +1,50 @@
-// lib/core/utils/notifications/notification_service.dart
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/utils/app_bootstrapper.dart';
-import 'package:leave_manager/features/notifications/domain/usecases/get_notifications_usecase.dart';
-import 'package:leave_manager/features/notifications/domain/usecases/save_notification_usecase.dart';
 
+/// Stream عالمي لالتقاط الـ Payload عند الضغط على الإشعار
 final StreamController<NotificationResponse> selectNotificationStream =
     StreamController<NotificationResponse>.broadcast();
 
+/// دالة للتعامل مع الضغط على الإشعار والتطبيق في الخلفية
 @pragma('vm:entry-point')
-Future<void> notificationTapBackground(
-  NotificationResponse notificationResponse,
-) async {
+Future<void> notificationTapBackground(NotificationResponse notificationResponse) async {
   await AppBootstrapper.init();
-  debugPrint(
-    'Notification Tapped in Background: ${notificationResponse.payload}',
-  );
+  debugPrint('Notification Tapped in Background: ${notificationResponse.payload}');
+  selectNotificationStream.add(notificationResponse);
 }
 
 @lazySingleton
 class NotificationService {
-  final SaveNotificationUseCase saveNotification;
-  final GetNotificationsUseCase getNotifications;
-  final FlutterLocalNotificationsPlugin _notificationsPlugin =
-      FlutterLocalNotificationsPlugin();
-      
+  final FlutterLocalNotificationsPlugin _notificationsPlugin = FlutterLocalNotificationsPlugin();
+  
   NotificationResponse? initialNotificationResponse;
 
-  NotificationService(this.saveNotification, this.getNotifications);
-
+  /// تهيئة إعدادات الإشعارات المحلية
   Future<void> init() async {
     const AndroidInitializationSettings androidInitSettings =
         AndroidInitializationSettings('@mipmap/ic_launcher');
         
-    const DarwinInitializationSettings iosInitSettings =
-        DarwinInitializationSettings(
+    const DarwinInitializationSettings iosInitSettings = DarwinInitializationSettings(
       requestAlertPermission: false,
       requestBadgePermission: false,
       requestSoundPermission: false,
     );
-    
+
     const InitializationSettings initSettings = InitializationSettings(
       android: androidInitSettings,
       iOS: iosInitSettings,
     );
 
+    // التحقق مما إذا كان التطبيق قد فُتح عبر الضغط على إشعار
     final NotificationAppLaunchDetails? notificationAppLaunchDetails =
         await _notificationsPlugin.getNotificationAppLaunchDetails();
-        
+
     if (notificationAppLaunchDetails?.didNotificationLaunchApp ?? false) {
-      initialNotificationResponse =
-          notificationAppLaunchDetails?.notificationResponse;
+      initialNotificationResponse = notificationAppLaunchDetails?.notificationResponse;
     }
 
     await _notificationsPlugin.initialize(
@@ -63,40 +54,32 @@ class NotificationService {
       },
       onDidReceiveBackgroundNotificationResponse: notificationTapBackground,
     );
-
-    // إلغاء أي إشعارات محلية مجدولة مسبقاً لتفادي التكرار مع FCM
-    await _notificationsPlugin.cancelAll();
   }
 
+  /// طلب صلاحيات النظام للإشعارات المحلية
   Future<void> requestPermissions() async {
     try {
       if (Platform.isAndroid) {
         final androidImplementation = _notificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                AndroidFlutterLocalNotificationsPlugin>();
+            .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
         if (androidImplementation != null) {
           await androidImplementation.requestNotificationsPermission();
         }
-        // تم إزالة طلب صلاحية scheduleExactAlarm لعدم الحاجة إليها
       } else if (Platform.isIOS) {
         final iosImplementation = _notificationsPlugin
-            .resolvePlatformSpecificImplementation<
-                IOSFlutterLocalNotificationsPlugin>();
+            .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
         await iosImplementation?.requestPermissions(
           alert: true,
           badge: true,
           sound: true,
         );
       }
-    } catch (e) {
-      debugPrint('Error requesting permissions: $e');
+    } catch (e, stackTrace) {
+      debugPrint('Error requesting permissions: $e\n$stackTrace');
     }
   }
 
-  Future<void> cancelNotification(int id) async {
-    await _notificationsPlugin.cancel(id: id);
-  }
-
+  /// عرض إشعار مرئي في واجهة التطبيق
   Future<void> showNotification({
     required int id,
     required String title,
@@ -106,12 +89,12 @@ class NotificationService {
     const androidDetails = AndroidNotificationDetails(
       'leave_manager_high_importance_channel',
       'تنبيهات هامة',
-      channelDescription: 'هذه القناة مخصصة للإشعارات الهامة والعاجلة.',
+      channelDescription: 'قناة مخصصة لتنبيهات الأرصدة والعطلات',
       importance: Importance.max,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
     );
-    
+
     const iosDetails = DarwinNotificationDetails(
       presentAlert: true,
       presentBadge: true,
@@ -119,7 +102,13 @@ class NotificationService {
     );
 
     const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
-
-    await _notificationsPlugin.show(id: id, title: title, body:body, notificationDetails: details, payload: payload);
+    
+    await _notificationsPlugin.show(
+      id: id,
+      title: title,
+      body: body,
+      notificationDetails: details,
+      payload: payload,
+    );
   }
 }

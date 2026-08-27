@@ -78,19 +78,20 @@ class _SplashScreenState extends State<SplashScreen>
       await notificationService.init();
 
       // 2. قراءة التفضيلات المخزنة
-    final prefs = sl<SharedPreferences>();
-    final hasRequestedNotifications = prefs.getBool('has_requested_notifications') ?? false;
+      final prefs = sl<SharedPreferences>();
+      final hasRequestedNotifications =
+          prefs.getBool('has_requested_notifications') ?? false;
 
-    // 3. عرض مربع الحوار إذا لم يتم الطلب مسبقاً
-    if (!hasRequestedNotifications && mounted) {
-      // ✅ استدعاء مدير الصلاحيات الموحد
-      final isGranted = await sl<NotificationPermissionManager>()
-          .requestPermissionsWithDialog(context);
-          
-      // حفظ قرار المستخدم כقيمة ابتدائية لشاشة الإعدادات
-      await prefs.setBool('notifications_enabled_initial', isGranted);
-      await prefs.setBool('has_requested_notifications', true);
-    }
+      // 3. عرض مربع الحوار إذا لم يتم الطلب مسبقاً
+      if (!hasRequestedNotifications && mounted) {
+        // ✅ استدعاء مدير الصلاحيات الموحد
+        final isGranted = await sl<NotificationPermissionManager>()
+            .requestPermissionsWithDialog(context);
+
+        // حفظ قرار المستخدم כقيمة ابتدائية لشاشة الإعدادات
+        await prefs.setBool('notifications_enabled_initial', isGranted);
+        await prefs.setBool('has_requested_notifications', true);
+      }
 
       // 4. تأخير العرض
       await Future.delayed(const Duration(milliseconds: 3000));
@@ -103,6 +104,12 @@ class _SplashScreenState extends State<SplashScreen>
       if (mounted) {
         AppToast.showError(context, 'حدث خطأ غير متوقع');
         context.go(AppRouter.setup);
+      }
+    } finally {
+      // 4. الانتقال للشاشة المناسبة دائماً (يتم تنفيذه سواء نجحت المحاولة أم فشلت)
+      await Future.delayed(const Duration(milliseconds: 3000));
+      if (mounted) {
+        context.read<SettingsBloc>().add(CheckSettingsEvent());
       }
     }
   }

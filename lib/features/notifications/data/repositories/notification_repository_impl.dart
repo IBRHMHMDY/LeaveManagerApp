@@ -1,10 +1,10 @@
+// lib/features/notifications/data/repositories/notification_repository_impl.dart
 import 'package:dartz/dartz.dart';
 import 'package:drift/drift.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
 import 'package:leave_manager/core/errors/failures.dart';
-import 'package:leave_manager/core/utils/notifications/fcm_service.dart';
 import 'package:leave_manager/features/notifications/data/datasources/notifications_local_data_source.dart';
 import 'package:leave_manager/features/notifications/data/models/notification_mapper.dart';
 import 'package:leave_manager/features/notifications/domain/entities/notification_entity.dart';
@@ -13,8 +13,8 @@ import 'package:leave_manager/features/notifications/domain/repositories/notific
 @LazySingleton(as: NotificationRepository)
 class NotificationRepositoryImpl implements NotificationRepository {
   final NotificationsLocalDataSource localDataSource;
-  final FCMService fcmService;
-  NotificationRepositoryImpl(this.localDataSource, this.fcmService);
+
+  NotificationRepositoryImpl({required this.localDataSource});
 
   @override
   Future<Either<Failure, Unit>> saveNotification({
@@ -73,26 +73,6 @@ class NotificationRepositoryImpl implements NotificationRepository {
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> subscribeToTopic(String topic) async {
-    try {
-      await fcmService.subscribeToTopic(topic);
-      return const Right(unit);
-    } catch (e) {
-      return const Left(ValidationFailure('تعذر الاتصال بخادم الإشعارات.'));
-    }
-  }
-
-  @override
-  Future<Either<Failure, Unit>> unsubscribeFromTopic(String topic) async {
-    try {
-      await fcmService.unsubscribeFromTopic(topic);
-      return const Right(unit);
-    } catch (e) {
-      return const Left(ValidationFailure('تعذر الاتصال بخادم الإشعارات.'));
     }
   }
 }

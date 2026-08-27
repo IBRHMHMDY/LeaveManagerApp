@@ -8,6 +8,7 @@ import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/notifications/notification_permission_manager.dart';
+import 'package:leave_manager/core/utils/notifications/notification_service.dart';
 import 'package:leave_manager/features/backup_restore/presentation/widgets/backup_settings_section.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
@@ -22,7 +23,7 @@ import 'package:leave_manager/features/settings/presentation/widgets/danger_zone
 import 'package:leave_manager/features/settings/presentation/widgets/settings_form_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/theme_selection_section.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/notification_settings_section.dart'; // المكون الجديد
+import 'package:leave_manager/features/settings/presentation/widgets/notification_settings_section.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -37,7 +38,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _jobController = TextEditingController(text: 'موظف');
+  final _jobController = TextEditingController(text: '');
   final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
   bool _enableNotifications = true;
@@ -47,8 +48,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void initState() {
     super.initState();
     _isFirstTime = widget.isFirstTime;
-
-    // ✅ إذا كان المستخدم يدخل لأول مرة، نقرأ اختياره من نافذة Splash
+    
+    // جلب حالة الإشعارات الأولية
     if (_isFirstTime) {
       _enableNotifications =
           sl<SharedPreferences>().getBool('notifications_enabled_initial') ??
@@ -56,7 +57,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     } else {
       _enableNotifications = true;
     }
-
     _loadInitialData();
   }
 
@@ -91,7 +91,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _saveSettings() {
     if (_formKey.currentState!.validate()) {
       FocusScope.of(context).unfocus();
-
       final settings = Settings(
         id: 1,
         employeeName: _nameController.text.trim(),
@@ -100,7 +99,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         totalCasualLeaves: _casualLeavesController.text.toIntSafely(),
         enableNotifications: _enableNotifications,
       );
-
       context.read<SettingsBloc>().add(SaveSettingsEvent(settings));
     }
   }
@@ -146,27 +144,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   casualLeavesController: _casualLeavesController,
                 ),
                 const SizedBox(height: AppSpacing.lg),
+                
                 // --- Notifications ---
                 NotificationSettingsSection(
                   isEnabled: _enableNotifications,
                   onToggle: (value) async {
                     if (value == true) {
-                      // ✅ المستخدم يريد التفعيل: نظهر له مربع الحوار ثم صلاحيات النظام
+                      // طلب الصلاحيات أولاً
                       final isGranted = await sl<NotificationPermissionManager>()
                           .requestPermissionsWithDialog(context);
-                          
+                      
                       if (mounted) {
                         setState(() => _enableNotifications = isGranted);
+                        if (isGranted) {
+                          // إرسال إشعار فعلي لاختبار عمل الإشعارات بدلاً من الـ AppToast
+                          sl<NotificationService>().showNotification(
+                            id: 999, // ID مخصص للاختبار
+                            title: 'تأكيد التفعيل',
+                            body: 'الإشعارات تعمل بنجاح! ستتلقى التنبيهات من الآن فصاعداً.',
+                          );
+                        } else {
+                          if(context.mounted){
+                            AppToast.showError(context, 'لم يتم منح صلاحية الإشعارات.');
+                          }
+                        }
                       }
                     } else {
-                      // ✅ المستخدم يريد الإلغاء: نلغي التفعيل مباشرة بدون أسئلة
+                      // تعطيل الإشعارات
                       if (mounted) {
                         setState(() => _enableNotifications = false);
+                        AppToast.showWarning(context, 'تم تعطيل الإشعارات، ستتوقف التنبيهات عن العمل.');
                       }
                     }
                   },
                 ),
                 const SizedBox(height: AppSpacing.xl),
+                
                 // Save Settings button
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
@@ -180,12 +193,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   },
                 ),
                 const SizedBox(height: AppSpacing.lg),
+                
                 // --- Backup & Restore ---
                 const BackupSettingsSection(),
                 const SizedBox(height: AppSpacing.lg),
+                
                 // --- Dark & Light Themes ---
                 const ThemeSelectionSection(),
                 const SizedBox(height: AppSpacing.md),
+                
                 !widget.isFirstTime
                     ? const DangerZoneSection()
                     : const SizedBox.shrink(),

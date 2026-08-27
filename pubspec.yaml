@@ -9,38 +9,36 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  flutter_bloc: ^8.1.3          # لإدارة الحالة (BLoC Pattern)
-  equatable: ^2.0.5             # لمقارنة الكائنات بسهولة (ضروري للـ BLoC والـ Entities)
-  dartz: ^0.10.1                # للبرمجة الوظيفية ومعالجة الأخطاء (Either و Unit)
-  get_it: ^7.6.4                # لحقن الاعتماديات (Dependency Injection)
-  shared_preferences: ^2.3.0  # لحفظ تفضيلات المستخدم (مثل الثيم واللغة)
-  drift: ^2.14.1                # مكتبة قاعدة البيانات الرئيسية
-  sqlite3_flutter_libs: ^0.5.18 # مكتبات التشغيل الأصلية لـ SQLite
-  path_provider: ^2.1.1         # للوصول إلى مسارات التخزين في الجهاز (مجلد المستندات)
-  path: ^1.8.3                  # للتعامل مع مسارات الملفات برمجياً
-  intl: ^0.20.2                 # لتنسيق التواريخ (Date Formatting)
-  google_fonts: ^6.2.0          # (اختياري) لاستخدام خطوط عصرية مثل Cairo أو Almarai
-  flutter_localizations:        # لدعم اللغة العربية والاتجاه من اليمين لليسار (RTL)
+  flutter_bloc: ^8.1.3          
+  equatable: ^2.0.5             
+  dartz: ^0.10.1                
+  get_it: ^7.6.4                
+  shared_preferences: ^2.3.0  
+  drift: ^2.14.1                
+  sqlite3_flutter_libs: ^0.5.18 
+  path_provider: ^2.1.1         
+  path: ^1.8.3                  
+  intl: ^0.20.2                 
+  google_fonts: ^6.2.0          
+  flutter_localizations:        
     sdk: flutter
-  share_plus: ^10.0.0           # إضافة حزمة المشاركة الحديثة
+  share_plus: ^10.0.0           
   go_router: ^17.3.0
-  package_info_plus: ^8.0.0     # لقراءة معلومات التطبيق برمجياً
-  url_launcher: ^6.3.0          # لفتح الروابط (بريد إلكتروني، مواقع، الخ)
-  shimmer: ^3.0.0               # يعطى تاثير جمالى أثناء التحميل وقبل ظهور البيانات 
+  package_info_plus: ^8.0.0     
+  url_launcher: ^6.3.0          
+  shimmer: ^3.0.0               
   injectable: ^2.6.0
   calendar_date_picker2: ^3.0.0
   cupertino_icons: ^1.0.8
-  flutter_local_notifications: ^22.3.0 # ادارة الاشعارات المحليه
-  
-  permission_handler: ^13.0.1   # لاعطاء الصلاحيات
-  google_sign_in: ^6.2.0        #لتسجيل دخول من جوجل
-  googleapis: ^13.1.0           #للوصول الى google Drive API
-  googleapis_auth: ^1.4.1       #للمصادقه من جوجل
-  file_picker: ^8.0.0           # لتحديد مسار النسخ الاحتياطى المحلى
+  flutter_local_notifications: ^22.3.0 
+  workmanager: ^0.10.9           # تمت إضافة الحزمة للمزامنة المحلية
+  permission_handler: ^13.0.1   
+  google_sign_in: ^6.2.0        
+  googleapis: ^13.1.0           
+  googleapis_auth: ^1.4.1       
+  file_picker: ^8.0.0           
   http: ^1.6.0
   connectivity_plus: ^7.3.1
-  firebase_core: ^4.14.0
-  firebase_messaging: ^16.6.0
   
 dev_dependencies:
   flutter_test:
