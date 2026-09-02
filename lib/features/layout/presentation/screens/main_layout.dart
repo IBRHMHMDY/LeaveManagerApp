@@ -10,6 +10,8 @@ import 'package:leave_manager/core/utils/notifications/notification_flow_manager
 import 'package:leave_manager/features/layout/presentation/cubit/layout_cubit.dart';
 import 'package:leave_manager/features/layout/presentation/cubit/layout_state.dart';
 import 'package:leave_manager/features/layout/presentation/widgets/main_bottom_nav_bar.dart';
+import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'package:leave_manager/features/notifications/presentation/bloc/notifications_event.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 
 class MainLayout extends StatefulWidget {
@@ -20,19 +22,35 @@ class MainLayout extends StatefulWidget {
   State<MainLayout> createState() => _MainLayoutState();
 }
 
-class _MainLayoutState extends State<MainLayout> {
+class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver{
   late final NotificationFlowManager _flowManager;
 
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    
     _flowManager = sl<NotificationFlowManager>();
     _flowManager.init();
+    
+    // استدعاء جلب الإشعارات (والذي سيفعل عملية التنظيف تلقائياً)
+    context.read<NotificationsBloc>().add(LoadNotificationsEvent());
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    if (state == AppLifecycleState.resumed) {
+      // عند عودة التطبيق من الخلفية، قم بتحديث الإشعارات لضمان دقة العداد (Badge)
+      context.read<NotificationsBloc>().add(LoadNotificationsEvent());
+    }
   }
 
   @override
   void dispose() {
-    _flowManager.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+    // تأمين إغلاق Streams لمنع Memory Leaks وفقاً لمعايير 2026
+    _flowManager.dispose(); 
     super.dispose();
   }
 

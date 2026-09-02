@@ -37,7 +37,7 @@ class NotificationSettingsSection extends StatelessWidget {
               style: context.textTheme.titleMedium,
             ),
             subtitle: Text(
-              'السماح بارسال اشعارات للتنبيهات بالعطلات القادمه والارصده المتبقيه وغيرها',
+              'السماح بارسال اشعارات للتنبيهات بالعطلات القادمه',
               style: context.textTheme.bodySmall,
             ),
             secondary: Icon(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:intl/intl.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
@@ -41,7 +42,6 @@ class NotificationCard extends StatelessWidget {
           if (!notification.isRead) {
             context.read<NotificationsBloc>().add(MarkNotificationAsReadEvent(notification.id));
           }
-          // هنا يمكنك إضافة منطق التوجيه بناءً على الـ Payload إذا لزم الأمر
         },
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -58,11 +58,23 @@ class NotificationCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Text(
-                  notification.createdAt.toFormatDayMonth(),
-                  style: context.textTheme.labelSmall?.copyWith(
-                    color: context.colorScheme.onSurfaceVariant,
-                  ),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      notification.createdAt.toFormatDayMonth(),
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      DateFormat.jm().format(notification.createdAt), 
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: context.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ),

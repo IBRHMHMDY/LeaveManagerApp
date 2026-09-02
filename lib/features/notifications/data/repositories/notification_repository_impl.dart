@@ -21,14 +21,16 @@ class NotificationRepositoryImpl implements NotificationRepository {
     required String title,
     required String body,
     String? payload,
+    DateTime? createdAt,
   }) async {
     try {
       final companion = NotificationsTableCompanion(
         title: Value(title),
         body: Value(body),
         payload: payload != null ? Value(payload) : const Value.absent(),
+        createdAt: createdAt != null ? Value(createdAt) : const Value.absent(),
       );
-      await localDataSource.saveNotification(companion);
+      await localDataSource.showAndSaveNotification(companion);
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));
@@ -70,6 +72,16 @@ class NotificationRepositoryImpl implements NotificationRepository {
   Future<Either<Failure, Unit>> deleteNotification(int id) async {
     try {
       await localDataSource.deleteNotification(id);
+      return const Right(unit);
+    } on DatabaseException catch (e) {
+      return Left(DatabaseFailure(e.message));
+    }
+  }
+
+  @override
+  Future<Either<Failure, Unit>> deleteOldNotifications(DateTime threshold) async {
+    try {
+      await localDataSource.deleteOldNotifications(threshold);
       return const Right(unit);
     } on DatabaseException catch (e) {
       return Left(DatabaseFailure(e.message));

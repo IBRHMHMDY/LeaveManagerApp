@@ -1,10 +1,12 @@
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
+import 'package:leave_manager/features/notifications/domain/usecases/clean_old_notifications_usecase.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/delete_notification_usecase.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/get_notifications_usecase.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/get_unread_count_usecase.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/mark_notification_as_read_usecase.dart';
+import 'package:leave_manager/features/notifications/domain/usecases/show_and_save_notification_usecase.dart';
 import 'notifications_event.dart';
 import 'notifications_state.dart';
 
@@ -14,21 +16,46 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   final MarkNotificationAsReadUseCase markAsRead;
   final DeleteNotificationUseCase deleteNotification;
   final GetUnreadCountUseCase getUnreadCount;
-
+  final CleanOldNotificationsUseCase cleanOldNotifications;
+  final ShowAndSaveNotificationUseCase showAndSaveNotification;
+  
   NotificationsBloc({
     required this.getNotifications,
     required this.markAsRead,
     required this.deleteNotification,
     required this.getUnreadCount,
+    required this.cleanOldNotifications,
+    required this.showAndSaveNotification,
   }) : super(NotificationsInitial()) {
     on<LoadNotificationsEvent>(_onLoadNotifications);
     on<MarkNotificationAsReadEvent>(_onMarkAsRead);
     on<DeleteNotificationEvent>(_onDeleteNotification);
+    on<SendAndSaveInstantNotificationEvent>(_onSendAndSaveInstantNotification);
   }
 
+  Future<void> _onSendAndSaveInstantNotification(
+      SendAndSaveInstantNotificationEvent event, Emitter<NotificationsState> emit) async {
+    
+    final result = await showAndSaveNotification(
+      ShowAndSaveNotificationParams(
+        id: event.id,
+        title: event.title,
+        body: event.body,
+        payload: event.payload,
+      ),
+    );
+
+    await result.fold(
+      (failure) async => emit(NotificationsError(failure.message)),
+      // تحديث حالة الشاشة ورقم الإشعارات غير المقروءة تلقائياً
+      (_) async => await _fetchAndEmitData(emit), 
+    );
+  }
+  
   Future<void> _onLoadNotifications(
       LoadNotificationsEvent event, Emitter<NotificationsState> emit) async {
     emit(NotificationsLoading());
+    await cleanOldNotifications(const NoParams());
     await _fetchAndEmitData(emit);
   }
 

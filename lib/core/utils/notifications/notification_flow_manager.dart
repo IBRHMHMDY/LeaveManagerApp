@@ -20,6 +20,7 @@ class NotificationFlowManager {
   NotificationFlowManager(this._notificationService);
 
   void init() {
+
     _subscription?.cancel();
     
     if (_notificationService.initialNotificationResponse != null) {
@@ -49,8 +50,6 @@ class NotificationFlowManager {
         if (holidayId != null) {
           _handleHolidayRouting(holidayId);
         }
-      } else if (type == 'low_balance') {
-        AppRouter.router.go(AppRouter.leaves);
       } else {
         AppRouter.router.go(AppRouter.notifications);
       }
@@ -70,8 +69,8 @@ class NotificationFlowManager {
         final holiday = state.financialYearHolidays.where((h) => h.id == holidayId).firstOrNull;
         
         if (holiday != null) {
-          // إضافة تأخير زمني 400 مللي ثانية لضمان انتهاء أنيميشن GoRouter وبناء الشاشة
-          Future.delayed(const Duration(milliseconds: 400), () {
+          // إضافة تأخير زمني 600 مللي ثانية لضمان انتهاء أنيميشن GoRouter وبناء الشاشة
+          Future.delayed(const Duration(milliseconds: 600), () {
             final context = AppRouter.router.routerDelegate.navigatorKey.currentContext;
             if (context != null && context.mounted) {
               showHolidayActionBottomSheet(context, holiday);

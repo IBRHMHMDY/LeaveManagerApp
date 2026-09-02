@@ -8,9 +8,11 @@ abstract class NotificationRepository {
     required String title,
     required String body,
     String? payload,
+    DateTime? createdAt,
   });
   Future<Either<Failure, List<NotificationEntity>>> getNotifications();
   Future<Either<Failure, Unit>> markAsRead(int id);
   Future<Either<Failure, int>> getUnreadCount();
   Future<Either<Failure, Unit>> deleteNotification(int id);
+  Future<Either<Failure, Unit>> deleteOldNotifications(DateTime threshold);
 }

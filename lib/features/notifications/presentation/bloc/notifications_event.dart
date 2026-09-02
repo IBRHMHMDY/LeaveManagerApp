@@ -24,3 +24,20 @@ class DeleteNotificationEvent extends NotificationsEvent {
   @override
   List<Object> get props => [id];
 }
+
+class SendAndSaveInstantNotificationEvent extends NotificationsEvent {
+  final int id;
+  final String title;
+  final String body;
+  final String? payload;
+
+  const SendAndSaveInstantNotificationEvent({
+    required this.id,
+    required this.title,
+    required this.body,
+    this.payload,
+  });
+
+  @override
+  List<Object> get props => [id, title, body, ?payload];
+}
