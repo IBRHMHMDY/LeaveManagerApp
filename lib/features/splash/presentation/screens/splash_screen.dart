@@ -3,10 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
-import 'package:leave_manager/core/utils/notifications/notification_permission_manager.dart';
-import 'package:leave_manager/core/utils/notifications/notification_service.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/app_version.dart';
 import 'package:leave_manager/features/splash/presentation/widgets/custom_app_logo.dart';
@@ -18,7 +15,6 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../../../settings/presentation/bloc/settings_bloc.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -73,43 +69,14 @@ class _SplashScreenState extends State<SplashScreen>
 
   Future<void> _initializeApp() async {
     try {
-      // 1. تهيئة الخدمات
-      final notificationService = sl<NotificationService>();
-      await notificationService.init();
-
-      // 2. قراءة التفضيلات المخزنة
-      final prefs = sl<SharedPreferences>();
-      final hasRequestedNotifications =
-          prefs.getBool('has_requested_notifications') ?? false;
-
-      // 3. عرض مربع الحوار إذا لم يتم الطلب مسبقاً
-      if (!hasRequestedNotifications && mounted) {
-        // ✅ استدعاء مدير الصلاحيات الموحد
-        final isGranted = await sl<NotificationPermissionManager>()
-            .requestPermissionsWithDialog(context);
-
-        // حفظ قرار المستخدم כقيمة ابتدائية لشاشة الإعدادات
-        await prefs.setBool('notifications_enabled_initial', isGranted);
-        await prefs.setBool('has_requested_notifications', true);
-      }
-
-      // 4. تأخير العرض
       await Future.delayed(const Duration(milliseconds: 3000));
-
-      // 5. فحص الإعدادات والانتقال
       if (mounted) {
         context.read<SettingsBloc>().add(CheckSettingsEvent());
       }
     } catch (e) {
       if (mounted) {
-        AppToast.showError(context, 'حدث خطأ غير متوقع');
+        AppToast.showError(context, 'حدث خطأ أثناء التهيئة.');
         context.go(AppRouter.setup);
-      }
-    } finally {
-      // 4. الانتقال للشاشة المناسبة دائماً (يتم تنفيذه سواء نجحت المحاولة أم فشلت)
-      await Future.delayed(const Duration(milliseconds: 3000));
-      if (mounted) {
-        context.read<SettingsBloc>().add(CheckSettingsEvent());
       }
     }
   }

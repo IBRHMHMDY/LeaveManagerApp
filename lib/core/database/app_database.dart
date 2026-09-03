@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:leave_manager/core/database/tables/holidays_table.dart';
-import 'package:leave_manager/core/database/tables/notifications_table.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'tables/settings_table.dart';
@@ -17,14 +16,13 @@ part 'app_database.g.dart';
     LeaveRecordsTable,
     HolidaysTable,
     RestAllowancesTable,
-    NotificationsTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 3;
 
   @override
   MigrationStrategy get migration {
@@ -42,13 +40,7 @@ class AppDatabase extends _$AppDatabase {
         if (from < 3) {
           await m.createTable(restAllowancesTable);
         }
-        // schemaVersion => 4
-        if (from < 4) {
-          // إضافة عمود تفعيل الإشعارات
-          await m.addColumn(settingsTable, settingsTable.enableNotifications);
-          // إنشاء جدول الإشعارات للمستخدمين الحاليين عند التحديث
-          await m.createTable(notificationsTable);
-        }
+
       },
     );
   }

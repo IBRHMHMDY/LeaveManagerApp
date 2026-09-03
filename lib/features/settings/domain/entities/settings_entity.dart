@@ -7,7 +7,6 @@ class Settings extends Equatable {
   final String jobTitle;
   final int totalRegularLeaves;
   final int totalCasualLeaves;
-  final bool enableNotifications;
 
   const Settings({
     required this.id,
@@ -15,8 +14,7 @@ class Settings extends Equatable {
     required this.jobTitle,
     required this.totalRegularLeaves,
     required this.totalCasualLeaves,
-    // --- الحقول الجديدة بقيم افتراضية لتفادي أخطاء الـ null ---
-    this.enableNotifications = true,
+
   });
 
   @override
@@ -26,6 +24,5 @@ class Settings extends Equatable {
     jobTitle,
     totalRegularLeaves,
     totalCasualLeaves,
-    enableNotifications,
   ];
 }

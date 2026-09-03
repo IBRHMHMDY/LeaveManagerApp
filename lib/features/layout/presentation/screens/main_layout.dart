@@ -6,12 +6,9 @@ import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/layout_constants.dart';
-import 'package:leave_manager/core/utils/notifications/notification_flow_manager.dart';
 import 'package:leave_manager/features/layout/presentation/cubit/layout_cubit.dart';
 import 'package:leave_manager/features/layout/presentation/cubit/layout_state.dart';
 import 'package:leave_manager/features/layout/presentation/widgets/main_bottom_nav_bar.dart';
-import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
-import 'package:leave_manager/features/notifications/presentation/bloc/notifications_event.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 
 class MainLayout extends StatefulWidget {
@@ -22,29 +19,7 @@ class MainLayout extends StatefulWidget {
   State<MainLayout> createState() => _MainLayoutState();
 }
 
-class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver{
-
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addObserver(this);
-    sl<NotificationFlowManager>(); 
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    super.didChangeAppLifecycleState(state);
-    if (state == AppLifecycleState.resumed) {
-      // عند عودة التطبيق من الخلفية، قم بتحديث الإشعارات لضمان دقة العداد (Badge)
-      context.read<NotificationsBloc>().add(LoadNotificationsEvent());
-    }
-  }
-
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
+class _MainLayoutState extends State<MainLayout> {
 
   @override
   Widget build(BuildContext context) {
@@ -65,17 +40,14 @@ class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver{
             },
             child: PopScope(
               // 1. منع الخروج التلقائي نهائياً لإعطاء الأولوية للتحكم اليدوي
-              canPop: false, 
+              canPop: false,
               onPopInvokedWithResult: (bool didPop, Object? result) {
                 if (didPop) return;
-                
+
                 // 2. التحقق من التبويب الحالي
                 if (widget.navigationShell.currentIndex != 0) {
                   // 3. العودة للرئيسية إذا لم نكن فيها (Index 0)
-                  widget.navigationShell.goBranch(
-                    0,
-                    initialLocation: true,
-                  );
+                  widget.navigationShell.goBranch(0, initialLocation: true);
                 } else {
                   // 4. طلب الخروج عبر Cubit إذا كنا في الرئيسية بالفعل
                   context.read<LayoutCubit>().handlePopRequest();
@@ -85,7 +57,9 @@ class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver{
                 value: SystemUiOverlayStyle(
                   statusBarColor: Colors.transparent,
                   statusBarIconBrightness: iconBrightness,
-                  statusBarBrightness: isDark ? Brightness.dark : Brightness.light,
+                  statusBarBrightness: isDark
+                      ? Brightness.dark
+                      : Brightness.light,
                   systemNavigationBarColor: context.colorScheme.surface,
                   systemNavigationBarIconBrightness: iconBrightness,
                 ),
@@ -97,7 +71,8 @@ class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver{
                     onTabChanged: (index) {
                       widget.navigationShell.goBranch(
                         index,
-                        initialLocation: index == widget.navigationShell.currentIndex,
+                        initialLocation:
+                            index == widget.navigationShell.currentIndex,
                       );
                     },
                   ),

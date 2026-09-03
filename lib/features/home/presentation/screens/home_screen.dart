@@ -10,7 +10,6 @@ import 'package:leave_manager/features/home/presentation/cubit/home_cubit.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_state.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
-import 'package:leave_manager/features/notifications/presentation/widgets/notification_badge_action.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
 import 'package:leave_manager/features/home/presentation/widgets/rest_stats_card.dart';
@@ -42,13 +41,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: const AppAppBar(
         customTitle: HomeHeader(),
-        actions: [
-          NotificationBadgeAction(),
-          Padding(
-            padding: EdgeInsets.only(left: 12),
-            child: AppShareButton(buttonType: ShareButtonType.icon),
-          ),
-        ],
       ),
       body: MultiBlocListener(
         listeners: [

@@ -16,12 +16,12 @@ class BackupCubit extends Cubit<BackupState> {
   ) : super(BackupInitial());
 
   Future<void> createLocalBackup() async {
-    emit(const BackupLoading('جاري إنشاء نسخة احتياطية محلية...'));
+    emit(const BackupLoading('جاري إنشاء النسخة الاحتياطية...'));
     final result = await _backupToLocal(const NoParams());
     
     result.fold(
       (failure) => emit(BackupError(failure.message)),
-      (path) => emit(const BackupSuccess('تم إنشاء النسخة الاحتياطية بنجاح')),
+      (path) => emit(const BackupSuccess('تم إنشاء النسخة الاحتياطية بنجاح.')),
     );
   }
 
@@ -31,7 +31,10 @@ class BackupCubit extends Cubit<BackupState> {
     
     result.fold(
       (failure) => emit(BackupError(failure.message)),
-      (_) => emit(const BackupSuccess('تمت الاستعادة بنجاح.')),
+      (_) => emit(const BackupSuccess(
+        'تم استعادة النسخة الاحتياطية بنجاح. جاري إعادة تشغيل التطبيق...', 
+        requiresRestart: true,
+      )),
     );
   }
 }

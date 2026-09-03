@@ -21,10 +21,12 @@ class BackupLoading extends BackupState {
 
 class BackupSuccess extends BackupState {
   final String message;
-  const BackupSuccess(this.message);
+  final bool requiresRestart; // إضافة متغير لتحديد الحاجة لإعادة التشغيل
+
+  const BackupSuccess(this.message, {this.requiresRestart = false});
 
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [message, requiresRestart];
 }
 
 class BackupError extends BackupState {

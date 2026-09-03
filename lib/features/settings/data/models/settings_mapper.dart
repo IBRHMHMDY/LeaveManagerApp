@@ -10,7 +10,6 @@ extension SettingsMapper on SettingModel {
       jobTitle: jobTitle,
       totalRegularLeaves: totalRegularLeaves,
       totalCasualLeaves: totalCasualLeaves,
-      enableNotifications: enableNotifications,
     );
   }
 }

@@ -3,16 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
-import 'package:leave_manager/core/utils/notifications/notification_permission_manager.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
-import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
-import 'package:leave_manager/features/notifications/presentation/bloc/notifications_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
@@ -22,9 +18,7 @@ import 'package:leave_manager/features/settings/presentation/bloc/settings_state
 import 'package:leave_manager/features/settings/presentation/widgets/danger_zone_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_form_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/notification_settings_section.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class SettingsScreen extends StatefulWidget {
   final bool isFirstTime;
@@ -40,23 +34,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _jobController = TextEditingController(text: 'موظف');
   final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
-  bool _enableNotifications = true;
   late bool _isFirstTime;
-  bool _isNotificationAction = false;
 
   @override
   void initState() {
     super.initState();
     _isFirstTime = widget.isFirstTime;
-
-    // جلب حالة الإشعارات الأولية
-    if (_isFirstTime) {
-      _enableNotifications =
-          sl<SharedPreferences>().getBool('notifications_enabled_initial') ??
-          false;
-    } else {
-      _enableNotifications = true;
-    }
     _loadInitialData();
   }
 
@@ -83,9 +66,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _jobController.text = settings.jobTitle;
     _regularLeavesController.text = settings.totalRegularLeaves.toString();
     _casualLeavesController.text = settings.totalCasualLeaves.toString();
-    setState(() {
-      _enableNotifications = settings.enableNotifications;
-    });
   }
 
   void _saveSettings() {
@@ -97,7 +77,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         jobTitle: _jobController.text.trim(),
         totalRegularLeaves: _regularLeavesController.text.toIntSafely(),
         totalCasualLeaves: _casualLeavesController.text.toIntSafely(),
-        enableNotifications: _enableNotifications,
       );
       context.read<SettingsBloc>().add(SaveSettingsEvent(settings));
     }
@@ -116,21 +95,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
           context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
           context.read<HolidaysCubit>().loadHolidays();
-          if (_isNotificationAction) {
-            if (_enableNotifications) {
-              AppToast.showSuccess(context, 'تم تفعيل الإشعارات بنجاح!');
-            } else {
-              AppToast.showWarning(
-                context,
-                'تم تعطيل الإشعارات، ستتوقف التنبيهات عن العمل.',
-              );
-            }
-            // إعادة ضبط المتغير بعد عرض الرسالة
-            _isNotificationAction = false;
-          } else {
-            AppToast.showSuccess(context, 'تم حفظ الإعدادات بنجاح.');
-          }
-
+          AppToast.showSuccess(context, 'تم حفظ الاعدادات بنجاح');
           if (_isFirstTime) {
             setState(() {
               _isFirstTime = false;
@@ -157,47 +122,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   regularLeavesController: _regularLeavesController,
                   casualLeavesController: _casualLeavesController,
                 ),
-                const SizedBox(height: AppSpacing.lg),
-                // --- Notifications ---
-                NotificationSettingsSection(
-                  isEnabled: _enableNotifications,
-                  onToggle: (value) async {
-                    if (value == true) {
-                      // طلب الصلاحيات أولاً
-                      final isGranted =
-                          await sl<NotificationPermissionManager>()
-                              .requestPermissionsWithDialog(context);
 
-                      if (mounted) {
-                        setState(() => _enableNotifications = isGranted);
-                        if (isGranted) {
-                          context.read<NotificationsBloc>().add(
-                            const SendAndSaveInstantNotificationEvent(
-                              id: 999,
-                              title: 'تنبيه النظام',
-                              body: 'تم تفعيل الإشعارات بنجاح!',
-                            ),
-                          );
-                        } else {
-                          if (context.mounted) {
-                            AppToast.showError(
-                              context,
-                              'تعذر تفعيل الإشعارات لعدم وجود صلاحية.',
-                            );
-                          }
-                        }
-                      }
-                    } else {
-                      if (context.mounted) {
-                        setState(() => _enableNotifications = false);
-                      }
-                    }
-                    if (!_isFirstTime) {
-                      _isNotificationAction = true;
-                      _saveSettings();
-                    }
-                  },
-                ),
                 // إضافة مسافة فاصلة
                 const SizedBox(height: AppSpacing.lg),
                 // Save Settings button

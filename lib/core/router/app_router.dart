@@ -1,9 +1,7 @@
 // lib/core/router/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leave_manager/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
-
 import 'package:leave_manager/features/splash/presentation/screens/splash_screen.dart';
 import 'package:leave_manager/features/layout/presentation/screens/main_layout.dart';
 import 'package:leave_manager/features/holidays/presentation/screens/holidays_screen.dart';
@@ -24,7 +22,6 @@ class AppRouter {
   static const String restAllowances = '/rest_allowances';
   static const String settings = '/settings';
   static const String setup = '/setup';
-  static const String notifications = '/notifications';
 
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
@@ -38,19 +35,9 @@ class AppRouter {
           body: SafeArea(child: SettingsScreen(isFirstTime: true)),
         ),
       ),
-
-      // ✅ الحل: وضع مسار العطلات كمسار رئيسي خارج الـ StatefulShellRoute
       GoRoute(
-  path: holidays,
-  builder: (context, state) {
-    final extra = state.extra as Map<String, dynamic>?;
-    final showHolidayId = extra?['showHolidayId'] as int?;
-    return HolidaysScreen(autoOpenHolidayId: showHolidayId);
-  },
-),
-      GoRoute(
-        path: notifications,
-        builder: (context, state) => const NotificationsScreen(),
+        path: holidays,
+        builder: (context, state) => const HolidaysScreen(),
       ),
       // Bottom Navigation باستخدام StatefulShellRoute
       StatefulShellRoute.indexedStack(
@@ -65,7 +52,6 @@ class AppRouter {
                 path: home,
                 builder: (context, state) => const HomeScreen(),
               ),
-              // ❌ تمت إزالة مسار holidays من هنا
             ],
           ),
 

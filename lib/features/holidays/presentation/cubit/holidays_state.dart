@@ -12,24 +12,22 @@ class HolidaysInitial extends HolidaysState {}
 
 class HolidaysLoading extends HolidaysState {}
 
-class HolidaysLoaded extends HolidaysState {
-  final Holiday? upcomingHoliday;
-  final List<Holiday> financialYearHolidays;
-
-  const HolidaysLoaded({
-    required this.upcomingHoliday,
-    required this.financialYearHolidays,
-  });
-
-  @override
-  List<Object?> get props => [upcomingHoliday, financialYearHolidays];
-}
-
 class HolidaysError extends HolidaysState {
   final String message;
-
   const HolidaysError(this.message);
 
   @override
   List<Object> get props => [message];
+}
+
+class HolidaysLoaded extends HolidaysState {
+  final Holiday? upcomingHoliday;
+  final List<Holiday> financialYearHolidays;
+  const HolidaysLoaded({
+    required this.upcomingHoliday,
+    required this.financialYearHolidays,
+  });
+  
+  @override
+  List<Object?> get props => [upcomingHoliday, financialYearHolidays];
 }

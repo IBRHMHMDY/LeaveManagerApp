@@ -6,41 +6,14 @@ import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
-import 'package:leave_manager/features/holidays/presentation/widgets/holiday_action_bottomsheet.dart';
 import 'package:leave_manager/features/holidays/presentation/widgets/holiday_card.dart';
 import 'package:leave_manager/shared/widgets/displays/app_app_bar.dart';
 import 'package:leave_manager/shared/widgets/displays/app_badge.dart';
 import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
 
-class HolidaysScreen extends StatefulWidget {
-  final int? autoOpenHolidayId;
-  const HolidaysScreen({super.key,this.autoOpenHolidayId});
+class HolidaysScreen extends StatelessWidget {
+  const HolidaysScreen({super.key});
 
-  @override
-  State<HolidaysScreen> createState() => _HolidaysScreenState();
-}
-
-class _HolidaysScreenState extends State<HolidaysScreen> {
-  @override
-  void initState() {
-    super.initState();
-    // التحقق بعد بناء الواجهة مباشرة لفتح الـ BottomSheet بأمان
-    if (widget.autoOpenHolidayId != null) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _checkAndOpenHoliday(widget.autoOpenHolidayId!);
-      });
-    }
-  }
-
-  void _checkAndOpenHoliday(int id) {
-     final state = context.read<HolidaysCubit>().state;
-     if (state is HolidaysLoaded) {
-       final holiday = state.financialYearHolidays.where((h) => h.id == id).firstOrNull;
-       if (holiday != null && mounted) {
-         showHolidayActionBottomSheet(context, holiday);
-       }
-     }
-  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -48,7 +21,7 @@ class _HolidaysScreenState extends State<HolidaysScreen> {
         customTitle: Column(
           children: [
             Text(
-              'العطلات الرسميه',
+              'العطلات الرسمية',
               style: context.textTheme.displaySmall?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: context.colorScheme.primary,
@@ -63,34 +36,35 @@ class _HolidaysScreenState extends State<HolidaysScreen> {
         ),
       ),
       body: BlocBuilder<HolidaysCubit, HolidaysState>(
-          builder: (context, state) {
-            if (state is HolidaysLoading || state is HolidaysInitial) {
-              return const Center(child: CircularProgressIndicator());
-            }
-            if (state is HolidaysError) {
-              return Center(child: Text(state.message));
-            }
-            if (state is HolidaysLoaded) {
-              final holidays = state.financialYearHolidays;
-              if (holidays.isEmpty) {
-                return const AppEmptyState(
-                  title: 'فشل فى قراءه العطلات',
-                  content: 'من فضلك اتصل بالدعم لإصلاح المشكله',
-                );
-              }
-              return ListView.builder(
-                padding: const EdgeInsets.all(AppSpacing.md),
-                itemCount: holidays.length,
-                itemBuilder: (context, index) {
-                  final holiday = holidays[index];
-                  final isPast = holiday.endDate.isBefore(DateTime.now());
-                  return HolidayCard(holiday: holiday,isPast: isPast);
-                },
+        builder: (context, state) {
+          if (state is HolidaysLoading || state is HolidaysInitial) {
+            return const Center(child: CircularProgressIndicator());
+          }
+          if (state is HolidaysError) {
+            return Center(child: Text(state.message));
+          }
+          if (state is HolidaysLoaded) {
+            final holidays = state.financialYearHolidays;
+            if (holidays.isEmpty) {
+              return const AppEmptyState(
+                title: 'لا توجد عطلات',
+                content: 'لم يتم العثور على عطلات مسجلة.'
               );
             }
-            return const SizedBox.shrink();
-          },
-        ),
+            return ListView.builder(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              itemCount: holidays.length,
+              itemBuilder: (context, index) {
+                final holiday = holidays[index];
+                final isPast = holiday.endDate.isBefore(DateTime.now());
+                // وظيفة النقر ستظل تعمل طبيعياً داخل HolidayCard
+                return HolidayCard(holiday: holiday, isPast: isPast);
+              },
+            );
+          }
+          return const SizedBox.shrink();
+        },
+      ),
     );
   }
 }
