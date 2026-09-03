@@ -16,16 +16,10 @@ import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
 import '../../features/backup_restore/data/datasources/local_backup_data_source.dart'
     as _i776;
-import '../../features/backup_restore/data/datasources/remote_backup_data_source.dart'
-    as _i1030;
 import '../../features/backup_restore/data/repositories/backup_repository_impl.dart'
     as _i819;
 import '../../features/backup_restore/domain/repositories/backup_repository.dart'
     as _i137;
-import '../../features/backup_restore/domain/usecases/auth_google_usecases.dart'
-    as _i595;
-import '../../features/backup_restore/domain/usecases/cloud_backup_usecases.dart'
-    as _i685;
 import '../../features/backup_restore/domain/usecases/local_backup_usecases.dart'
     as _i290;
 import '../../features/backup_restore/presentation/cubit/backup_cubit.dart'
@@ -147,11 +141,14 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i828.HolidaysLocalDataSource>(
       () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),
     );
-    gh.lazySingleton<_i1030.RemoteBackupDataSource>(
-      () => _i1030.RemoteBackupDataSourceImpl(),
-    );
     gh.lazySingleton<_i776.LocalBackupDataSource>(
       () => _i776.LocalBackupDataSourceImpl(),
+    );
+    gh.lazySingleton<_i137.BackupRepository>(
+      () => _i819.BackupRepositoryImpl(
+        localDataSource: gh<_i776.LocalBackupDataSource>(),
+        appDatabase: gh<_i982.AppDatabase>(),
+      ),
     );
     gh.lazySingleton<_i1034.NotificationsLocalDataSource>(
       () => _i1034.NotificationsLocalDataSourceImpl(gh<_i982.AppDatabase>()),
@@ -184,33 +181,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i171.HolidaysRepository>(
       () => _i106.HolidaysRepositoryImpl(gh<_i828.HolidaysLocalDataSource>()),
-    );
-    gh.lazySingleton<_i137.BackupRepository>(
-      () => _i819.BackupRepositoryImpl(
-        localDataSource: gh<_i776.LocalBackupDataSource>(),
-        remoteDataSource: gh<_i1030.RemoteBackupDataSource>(),
-        appDatabase: gh<_i982.AppDatabase>(),
-        networkInfo: gh<_i496.CheckNetworkInfo>(),
-      ),
-    );
-    gh.lazySingleton<_i595.SignInWithGoogleUseCase>(
-      () => _i595.SignInWithGoogleUseCase(gh<_i137.BackupRepository>()),
-    );
-    gh.lazySingleton<_i595.SignOutFromGoogleUseCase>(
-      () => _i595.SignOutFromGoogleUseCase(gh<_i137.BackupRepository>()),
-    );
-    gh.lazySingleton<_i595.IsGoogleSignedInUseCase>(
-      () => _i595.IsGoogleSignedInUseCase(gh<_i137.BackupRepository>()),
-    );
-    gh.lazySingleton<_i685.BackupToCloudUseCase>(
-      () => _i685.BackupToCloudUseCase(gh<_i137.BackupRepository>()),
-    );
-    gh.lazySingleton<_i685.RestoreFromCloudUseCase>(
-      () => _i685.RestoreFromCloudUseCase(gh<_i137.BackupRepository>()),
-    );
-    gh.lazySingleton<_i685.GetLastCloudBackupMetadataUseCase>(
-      () =>
-          _i685.GetLastCloudBackupMetadataUseCase(gh<_i137.BackupRepository>()),
     );
     gh.lazySingleton<_i290.BackupToLocalUseCase>(
       () => _i290.BackupToLocalUseCase(gh<_i137.BackupRepository>()),
@@ -281,6 +251,12 @@ extension GetItInjectableX on _i174.GetIt {
         notificationRepository: gh<_i367.NotificationRepository>(),
       ),
     );
+    gh.factory<_i877.BackupCubit>(
+      () => _i877.BackupCubit(
+        gh<_i290.BackupToLocalUseCase>(),
+        gh<_i290.RestoreFromLocalUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i787.CheckSettingsExistUseCase>(
       () => _i787.CheckSettingsExistUseCase(gh<_i674.SettingsRepository>()),
     );
@@ -292,18 +268,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i109.SaveSettingsUseCase>(
       () => _i109.SaveSettingsUseCase(gh<_i674.SettingsRepository>()),
-    );
-    gh.factory<_i877.BackupCubit>(
-      () => _i877.BackupCubit(
-        gh<_i595.SignInWithGoogleUseCase>(),
-        gh<_i595.SignOutFromGoogleUseCase>(),
-        gh<_i595.IsGoogleSignedInUseCase>(),
-        gh<_i290.BackupToLocalUseCase>(),
-        gh<_i290.RestoreFromLocalUseCase>(),
-        gh<_i685.BackupToCloudUseCase>(),
-        gh<_i685.RestoreFromCloudUseCase>(),
-        gh<_i685.GetLastCloudBackupMetadataUseCase>(),
-      ),
     );
     gh.lazySingleton<_i501.DeleteLeaveUseCase>(
       () => _i501.DeleteLeaveUseCase(gh<_i388.LeaveRepository>()),

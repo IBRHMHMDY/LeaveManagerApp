@@ -14,7 +14,7 @@ class BackupSettingsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return BlocProvider(
-      create: (context) => sl<BackupCubit>()..checkAuthStatus(),
+      create: (context) => sl<BackupCubit>(),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -33,8 +33,6 @@ class BackupSettingsSection extends StatelessWidget {
             },
             builder: (context, state) {
               final isLoading = state is BackupLoading;
-              final authState = state is BackupAuthStatus ? state : null;
-              final isSignedIn = authState?.isSignedIn ?? false;
 
               return Container(
                 padding: const EdgeInsets.all(AppSpacing.md),
@@ -81,96 +79,6 @@ class BackupSettingsSection extends StatelessWidget {
                         ),
                       ],
                     ),
-
-                    const Padding(
-                      padding: EdgeInsets.symmetric(vertical: AppSpacing.md),
-                      child: Divider(),
-                    ),
-
-                    // --- التخزين السحابي (Google Drive) ---
-                    Text(
-                      'النسخة السحابيه',
-                      style: context.textTheme.titleLarge,
-                    ),
-                    const SizedBox(height: AppSpacing.md),
-
-                    if (!isSignedIn)
-                      AppPrimaryButton(
-                        label: 'تسجيل الدخول بحساب Google',
-                        icon: Icons.cloud_done_rounded,
-                        isLoading: isLoading,
-                        onPressed: isLoading
-                            ? null
-                            : () => context.read<BackupCubit>().signIn(),
-                      )
-                    else ...[
-                      Row(
-                        children: [
-                          Expanded(
-                            child: AppOutlinedButton(
-                              label: 'رفع',
-                              icon: Icons.cloud_upload_rounded,
-                              isLoading: isLoading,
-                              onPressed: isLoading
-                                  ? null
-                                  : () => context
-                                        .read<BackupCubit>()
-                                        .createCloudBackup(),
-                              foregroundColor: context.colorScheme.onSurface,
-                            ),
-                          ),
-                          const SizedBox(width: AppSpacing.sm),
-                          Expanded(
-                            child: AppOutlinedButton(
-                              label: 'استعادة',
-                              icon: Icons.cloud_download_rounded,
-                              isLoading: isLoading,
-                              onPressed: isLoading
-                                  ? null
-                                  : () => context
-                                        .read<BackupCubit>()
-                                        .restoreCloudBackup(),
-                              foregroundColor: context.colorScheme.error,
-                            ),
-                          ),
-                        ],
-                      ),
-                      const SizedBox(height: AppSpacing.md),
-                      if (authState?.lastBackupMetadata != null) ...[
-                        Container(
-                          padding: const EdgeInsets.all(AppSpacing.sm),
-                          margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: context.colorScheme.primaryContainer
-                                .withOpacity(0.3),
-                            borderRadius: AppRadius.sm,
-                          ),
-                          child: Text(
-                            'آخر نسخة سحابية: ${authState!.lastBackupMetadata!.createdAt.toString().split('.')[0]}\nالحجم: ${authState.lastBackupMetadata!.sizeInMB.toStringAsFixed(2)} MB',
-                            style: context.textTheme.labelMedium?.copyWith(
-                              color: context.colorScheme.onSurfaceVariant,
-                            ),
-                          ),
-                        ),
-                      ],
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Google Drive',
-                            style: context.textTheme.titleMedium,
-                          ),
-                          if (isSignedIn)
-                            TextButton.icon(
-                              onPressed: isLoading
-                                  ? null
-                                  : () => context.read<BackupCubit>().signOut(),
-                              icon: const Icon(Icons.logout, size: 18),
-                              label: const Text('تسجيل خروج'),
-                            ),
-                        ],
-                      ),
-                    ],
                   ],
                 ),
               );

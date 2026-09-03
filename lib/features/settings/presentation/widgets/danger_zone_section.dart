@@ -35,7 +35,7 @@ class DangerZoneSection extends StatelessWidget {
         AppOutlinedButton(
           foregroundColor: context.colorScheme.error,
           icon: Icons.delete_forever,
-          label: 'حذف جميع السجلات',
+          label: 'استعاده ضبط المصنع',
           onPressed: () {
             showDialog(
               context: context,
@@ -43,7 +43,7 @@ class DangerZoneSection extends StatelessWidget {
                 return AppConfirmDialog(
                   title: 'تحذير الحذف',
                   content:
-                      'هل أنت متأكد من رغبتك في حذف جميع سجلات الإجازات والبدلات نهائياً؟ لا يمكن التراجع عن هذه الخطوة.',
+                      'هذا الاجراء سيؤدى الى حذف جميع سجلات الإجازات والبدلات نهائياً؟ لا يمكن التراجع عن هذه الخطوة.',
                   confirmText: 'نعم، احذف',
                   cancelText: 'إلغاء',
                   onConfirm: () {

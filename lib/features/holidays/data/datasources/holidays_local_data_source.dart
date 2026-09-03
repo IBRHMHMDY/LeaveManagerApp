@@ -40,7 +40,7 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
   Future<void> seedHolidaysFromJson() async {
     try {
       // قراءة الملف كنص
-      final String jsonString = await rootBundle.loadString('assets/json/holidays_test.json');
+      final String jsonString = await rootBundle.loadString('assets/json/holidays.json');
       
       // معالجة الـ JSON في Isolate منفصل لمنع تجميد الشاشة
       final List<Map<String, dynamic>> jsonResponse = await compute(_parseJsonInBackground, jsonString);
