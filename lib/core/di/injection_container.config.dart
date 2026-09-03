@@ -120,6 +120,7 @@ import '../utils/check_network_info.dart' as _i496;
 import '../utils/notifications/notification_flow_manager.dart' as _i292;
 import '../utils/notifications/notification_permission_manager.dart' as _i276;
 import '../utils/notifications/notification_service.dart' as _i1043;
+import '../utils/notifications/timezone_service.dart' as _i450;
 import '../utils/share_service.dart' as _i518;
 import 'register_module.dart' as _i291;
 
@@ -141,6 +142,7 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i1043.NotificationService>(
       () => _i1043.NotificationService(),
     );
+    gh.lazySingleton<_i450.TimezoneService>(() => _i450.TimezoneService());
     gh.lazySingleton<_i518.ShareService>(() => _i518.ShareService());
     gh.lazySingleton<_i828.HolidaysLocalDataSource>(
       () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),

@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/utils/notifications/notification_service.dart';
+import 'package:leave_manager/core/utils/notifications/timezone_service.dart';
 
 abstract final class AppBootstrapper {
   /// تهيئة خدمات التطبيق قبل تنفيذ runApp
@@ -13,9 +14,8 @@ abstract final class AppBootstrapper {
     if (!sl.isRegistered<NotificationService>()) {
       await configureDependencies();
     }
-
+    await sl<TimezoneService>().init();
     // 3. تهيئة خدمة الإشعارات المحلية
     await sl<NotificationService>().init();
-    
   }
 }

@@ -23,18 +23,12 @@ class MainLayout extends StatefulWidget {
 }
 
 class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver{
-  late final NotificationFlowManager _flowManager;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    
-    _flowManager = sl<NotificationFlowManager>();
-    _flowManager.init();
-    
-    // استدعاء جلب الإشعارات (والذي سيفعل عملية التنظيف تلقائياً)
-    context.read<NotificationsBloc>().add(LoadNotificationsEvent());
+    sl<NotificationFlowManager>(); 
   }
 
   @override
@@ -49,8 +43,6 @@ class _MainLayoutState extends State<MainLayout> with WidgetsBindingObserver{
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    // تأمين إغلاق Streams لمنع Memory Leaks وفقاً لمعايير 2026
-    _flowManager.dispose(); 
     super.dispose();
   }
 

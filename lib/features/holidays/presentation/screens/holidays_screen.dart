@@ -6,14 +6,41 @@ import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
+import 'package:leave_manager/features/holidays/presentation/widgets/holiday_action_bottomsheet.dart';
 import 'package:leave_manager/features/holidays/presentation/widgets/holiday_card.dart';
 import 'package:leave_manager/shared/widgets/displays/app_app_bar.dart';
 import 'package:leave_manager/shared/widgets/displays/app_badge.dart';
 import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
 
-class HolidaysScreen extends StatelessWidget {
-  const HolidaysScreen({super.key});
+class HolidaysScreen extends StatefulWidget {
+  final int? autoOpenHolidayId;
+  const HolidaysScreen({super.key,this.autoOpenHolidayId});
 
+  @override
+  State<HolidaysScreen> createState() => _HolidaysScreenState();
+}
+
+class _HolidaysScreenState extends State<HolidaysScreen> {
+  @override
+  void initState() {
+    super.initState();
+    // التحقق بعد بناء الواجهة مباشرة لفتح الـ BottomSheet بأمان
+    if (widget.autoOpenHolidayId != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _checkAndOpenHoliday(widget.autoOpenHolidayId!);
+      });
+    }
+  }
+
+  void _checkAndOpenHoliday(int id) {
+     final state = context.read<HolidaysCubit>().state;
+     if (state is HolidaysLoaded) {
+       final holiday = state.financialYearHolidays.where((h) => h.id == id).firstOrNull;
+       if (holiday != null && mounted) {
+         showHolidayActionBottomSheet(context, holiday);
+       }
+     }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -66,6 +93,4 @@ class HolidaysScreen extends StatelessWidget {
         ),
     );
   }
-
-  
 }

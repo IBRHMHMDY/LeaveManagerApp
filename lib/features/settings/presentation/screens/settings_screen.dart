@@ -8,7 +8,6 @@ import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/notifications/notification_permission_manager.dart';
-import 'package:leave_manager/features/backup_restore/presentation/widgets/backup_settings_section.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
@@ -23,8 +22,6 @@ import 'package:leave_manager/features/settings/presentation/bloc/settings_state
 import 'package:leave_manager/features/settings/presentation/widgets/danger_zone_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_form_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/test_notifications_button.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/theme_selection_section.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/notification_settings_section.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,11 +37,12 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
-  final _jobController = TextEditingController(text: '');
+  final _jobController = TextEditingController(text: 'موظف');
   final _regularLeavesController = TextEditingController(text: '15');
   final _casualLeavesController = TextEditingController(text: '7');
   bool _enableNotifications = true;
   late bool _isFirstTime;
+  bool _isNotificationAction = false;
 
   @override
   void initState() {
@@ -118,7 +116,21 @@ class _SettingsScreenState extends State<SettingsScreen> {
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
           context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
           context.read<HolidaysCubit>().loadHolidays();
-          AppToast.showSuccess(context, 'تم حفظ الإعدادات بنجاح.');
+          if (_isNotificationAction) {
+            if (_enableNotifications) {
+              AppToast.showSuccess(context, 'تم تفعيل الإشعارات بنجاح!');
+            } else {
+              AppToast.showWarning(
+                context,
+                'تم تعطيل الإشعارات، ستتوقف التنبيهات عن العمل.',
+              );
+            }
+            // إعادة ضبط المتغير بعد عرض الرسالة
+            _isNotificationAction = false;
+          } else {
+            AppToast.showSuccess(context, 'تم حفظ الإعدادات بنجاح.');
+          }
+
           if (_isFirstTime) {
             setState(() {
               _isFirstTime = false;
@@ -146,7 +158,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   casualLeavesController: _casualLeavesController,
                 ),
                 const SizedBox(height: AppSpacing.lg),
-
                 // --- Notifications ---
                 NotificationSettingsSection(
                   isEnabled: _enableNotifications,
@@ -160,11 +171,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
                       if (mounted) {
                         setState(() => _enableNotifications = isGranted);
                         if (isGranted) {
-                          // إرسال إشعار فعلي لاختبار عمل الإشعارات بدلاً من الـ AppToast
                           context.read<NotificationsBloc>().add(
                             const SendAndSaveInstantNotificationEvent(
                               id: 999,
-                              title: 'تفعيل الإشعارات',
+                              title: 'تنبيه النظام',
                               body: 'تم تفعيل الإشعارات بنجاح!',
                             ),
                           );
@@ -172,29 +182,24 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           if (context.mounted) {
                             AppToast.showError(
                               context,
-                              'لم يتم منح صلاحية الإشعارات.',
+                              'تعذر تفعيل الإشعارات لعدم وجود صلاحية.',
                             );
                           }
                         }
                       }
                     } else {
-                      // تعطيل الإشعارات
-                      if (mounted) {
+                      if (context.mounted) {
                         setState(() => _enableNotifications = false);
-                        AppToast.showWarning(
-                          context,
-                          'تم تعطيل الإشعارات، ستتوقف التنبيهات عن العمل.',
-                        );
                       }
                     }
-                    if (!_isFirstTime) _saveSettings();
+                    if (!_isFirstTime) {
+                      _isNotificationAction = true;
+                      _saveSettings();
+                    }
                   },
                 ),
-
-                const SizedBox(height: AppSpacing.xl),
-                // زر مؤقت لاختبار الاشعارات
-                const TestHolidayNotificationButton(),
-                const SizedBox(height: AppSpacing.xl),
+                // إضافة مسافة فاصلة
+                const SizedBox(height: AppSpacing.lg),
                 // Save Settings button
                 BlocBuilder<SettingsBloc, SettingsState>(
                   builder: (context, state) {
@@ -207,15 +212,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     );
                   },
                 ),
-                const SizedBox(height: AppSpacing.lg),
-
-                // --- Backup & Restore ---
-                const BackupSettingsSection(),
-                const SizedBox(height: AppSpacing.lg),
-
-                // --- Dark & Light Themes ---
-                const ThemeSelectionSection(),
-                const SizedBox(height: AppSpacing.md),
 
                 !widget.isFirstTime
                     ? const DangerZoneSection()

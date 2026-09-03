@@ -15,4 +15,5 @@ abstract class NotificationRepository {
   Future<Either<Failure, int>> getUnreadCount();
   Future<Either<Failure, Unit>> deleteNotification(int id);
   Future<Either<Failure, Unit>> deleteOldNotifications(DateTime threshold);
+
 }

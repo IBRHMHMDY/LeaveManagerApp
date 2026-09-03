@@ -39,45 +39,48 @@ class ScheduleAllHolidaysUseCase implements BaseUseCase<Unit, NoParams> {
       );
 
       return holidaysResult.fold((failure) => Left(failure), (holidays) async {
+        final List<Future<void>> futures = [];
         // 3. جدولة العطلات المستقبلية فقط
         for (var holiday in holidays) {
-          // نحدد وقت الإشعار: الساعة 9:00 صباحاً في يوم العطلة
+          // نحدد وقت الإشعار: الساعة 10:00 صباحاً في يوم العطلة
           final scheduledDate = DateTime(
             holiday.startDate.year,
             holiday.startDate.month,
             holiday.startDate.day,
-            9, // الساعة 9 صباحاً
+            10, // الساعة 10 صباحاً
             0,
           );
 
           // نتحقق أن وقت الإشعار المجدول لم يمر بعد (مستقبلي)
           if (scheduledDate.isAfter(now)) {
-            // بناء Payload متوافق مع NotificationFlowManager الخاص بك للتوجيه
             final payload =
                 '{"type": "holiday_alert", "holidayId": "${holiday.id}"}';
 
             // 4. تمرير البيانات لخدمة الإشعارات للجدولة
-            await notificationService.scheduleHolidayNotification(
-              id: holiday.id, // استخدام معرّف العطلة كمعرّف للإشعار لتسهيل إدارته
-              title: 'تذكير بعطلة: ${holiday.name}',
-              body: 'تبدأ اليوم عطلة ${holiday.name}، اضغط هنا لاتخاذ قرار ؟!',
-              scheduledDate: scheduledDate,
-              payload: payload,
+            futures.add(
+              notificationService.scheduleHolidayNotification(
+                id: holiday.id,
+                title: 'تذكير بعطله قادمة: ',
+                body: 'تذكير بعطله ${holiday.name}!',
+                scheduledDate: scheduledDate,
+                payload: payload,
+              ),
             );
             // 5. الحفظ المسبق (Pre-Save) في قاعدة البيانات بتاريخ مستقبلي
             await notificationRepository.saveNotification(
-                title: 'تذكير عطلة: ${holiday.name}',
-                body: 'لا تنسَ عطلتك القادمة ${holiday.name}. استمتع بوقتك!',
-                payload: payload,
-                createdAt: scheduledDate, // يضمن عدم ظهوره في شاشة الإشعارات قبل أوانه
-              );
+              title: 'تذكير بعطله قادمة: ',
+              body: 'تذكير بعطله ${holiday.name}!',
+              payload: payload,
+              createdAt: scheduledDate,
+            );
           }
         }
+        await Future.wait(futures);
         return const Right(unit);
       });
     } catch (e, stackTrace) {
       debugPrint('Error scheduling holidays: $e\n$stackTrace');
-      return Left(ServerFailure('حدث خطأ أثناء جدولة الإشعارات: $e'));
+      return Left(DatabaseFailure('حدث خطأ أثناء جدولة الإشعارات: $e'));
     }
   }
 }

@@ -41,9 +41,13 @@ class AppRouter {
 
       // ✅ الحل: وضع مسار العطلات كمسار رئيسي خارج الـ StatefulShellRoute
       GoRoute(
-        path: holidays,
-        builder: (context, state) => const HolidaysScreen(),
-      ),
+  path: holidays,
+  builder: (context, state) {
+    final extra = state.extra as Map<String, dynamic>?;
+    final showHolidayId = extra?['showHolidayId'] as int?;
+    return HolidaysScreen(autoOpenHolidayId: showHolidayId);
+  },
+),
       GoRoute(
         path: notifications,
         builder: (context, state) => const NotificationsScreen(),

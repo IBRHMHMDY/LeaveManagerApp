@@ -21,7 +21,7 @@ Future<void> notificationTapBackground(
     'notification_port',
   );
   sendPort?.send(notificationResponse.payload);
-  // debugPrint('Notification Tapped in Background: ${notificationResponse.payload}');
+  debugPrint('Notification Tapped in Background: ${notificationResponse.payload}');
 }
 
 @lazySingleton
@@ -103,12 +103,15 @@ class NotificationService {
     String? payload,
   }) async {
     const androidDetails = AndroidNotificationDetails(
-      'leave_manager_high_importance_channel',
+      'leave_manager_high_importance_channel_v4',
       'إشعارات هامة',
       channelDescription: 'قناة مخصصة للإشعارات الفورية الهامة',
       importance: Importance.max,
       priority: Priority.high,
       icon: '@mipmap/ic_launcher',
+      enableVibration: true,      // إجباري لظهور Heads-up في معظم واجهات Android
+      playSound: true,
+      ticker: 'تنبيه جديد',
     );
     const iosDetails = DarwinNotificationDetails(
       presentAlert: true,
@@ -139,12 +142,14 @@ class NotificationService {
     String? payload,
   }) async {
     const androidDetails = AndroidNotificationDetails(
-      'leave_manager_holidays_channel',
+      'leave_manager_holidays_channel_v4',
       'تذكيرات العطلات',
       channelDescription: 'قناة مخصصة لتذكيرات العطلات المجدولة',
-      importance: Importance.defaultImportance,
-      priority: Priority.defaultPriority,
+      importance: Importance.max,
+      priority: Priority.high,
       icon: '@mipmap/ic_launcher',
+      enableVibration: true,      // إجباري لظهور Heads-up في معظم واجهات Android
+      playSound: true,
     );
     const iosDetails = DarwinNotificationDetails();
     const details = NotificationDetails(
@@ -168,6 +173,49 @@ class NotificationService {
     );
   }
 
+  /// جدولة إشعار اختباري يظهر بعد مدة زمنية محددة
+  Future<void> scheduleDelayedNotification({
+    required int id,
+    required String title,
+    required String body,
+    required Duration delay,
+    String? payload,
+  }) async {
+    const androidDetails = AndroidNotificationDetails(
+      'leave_manager_test_channel_v1',
+      'اختبار الإشعارات',
+      channelDescription: 'قناة مخصصة لاختبار وصول الإشعارات',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      enableVibration: true,
+      playSound: true,
+    );
+
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: iosDetails,
+    );
+
+    final tz.TZDateTime scheduledTZDate = tz.TZDateTime.now(tz.local).add(delay);
+
+    await _notificationsPlugin.zonedSchedule(
+      id:id,
+      title: title,
+      body: body,
+      scheduledDate: scheduledTZDate,
+      notificationDetails: details,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: payload,
+    );
+  }
+
   /// إلغاء إشعار مجدول محدد بواسطة الـ ID الخاص به
   Future<void> cancelNotification(int id) async {
     await _notificationsPlugin.cancel(id: id);
@@ -176,5 +224,9 @@ class NotificationService {
   /// إلغاء جميع الإشعارات المجدولة
   Future<void> cancelAllNotifications() async {
     await _notificationsPlugin.cancelAll();
+  }
+  // التخلص من متحكم الـ Stream لمنع Memory Leaks
+  void dispose() {
+    selectNotificationStream.close();
   }
 }
