@@ -26,47 +26,75 @@ class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
   Future<Either<Failure, Unit>> call(LeaveRecord leave) async {
     // 1. التحقق من الرصيد (Functional)
     final balanceResult = await calculateBalances(const NoParams());
-    
-    return balanceResult.fold(
-      (failure) async => Left(failure),
-      (balance) async {
-        // --- تطبيق قواعد الأعمال (Business Rules) ---
-        if ((balance.remainingRegular + balance.remainingCasual + balance.remainingSick) == 0) {
-          return const Left(ValidationFailure('لا يوجد رصيد كافٍ لإضافة أي إجازة.'));
-        }
-        
-        if (leave.leaveType == LeaveType.regular && balance.remainingRegular < leave.daysCount) {
-          return Left(ValidationFailure('رصيد الإجازات الاعتيادية لا يكفي (المتبقي: ${balance.remainingRegular} أيام، المطلوب: ${leave.daysCount} أيام).'));
-        }
-        
-        if (leave.leaveType == LeaveType.casual && balance.remainingCasual < leave.daysCount) {
-          return Left(ValidationFailure('رصيد الإجازات العارضة لا يكفي (المتبقي: ${balance.remainingCasual} أيام، المطلوب: ${leave.daysCount} أيام).'));
-        }
 
-        // ✅ إضافة قاعدة التحقق الخاصة بالإجازة المرضية
-        if (leave.leaveType == LeaveType.sick && balance.remainingSick < leave.daysCount) {
-          return Left(ValidationFailure('رصيد الإجازات المرضية لا يكفي (المتبقي: ${balance.remainingSick} أيام، المطلوب: ${leave.daysCount} أيام).'));
-        }
-
-        // 2. التحقق من وقوع الإجازة داخل السنة المالية
-        if (!FinancialYearCalculator.isDateInCurrentFinancialYear(leave.startDate) ||
-            !FinancialYearCalculator.isDateInCurrentFinancialYear(leave.endDate)) {
-          return const Left(ValidationFailure('تاريخ الإجازة يقع خارج نطاق السنة المالية الحالية.'));
-        }
-
-        // 3. التحقق من عدم التداخل مع إجازات أخرى
-        final overlapCheck = await checkDateOverlap(
-          DateRangeParams(startDate: leave.startDate, endDate: leave.endDate)
+    return balanceResult.fold((failure) async => Left(failure), (
+      balance,
+    ) async {
+      // --- تطبيق قواعد الأعمال (Business Rules) ---
+      if ((balance.remainingRegular +
+              balance.remainingCasual +
+              balance.remainingSick) ==
+          0) {
+        return const Left(
+          ValidationFailure('لا يوجد رصيد كافٍ لإضافة أي إجازة.'),
         );
+      }
 
-        return overlapCheck.fold(
-          (failure) async => Left(failure),
-          (_) async {
-            // 4. الحفظ في قاعدة البيانات
-            return await repository.addLeave(leave);
-          }
+      if (leave.leaveType == LeaveType.regular &&
+          balance.remainingRegular < leave.daysCount) {
+        return Left(
+          ValidationFailure(
+            'رصيد الإجازات الاعتيادية لا يكفي (المتبقي: ${balance.remainingRegular} أيام، المطلوب: ${leave.daysCount} أيام).',
+          ),
         );
-      },
-    );
+      }
+
+      if (leave.leaveType == LeaveType.casual &&
+          balance.remainingCasual < leave.daysCount) {
+        return Left(
+          ValidationFailure(
+            'رصيد الإجازات العارضة لا يكفي (المتبقي: ${balance.remainingCasual} أيام، المطلوب: ${leave.daysCount} أيام).',
+          ),
+        );
+      }
+
+      // ✅ إضافة قاعدة التحقق الخاصة بالإجازة المرضية
+      if (leave.leaveType == LeaveType.sick &&
+          balance.remainingSick < leave.daysCount) {
+        return Left(
+          ValidationFailure(
+            'رصيد الإجازات المرضية لا يكفي (المتبقي: ${balance.remainingSick} أيام، المطلوب: ${leave.daysCount} أيام).',
+          ),
+        );
+      }
+
+      // 2. التحقق من وقوع الإجازة داخل السنة المالية
+      if (!FinancialYearCalculator.isDateInCurrentFinancialYear(
+            leave.startDate,
+          ) ||
+          !FinancialYearCalculator.isDateInCurrentFinancialYear(
+            leave.endDate,
+          )) {
+        return const Left(
+          ValidationFailure(
+            'تاريخ الإجازة يقع خارج نطاق السنة المالية الحالية.',
+          ),
+        );
+      }
+
+      // 3. التحقق من عدم التداخل مع إجازات أخرى
+      final overlapCheck = await checkDateOverlap(
+        DateRangeParams(
+          startDate: leave.startDate,
+          endDate: leave.endDate,
+          allowHolidayOverlap: true,
+        ),
+      );
+
+      return overlapCheck.fold((failure) async => Left(failure), (_) async {
+        // 4. الحفظ في قاعدة البيانات
+        return await repository.addLeave(leave);
+      });
+    });
   }
 }

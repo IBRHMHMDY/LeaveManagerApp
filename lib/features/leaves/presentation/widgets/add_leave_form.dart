@@ -37,7 +37,7 @@ class AddLeaveFormState extends State<AddLeaveForm> {
 
   @override
   Widget build(BuildContext context) {
-    final blockedDates = context.getBlockedDates();
+    final blockedDates = context.getBlockedDates(includeHolidays: false);
 
     return BlocListener<LeavesBloc, LeavesState>(
       bloc: context.read<LeavesBloc>(),
