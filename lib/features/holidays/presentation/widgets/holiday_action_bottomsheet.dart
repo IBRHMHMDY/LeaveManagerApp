@@ -9,7 +9,6 @@ import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
-import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_extra_work_bottomsheet.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 
 void showHolidayActionBottomSheet(BuildContext context, Holiday holiday) {
@@ -76,14 +75,7 @@ class _HolidayActionForm extends StatelessWidget {
             foregroundColor: context.colorScheme.primary,
             onPressed: () {
               context.pop(); // إغلاق النافذة الحالية
-              parentContext.go(AppRouter.restAllowances); // الانتقال للشاشة المستهدفة
-              
-              // فتح نافذة الإضافة الجديدة بعد التأكد من الانتقال
-              Future.delayed(const Duration(milliseconds: 300), () {
-                if (parentContext.mounted) {
-                  showAddExtraWorkBottomSheet(parentContext, initialHoliday: holiday);
-                }
-              });
+              parentContext.go(AppRouter.restAllowances, extra: holiday);
             },
           ),
           const SizedBox(height: AppSpacing.md),

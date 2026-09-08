@@ -2,10 +2,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
+import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_extra_work_bottomsheet.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_allowances_card.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/add_balance_button.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/widgets/rest_header.dart';
@@ -14,7 +16,8 @@ import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 
 class RestAllowancesScreen extends StatefulWidget {
-  const RestAllowancesScreen({super.key});
+  final Holiday? initialHoliday;
+  const RestAllowancesScreen({super.key, this.initialHoliday});
 
   @override
   State<RestAllowancesScreen> createState() => _RestAllowancesScreenState();
@@ -25,6 +28,14 @@ class _RestAllowancesScreenState extends State<RestAllowancesScreen> {
   void initState() {
     super.initState();
     context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
+
+    if (widget.initialHoliday != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          showAddExtraWorkBottomSheet(context, initialHoliday: widget.initialHoliday);
+        }
+      });
+    }
   }
 
   @override

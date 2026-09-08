@@ -1,6 +1,7 @@
 // lib/core/router/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
 import 'package:leave_manager/features/splash/presentation/screens/splash_screen.dart';
 import 'package:leave_manager/features/layout/presentation/screens/main_layout.dart';
@@ -70,7 +71,11 @@ class AppRouter {
             routes: [
               GoRoute(
                 path: restAllowances,
-                builder: (context, state) => const RestAllowancesScreen(),
+                builder: (context, state) {
+                  // استلام كائن Holiday من الـ extra لتمريره للشاشة[cite: 1]
+                  final holiday = state.extra as Holiday?;
+                  return RestAllowancesScreen(initialHoliday: holiday);
+                },
               ),
             ],
           ),

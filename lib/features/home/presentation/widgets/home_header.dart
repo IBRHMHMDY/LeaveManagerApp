@@ -24,6 +24,7 @@ class HomeHeader extends StatelessWidget {
         BlocBuilder<SettingsBloc, SettingsState>(
           builder: (context, state) {
             if (state is SettingsLoaded) {
+              
               return AppBadge(
                 title: "السنه الماليه ${FinancialYearCalculator.getYearString(
                   state.settings.financialYearType,
