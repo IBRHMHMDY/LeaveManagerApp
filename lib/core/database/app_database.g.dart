@@ -73,6 +73,18 @@ class $SettingsTableTable extends SettingsTable
     requiredDuringInsert: false,
     defaultValue: const Constant(0),
   );
+  static const VerificationMeta _financialYearTypeMeta = const VerificationMeta(
+    'financialYearType',
+  );
+  @override
+  late final GeneratedColumn<int> financialYearType = GeneratedColumn<int>(
+    'financial_year_type',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -81,6 +93,7 @@ class $SettingsTableTable extends SettingsTable
     totalRegularLeaves,
     totalCasualLeaves,
     totalSickLeaves,
+    financialYearType,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -147,6 +160,15 @@ class $SettingsTableTable extends SettingsTable
         ),
       );
     }
+    if (data.containsKey('financial_year_type')) {
+      context.handle(
+        _financialYearTypeMeta,
+        financialYearType.isAcceptableOrUnknown(
+          data['financial_year_type']!,
+          _financialYearTypeMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -180,6 +202,10 @@ class $SettingsTableTable extends SettingsTable
         DriftSqlType.int,
         data['${effectivePrefix}total_sick_leaves'],
       )!,
+      financialYearType: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}financial_year_type'],
+      )!,
     );
   }
 
@@ -196,6 +222,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
   final int totalRegularLeaves;
   final int totalCasualLeaves;
   final int totalSickLeaves;
+  final int financialYearType;
   const SettingModel({
     required this.id,
     required this.employeeName,
@@ -203,6 +230,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     required this.totalRegularLeaves,
     required this.totalCasualLeaves,
     required this.totalSickLeaves,
+    required this.financialYearType,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -213,6 +241,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     map['total_regular_leaves'] = Variable<int>(totalRegularLeaves);
     map['total_casual_leaves'] = Variable<int>(totalCasualLeaves);
     map['total_sick_leaves'] = Variable<int>(totalSickLeaves);
+    map['financial_year_type'] = Variable<int>(financialYearType);
     return map;
   }
 
@@ -224,6 +253,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       totalRegularLeaves: Value(totalRegularLeaves),
       totalCasualLeaves: Value(totalCasualLeaves),
       totalSickLeaves: Value(totalSickLeaves),
+      financialYearType: Value(financialYearType),
     );
   }
 
@@ -239,6 +269,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       totalRegularLeaves: serializer.fromJson<int>(json['totalRegularLeaves']),
       totalCasualLeaves: serializer.fromJson<int>(json['totalCasualLeaves']),
       totalSickLeaves: serializer.fromJson<int>(json['totalSickLeaves']),
+      financialYearType: serializer.fromJson<int>(json['financialYearType']),
     );
   }
   @override
@@ -251,6 +282,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       'totalRegularLeaves': serializer.toJson<int>(totalRegularLeaves),
       'totalCasualLeaves': serializer.toJson<int>(totalCasualLeaves),
       'totalSickLeaves': serializer.toJson<int>(totalSickLeaves),
+      'financialYearType': serializer.toJson<int>(financialYearType),
     };
   }
 
@@ -261,6 +293,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     int? totalRegularLeaves,
     int? totalCasualLeaves,
     int? totalSickLeaves,
+    int? financialYearType,
   }) => SettingModel(
     id: id ?? this.id,
     employeeName: employeeName ?? this.employeeName,
@@ -268,6 +301,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     totalRegularLeaves: totalRegularLeaves ?? this.totalRegularLeaves,
     totalCasualLeaves: totalCasualLeaves ?? this.totalCasualLeaves,
     totalSickLeaves: totalSickLeaves ?? this.totalSickLeaves,
+    financialYearType: financialYearType ?? this.financialYearType,
   );
   SettingModel copyWithCompanion(SettingsTableCompanion data) {
     return SettingModel(
@@ -285,6 +319,9 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
       totalSickLeaves: data.totalSickLeaves.present
           ? data.totalSickLeaves.value
           : this.totalSickLeaves,
+      financialYearType: data.financialYearType.present
+          ? data.financialYearType.value
+          : this.financialYearType,
     );
   }
 
@@ -296,7 +333,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
           ..write('jobTitle: $jobTitle, ')
           ..write('totalRegularLeaves: $totalRegularLeaves, ')
           ..write('totalCasualLeaves: $totalCasualLeaves, ')
-          ..write('totalSickLeaves: $totalSickLeaves')
+          ..write('totalSickLeaves: $totalSickLeaves, ')
+          ..write('financialYearType: $financialYearType')
           ..write(')'))
         .toString();
   }
@@ -309,6 +347,7 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
     totalRegularLeaves,
     totalCasualLeaves,
     totalSickLeaves,
+    financialYearType,
   );
   @override
   bool operator ==(Object other) =>
@@ -319,7 +358,8 @@ class SettingModel extends DataClass implements Insertable<SettingModel> {
           other.jobTitle == this.jobTitle &&
           other.totalRegularLeaves == this.totalRegularLeaves &&
           other.totalCasualLeaves == this.totalCasualLeaves &&
-          other.totalSickLeaves == this.totalSickLeaves);
+          other.totalSickLeaves == this.totalSickLeaves &&
+          other.financialYearType == this.financialYearType);
 }
 
 class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
@@ -329,6 +369,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
   final Value<int> totalRegularLeaves;
   final Value<int> totalCasualLeaves;
   final Value<int> totalSickLeaves;
+  final Value<int> financialYearType;
   const SettingsTableCompanion({
     this.id = const Value.absent(),
     this.employeeName = const Value.absent(),
@@ -336,6 +377,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     this.totalRegularLeaves = const Value.absent(),
     this.totalCasualLeaves = const Value.absent(),
     this.totalSickLeaves = const Value.absent(),
+    this.financialYearType = const Value.absent(),
   });
   SettingsTableCompanion.insert({
     this.id = const Value.absent(),
@@ -344,6 +386,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     required int totalRegularLeaves,
     required int totalCasualLeaves,
     this.totalSickLeaves = const Value.absent(),
+    this.financialYearType = const Value.absent(),
   }) : employeeName = Value(employeeName),
        jobTitle = Value(jobTitle),
        totalRegularLeaves = Value(totalRegularLeaves),
@@ -355,6 +398,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     Expression<int>? totalRegularLeaves,
     Expression<int>? totalCasualLeaves,
     Expression<int>? totalSickLeaves,
+    Expression<int>? financialYearType,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -364,6 +408,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
         'total_regular_leaves': totalRegularLeaves,
       if (totalCasualLeaves != null) 'total_casual_leaves': totalCasualLeaves,
       if (totalSickLeaves != null) 'total_sick_leaves': totalSickLeaves,
+      if (financialYearType != null) 'financial_year_type': financialYearType,
     });
   }
 
@@ -374,6 +419,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     Value<int>? totalRegularLeaves,
     Value<int>? totalCasualLeaves,
     Value<int>? totalSickLeaves,
+    Value<int>? financialYearType,
   }) {
     return SettingsTableCompanion(
       id: id ?? this.id,
@@ -382,6 +428,7 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
       totalRegularLeaves: totalRegularLeaves ?? this.totalRegularLeaves,
       totalCasualLeaves: totalCasualLeaves ?? this.totalCasualLeaves,
       totalSickLeaves: totalSickLeaves ?? this.totalSickLeaves,
+      financialYearType: financialYearType ?? this.financialYearType,
     );
   }
 
@@ -406,6 +453,9 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
     if (totalSickLeaves.present) {
       map['total_sick_leaves'] = Variable<int>(totalSickLeaves.value);
     }
+    if (financialYearType.present) {
+      map['financial_year_type'] = Variable<int>(financialYearType.value);
+    }
     return map;
   }
 
@@ -417,7 +467,8 @@ class SettingsTableCompanion extends UpdateCompanion<SettingModel> {
           ..write('jobTitle: $jobTitle, ')
           ..write('totalRegularLeaves: $totalRegularLeaves, ')
           ..write('totalCasualLeaves: $totalCasualLeaves, ')
-          ..write('totalSickLeaves: $totalSickLeaves')
+          ..write('totalSickLeaves: $totalSickLeaves, ')
+          ..write('financialYearType: $financialYearType')
           ..write(')'))
         .toString();
   }
@@ -1846,6 +1897,7 @@ typedef $$SettingsTableTableCreateCompanionBuilder =
       required int totalRegularLeaves,
       required int totalCasualLeaves,
       Value<int> totalSickLeaves,
+      Value<int> financialYearType,
     });
 typedef $$SettingsTableTableUpdateCompanionBuilder =
     SettingsTableCompanion Function({
@@ -1855,6 +1907,7 @@ typedef $$SettingsTableTableUpdateCompanionBuilder =
       Value<int> totalRegularLeaves,
       Value<int> totalCasualLeaves,
       Value<int> totalSickLeaves,
+      Value<int> financialYearType,
     });
 
 class $$SettingsTableTableFilterComposer
@@ -1893,6 +1946,11 @@ class $$SettingsTableTableFilterComposer
 
   ColumnFilters<int> get totalSickLeaves => $composableBuilder(
     column: $table.totalSickLeaves,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get financialYearType => $composableBuilder(
+    column: $table.financialYearType,
     builder: (column) => ColumnFilters(column),
   );
 }
@@ -1935,6 +1993,11 @@ class $$SettingsTableTableOrderingComposer
     column: $table.totalSickLeaves,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<int> get financialYearType => $composableBuilder(
+    column: $table.financialYearType,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$SettingsTableTableAnnotationComposer
@@ -1969,6 +2032,11 @@ class $$SettingsTableTableAnnotationComposer
 
   GeneratedColumn<int> get totalSickLeaves => $composableBuilder(
     column: $table.totalSickLeaves,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<int> get financialYearType => $composableBuilder(
+    column: $table.financialYearType,
     builder: (column) => column,
   );
 }
@@ -2010,6 +2078,7 @@ class $$SettingsTableTableTableManager
                 Value<int> totalRegularLeaves = const Value.absent(),
                 Value<int> totalCasualLeaves = const Value.absent(),
                 Value<int> totalSickLeaves = const Value.absent(),
+                Value<int> financialYearType = const Value.absent(),
               }) => SettingsTableCompanion(
                 id: id,
                 employeeName: employeeName,
@@ -2017,6 +2086,7 @@ class $$SettingsTableTableTableManager
                 totalRegularLeaves: totalRegularLeaves,
                 totalCasualLeaves: totalCasualLeaves,
                 totalSickLeaves: totalSickLeaves,
+                financialYearType: financialYearType,
               ),
           createCompanionCallback:
               ({
@@ -2026,6 +2096,7 @@ class $$SettingsTableTableTableManager
                 required int totalRegularLeaves,
                 required int totalCasualLeaves,
                 Value<int> totalSickLeaves = const Value.absent(),
+                Value<int> financialYearType = const Value.absent(),
               }) => SettingsTableCompanion.insert(
                 id: id,
                 employeeName: employeeName,
@@ -2033,6 +2104,7 @@ class $$SettingsTableTableTableManager
                 totalRegularLeaves: totalRegularLeaves,
                 totalCasualLeaves: totalCasualLeaves,
                 totalSickLeaves: totalSickLeaves,
+                financialYearType: financialYearType,
               ),
           withReferenceMapper: (p0) => p0
               .map((e) => (e.readTable(table), BaseReferences(db, table, e)))

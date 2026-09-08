@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/enums/financial_year_type.dart';
 import 'package:leave_manager/core/utils/enums/work_reason.dart';
 import 'package:leave_manager/core/utils/extenstions/blocked_dates_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
@@ -13,6 +14,8 @@ import 'package:leave_manager/features/holidays/presentation/cubit/holidays_stat
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_primary_button.dart';
 import 'package:leave_manager/shared/widgets/inputs/app_date_range_picker.dart';
 import 'package:leave_manager/shared/widgets/inputs/app_dropdown_field.dart';
@@ -65,6 +68,14 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
   @override
   Widget build(BuildContext context) {
     final blockedDates = context.getBlockedDates(includeHolidays: false);
+    final settingsState = context.read<SettingsBloc>().state;
+var yearType = FinancialYearType.fiscalYear;
+if (settingsState is SettingsLoaded) {
+  yearType = settingsState.settings.financialYearType;
+}
+
+final firstDate = FinancialYearCalculator.getYearStart(yearType);
+final lastDate = FinancialYearCalculator.getYearEnd(yearType);
 
     return SafeArea(
       child: Column(
@@ -172,8 +183,8 @@ class _AddExtraWorkFormState extends State<_AddExtraWorkForm> {
             hintText: _selectedReason == WorkReason.holiday
                 ? 'تواريخ العطلة'
                 : 'تواريخ العمل الإضافي',
-            firstDate: FinancialYearCalculator.currentFinancialYearStart,
-            lastDate: FinancialYearCalculator.currentFinancialYearEnd,
+            firstDate: firstDate,
+            lastDate: lastDate,
             selectableDayPredicate: (day) {
               return !blockedDates.contains(
                 DateTime(day.year, day.month, day.day),

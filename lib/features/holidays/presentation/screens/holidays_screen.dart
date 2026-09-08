@@ -7,6 +7,8 @@ import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
 import 'package:leave_manager/features/holidays/presentation/widgets/holiday_card.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/shared/widgets/displays/app_app_bar.dart';
 import 'package:leave_manager/shared/widgets/displays/app_badge.dart';
 import 'package:leave_manager/shared/widgets/displays/app_empty_state.dart';
@@ -28,9 +30,18 @@ class HolidaysScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            AppBadge(
-              title: FinancialYearCalculator.financialYearString,
-              textColor: context.colorScheme.onSurface,
+            BlocBuilder<SettingsBloc, SettingsState>(
+              builder: (context, state) {
+                if (state is SettingsLoaded) {
+                  return AppBadge(
+                    title: FinancialYearCalculator.getYearString(
+                      state.settings.financialYearType,
+                    ),
+                    textColor: context.colorScheme.onSurface,
+                  );
+                }
+                return const SizedBox.shrink();
+              },
             ),
           ],
         ),
@@ -48,7 +59,7 @@ class HolidaysScreen extends StatelessWidget {
             if (holidays.isEmpty) {
               return const AppEmptyState(
                 title: 'لا توجد عطلات',
-                content: 'لم يتم العثور على عطلات مسجلة.'
+                content: 'لم يتم العثور على عطلات مسجلة.',
               );
             }
             return ListView.builder(

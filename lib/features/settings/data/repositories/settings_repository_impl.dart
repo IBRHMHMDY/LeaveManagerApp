@@ -4,6 +4,7 @@ import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
 import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/core/utils/enums/financial_year_type.dart';
 import 'package:leave_manager/features/settings/data/datasources/settings_local_data_source.dart';
 import 'package:leave_manager/features/settings/data/models/settings_mapper.dart';
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
@@ -45,6 +46,9 @@ class SettingsRepositoryImpl implements SettingsRepository {
         totalRegularLeaves: Value(settings.totalRegularLeaves),
         totalCasualLeaves: Value(settings.totalCasualLeaves),
         totalSickLeaves: Value(settings.totalSickLeaves),
+        // <-- تحويل الـ Enum إلى رقم ليتم حفظه في القاعدة
+        financialYearType: Value(
+            settings.financialYearType == FinancialYearType.calendarYear ? 0 : 1),
       );
       
       await localDataSource.saveSettings(companion);

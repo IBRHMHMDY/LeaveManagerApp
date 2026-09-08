@@ -9,17 +9,20 @@ import 'package:leave_manager/features/leaves/domain/entities/leave_record_entit
 import 'package:leave_manager/core/utils/enums/leave_type.dart';
 import 'package:leave_manager/features/leaves/domain/repositories/leave_repository.dart';
 import 'package:leave_manager/features/leaves/domain/usecases/calculate_balances_usecase.dart';
+import 'package:leave_manager/features/settings/domain/usecases/get_settings_usecase.dart';
 
 @lazySingleton
 class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
   final LeaveRepository repository;
   final CalculateBalancesUseCase calculateBalances;
   final CheckDateOverlapUseCase checkDateOverlap; // حقن حالة الاستخدام الجديدة
+  final GetSettingsUseCase getSettings;
 
   AddLeaveUseCase({
     required this.repository,
     required this.calculateBalances,
     required this.checkDateOverlap,
+    required this.getSettings,
   });
 
   @override
@@ -69,11 +72,21 @@ class AddLeaveUseCase implements BaseUseCase<Unit, LeaveRecord> {
       }
 
       // 2. التحقق من وقوع الإجازة داخل السنة المالية
-      if (!FinancialYearCalculator.isDateInCurrentFinancialYear(
+      // 1. جلب الإعدادات
+      final settingsResult = await getSettings(const NoParams());
+      if (settingsResult.isLeft()) {
+        return Left(settingsResult.fold((l) => l, (r) => throw Exception()));
+      }
+      final settings = settingsResult.getOrElse(() => throw Exception());
+
+      // 2. التحقق من وقوع التاريخ داخل السنة المالية/الميلادية
+      if (!FinancialYearCalculator.isDateInYear(
             leave.startDate,
+            settings.financialYearType,
           ) ||
-          !FinancialYearCalculator.isDateInCurrentFinancialYear(
+          !FinancialYearCalculator.isDateInYear(
             leave.endDate,
+            settings.financialYearType,
           )) {
         return const Left(
           ValidationFailure(

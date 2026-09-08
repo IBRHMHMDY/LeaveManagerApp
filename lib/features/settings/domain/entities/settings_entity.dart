@@ -1,5 +1,6 @@
 // lib/features/settings/domain/entities/settings_entity.dart
 import 'package:equatable/equatable.dart';
+import 'package:leave_manager/core/utils/enums/financial_year_type.dart';
 
 class Settings extends Equatable {
   final int id;
@@ -8,6 +9,7 @@ class Settings extends Equatable {
   final int totalRegularLeaves;
   final int totalCasualLeaves;
   final int totalSickLeaves;
+  final FinancialYearType financialYearType;
 
   const Settings({
     required this.id,
@@ -15,7 +17,8 @@ class Settings extends Equatable {
     required this.jobTitle,
     required this.totalRegularLeaves,
     required this.totalCasualLeaves,
-    required this.totalSickLeaves
+    required this.totalSickLeaves,
+    required this.financialYearType,
   });
 
   @override
@@ -26,5 +29,6 @@ class Settings extends Equatable {
     totalRegularLeaves,
     totalCasualLeaves,
     totalSickLeaves,
+    financialYearType,
   ];
 }

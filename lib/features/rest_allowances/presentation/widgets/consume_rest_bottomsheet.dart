@@ -3,12 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/utils/enums/financial_year_type.dart';
 import 'package:leave_manager/core/utils/extenstions/blocked_dates_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/financial_year_calculator.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_primary_button.dart';
 import 'package:leave_manager/shared/widgets/inputs/app_date_range_picker.dart';
 import 'package:leave_manager/shared/widgets/inputs/app_text_field.dart';
@@ -49,13 +52,19 @@ class _ConsumeRestFormState extends State<_ConsumeRestForm> {
   @override
   Widget build(BuildContext context) {
     final blockedDates = context.getBlockedDates();
-    DateTime effectiveFirstDate =
-        FinancialYearCalculator.currentFinancialYearStart;
+    final settingsState = context.read<SettingsBloc>().state;
+    var yearType = FinancialYearType.fiscalYear;
+    if (settingsState is SettingsLoaded) {
+      yearType = settingsState.settings.financialYearType;
+    }
 
-    // منع اختيار تاريخ استهلاك يسبق تاريخ العمل الإضافي
+    DateTime effectiveFirstDate = FinancialYearCalculator.getYearStart(
+      yearType,
+    );
     if (widget.record.workStartDate.isAfter(effectiveFirstDate)) {
       effectiveFirstDate = widget.record.workStartDate;
     }
+    final lastDate = FinancialYearCalculator.getYearEnd(yearType);
 
     final title = widget.record.workReason == WorkReason.holiday
         ? 'عطلة رسمية'
@@ -70,7 +79,7 @@ class _ConsumeRestFormState extends State<_ConsumeRestForm> {
           endDate: _restEndDate,
           hintText: 'تاريخ استهلاك الراحة',
           firstDate: effectiveFirstDate,
-          lastDate: FinancialYearCalculator.currentFinancialYearEnd,
+          lastDate: lastDate,
           selectableDayPredicate: (day) {
             return !blockedDates.contains(
               DateTime(day.year, day.month, day.day),

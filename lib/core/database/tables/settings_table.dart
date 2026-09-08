@@ -8,7 +8,8 @@ class SettingsTable extends Table {
   IntColumn get totalRegularLeaves => integer()();
   IntColumn get totalCasualLeaves => integer()();
   IntColumn get totalSickLeaves => integer().withDefault(const Constant(0))();
-  
+  // <-- العمود الجديد: 0 = calendarYear, 1 = fiscalYear
+  IntColumn get financialYearType => integer().withDefault(const Constant(1))();
   @override
   Set<Column> get primaryKey => {id};
 }

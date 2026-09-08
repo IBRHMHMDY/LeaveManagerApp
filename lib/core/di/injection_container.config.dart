@@ -152,11 +152,6 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i290.RestoreFromLocalUseCase>(
       () => _i290.RestoreFromLocalUseCase(gh<_i137.BackupRepository>()),
     );
-    gh.lazySingleton<_i1053.GetFinancialYearHolidaysUseCase>(
-      () => _i1053.GetFinancialYearHolidaysUseCase(
-        gh<_i171.HolidaysRepository>(),
-      ),
-    );
     gh.lazySingleton<_i11.GetUpcomingHolidayUseCase>(
       () => _i11.GetUpcomingHolidayUseCase(gh<_i171.HolidaysRepository>()),
     );
@@ -166,38 +161,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i388.LeaveRepository>(
       () => _i408.LeaveRepositoryImpl(gh<_i1005.LeavesLocalDataSource>()),
     );
-    gh.factory<_i120.HolidaysCubit>(
-      () => _i120.HolidaysCubit(
-        gh<_i606.InitializeHolidaysUseCase>(),
-        gh<_i11.GetUpcomingHolidayUseCase>(),
-        gh<_i1053.GetFinancialYearHolidaysUseCase>(),
-      ),
-    );
     gh.lazySingleton<_i785.DeleteExtraWorkUseCase>(
       () => _i785.DeleteExtraWorkUseCase(gh<_i314.RestAllowancesRepository>()),
     );
     gh.lazySingleton<_i804.GetExtraWorkRecordsUseCase>(
       () => _i804.GetExtraWorkRecordsUseCase(
         gh<_i314.RestAllowancesRepository>(),
-      ),
-    );
-    gh.lazySingleton<_i707.CheckDateOverlapUseCase>(
-      () => _i707.CheckDateOverlapUseCase(
-        leaveRepository: gh<_i388.LeaveRepository>(),
-        restAllowancesRepository: gh<_i314.RestAllowancesRepository>(),
-        holidaysRepository: gh<_i171.HolidaysRepository>(),
-      ),
-    );
-    gh.lazySingleton<_i693.AddExtraWorkUseCase>(
-      () => _i693.AddExtraWorkUseCase(
-        gh<_i314.RestAllowancesRepository>(),
-        gh<_i707.CheckDateOverlapUseCase>(),
-      ),
-    );
-    gh.lazySingleton<_i474.UseRestAllowanceUseCase>(
-      () => _i474.UseRestAllowanceUseCase(
-        gh<_i314.RestAllowancesRepository>(),
-        gh<_i707.CheckDateOverlapUseCase>(),
       ),
     );
     gh.factory<_i877.BackupCubit>(
@@ -218,18 +187,48 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i109.SaveSettingsUseCase>(
       () => _i109.SaveSettingsUseCase(gh<_i674.SettingsRepository>()),
     );
+    gh.lazySingleton<_i972.GetCurrentYearLeavesUseCase>(
+      () => _i972.GetCurrentYearLeavesUseCase(
+        gh<_i388.LeaveRepository>(),
+        gh<_i1029.GetSettingsUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i501.DeleteLeaveUseCase>(
       () => _i501.DeleteLeaveUseCase(gh<_i388.LeaveRepository>()),
     );
-    gh.lazySingleton<_i972.GetCurrentYearLeavesUseCase>(
-      () => _i972.GetCurrentYearLeavesUseCase(gh<_i388.LeaveRepository>()),
+    gh.lazySingleton<_i707.CheckDateOverlapUseCase>(
+      () => _i707.CheckDateOverlapUseCase(
+        leaveRepository: gh<_i388.LeaveRepository>(),
+        restAllowancesRepository: gh<_i314.RestAllowancesRepository>(),
+        holidaysRepository: gh<_i171.HolidaysRepository>(),
+        getSettings: gh<_i1029.GetSettingsUseCase>(),
+      ),
     );
-    gh.factory<_i673.RestAllowancesBloc>(
-      () => _i673.RestAllowancesBloc(
-        getExtraWorkRecords: gh<_i804.GetExtraWorkRecordsUseCase>(),
-        addExtraWork: gh<_i693.AddExtraWorkUseCase>(),
-        useRestAllowance: gh<_i474.UseRestAllowanceUseCase>(),
-        deleteExtraWork: gh<_i785.DeleteExtraWorkUseCase>(),
+    gh.lazySingleton<_i1053.GetFinancialYearHolidaysUseCase>(
+      () => _i1053.GetFinancialYearHolidaysUseCase(
+        gh<_i171.HolidaysRepository>(),
+        gh<_i1029.GetSettingsUseCase>(),
+      ),
+    );
+    gh.lazySingleton<_i693.AddExtraWorkUseCase>(
+      () => _i693.AddExtraWorkUseCase(
+        gh<_i314.RestAllowancesRepository>(),
+        gh<_i707.CheckDateOverlapUseCase>(),
+        gh<_i1029.GetSettingsUseCase>(),
+      ),
+    );
+    gh.lazySingleton<_i474.UseRestAllowanceUseCase>(
+      () => _i474.UseRestAllowanceUseCase(
+        gh<_i314.RestAllowancesRepository>(),
+        gh<_i707.CheckDateOverlapUseCase>(),
+        gh<_i1029.GetSettingsUseCase>(),
+      ),
+    );
+    gh.factory<_i120.HolidaysCubit>(
+      () => _i120.HolidaysCubit(
+        gh<_i606.InitializeHolidaysUseCase>(),
+        gh<_i11.GetUpcomingHolidayUseCase>(),
+        gh<_i1053.GetFinancialYearHolidaysUseCase>(),
       ),
     );
     gh.lazySingleton<_i952.CalculateBalancesUseCase>(
@@ -253,11 +252,20 @@ extension GetItInjectableX on _i174.GetIt {
         saveSettings: gh<_i109.SaveSettingsUseCase>(),
       ),
     );
+    gh.factory<_i673.RestAllowancesBloc>(
+      () => _i673.RestAllowancesBloc(
+        getExtraWorkRecords: gh<_i804.GetExtraWorkRecordsUseCase>(),
+        addExtraWork: gh<_i693.AddExtraWorkUseCase>(),
+        useRestAllowance: gh<_i474.UseRestAllowanceUseCase>(),
+        deleteExtraWork: gh<_i785.DeleteExtraWorkUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i442.AddLeaveUseCase>(
       () => _i442.AddLeaveUseCase(
         repository: gh<_i388.LeaveRepository>(),
         calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
         checkDateOverlap: gh<_i707.CheckDateOverlapUseCase>(),
+        getSettings: gh<_i1029.GetSettingsUseCase>(),
       ),
     );
     gh.factory<_i562.LeavesBloc>(

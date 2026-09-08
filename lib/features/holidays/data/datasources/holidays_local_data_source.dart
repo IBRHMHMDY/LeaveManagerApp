@@ -14,7 +14,11 @@ List<Map<String, dynamic>> _parseJsonInBackground(String jsonString) {
 abstract class HolidaysLocalDataSource {
   Future<bool> hasHolidays();
   Future<void> seedHolidaysFromJson();
-  Future<List<HolidayModel>> getFinancialYearHolidays(DateTime start, DateTime end);
+  Future<void> reseedHolidaysFromJson();
+  Future<List<HolidayModel>> getFinancialYearHolidays(
+    DateTime start,
+    DateTime end,
+  );
   Future<HolidayModel?> getUpcomingHoliday(DateTime today);
 }
 
@@ -40,10 +44,15 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
   Future<void> seedHolidaysFromJson() async {
     try {
       // قراءة الملف كنص
-      final String jsonString = await rootBundle.loadString('assets/json/holidays.json');
-      
+      final String jsonString = await rootBundle.loadString(
+        'assets/json/holidays.json',
+      );
+
       // معالجة الـ JSON في Isolate منفصل لمنع تجميد الشاشة
-      final List<Map<String, dynamic>> jsonResponse = await compute(_parseJsonInBackground, jsonString);
+      final List<Map<String, dynamic>> jsonResponse = await compute(
+        _parseJsonInBackground,
+        jsonString,
+      );
 
       // تحويل البيانات إلى كائنات Drift على الخيط الرئيسي (عملية خفيفة جداً)
       final List<HolidaysTableCompanion> holidays = jsonResponse.map((json) {
@@ -65,8 +74,49 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
     }
   }
 
+  // داخل HolidaysLocalDataSourceImpl
   @override
-  Future<List<HolidayModel>> getFinancialYearHolidays(DateTime start, DateTime end) async {
+  Future<void> reseedHolidaysFromJson() async {
+    try {
+      // 1. مسح البيانات القديمة بالكامل
+      await db.delete(db.holidaysTable).go();
+
+      // 2. قراءة الملف الجديد من الـ assets
+      final String jsonString = await rootBundle.loadString(
+        'assets/json/holidays.json',
+      );
+
+      // استخدام compute للعمليات الثقيلة على الـ main thread لتجنب توقف الواجهة
+      final List<Map<String, dynamic>> jsonResponse = await compute(
+        _parseJsonInBackground,
+        jsonString,
+      );
+
+      final List<HolidaysTableCompanion> holidays = jsonResponse.map((json) {
+        return HolidaysTableCompanion.insert(
+          name: json['name'],
+          startDate: DateTime.parse(json['startDate']),
+          endDate: DateTime.parse(json['endDate']),
+          daysCount: json['days_count'],
+        );
+      }).toList();
+
+      // 3. إعادة الإدخال باستخدام Batch
+      await db.batch((batch) {
+        batch.insertAll(db.holidaysTable, holidays);
+      });
+    } catch (e, stackTrace) {
+      // استخدام try/catch في طبقة Data مع إضافة نوع الاستثناء
+      debugPrint('JSON Seeding Error: $e\n$stackTrace');
+      throw DatabaseException('حدث خطأ أثناء تحديث العطلات.');
+    }
+  }
+
+  @override
+  Future<List<HolidayModel>> getFinancialYearHolidays(
+    DateTime start,
+    DateTime end,
+  ) async {
     try {
       return await (db.select(db.holidaysTable)
             ..where((tbl) => tbl.startDate.isBetweenValues(start, end))
@@ -85,7 +135,7 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
         ..where((tbl) => tbl.endDate.isBiggerOrEqualValue(today))
         ..orderBy([(t) => OrderingTerm.asc(t.startDate)])
         ..limit(1);
-      
+
       return await query.getSingleOrNull();
     } catch (e) {
       throw DatabaseException('فشل في جلب العطلة القادمة');

@@ -43,8 +43,8 @@ class AppDatabase extends _$AppDatabase {
         // schemaVersion => 4
         if (from < 4) {
           await m.addColumn(settingsTable, settingsTable.totalSickLeaves);
+          await m.addColumn(settingsTable, settingsTable.financialYearType);
         }
-
       },
     );
   }

@@ -4,6 +4,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/core/utils/enums/financial_year_type.dart';
 import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
@@ -37,6 +38,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final _sickLeavesController = TextEditingController(text: '0');
   late bool _isFirstTime;
 
+  FinancialYearType _selectedFinancialYear = FinancialYearType.fiscalYear;
+
   @override
   void initState() {
     super.initState();
@@ -69,6 +72,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _regularLeavesController.text = settings.totalRegularLeaves.toString();
     _casualLeavesController.text = settings.totalCasualLeaves.toString();
     _sickLeavesController.text = settings.totalSickLeaves.toString();
+    setState(() {
+      _selectedFinancialYear = settings.financialYearType;
+    });
   }
 
   void _saveSettings() {
@@ -81,6 +87,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
         totalRegularLeaves: _regularLeavesController.text.toIntSafely(),
         totalCasualLeaves: _casualLeavesController.text.toIntSafely(),
         totalSickLeaves: _sickLeavesController.text.toIntSafely(),
+        financialYearType: _selectedFinancialYear,
       );
       context.read<SettingsBloc>().add(SaveSettingsEvent(settings));
     }
@@ -126,6 +133,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   regularLeavesController: _regularLeavesController,
                   casualLeavesController: _casualLeavesController,
                   sickLeavesController: _sickLeavesController,
+                  selectedFinancialYear: _selectedFinancialYear,
+                  onFinancialYearChanged: (newType) {
+                    setState(() {
+                      _selectedFinancialYear = newType;
+                    });
+                  },
                 ),
                 const SizedBox(height: AppSpacing.lg),
                 // Save Settings button
