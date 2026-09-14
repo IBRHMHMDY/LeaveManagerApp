@@ -7,6 +7,7 @@ import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_cubit.dart';
 import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_state.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_primary_button.dart';
+import 'package:leave_manager/shared/widgets/buttons/app_rate_button.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_share_button.dart';
 import 'package:leave_manager/shared/widgets/displays/app_version_display.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -141,6 +142,8 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
+              const AppRateButton(),
+              const SizedBox(height: AppSpacing.sm),
               const AppShareButton(buttonType: ShareButtonType.outline,),
               const SizedBox(height: AppSpacing.sm),
               // 5. زر التواصل عبر واتساب

@@ -1,8 +1,8 @@
 # Leave Manager - مدير اجازاتى
 ## تتبع إجازاتك بذكاء وسهولة
 
-### Features: 1.4.0
-#### added Leaves [Regular - casual - Sick]
-#### added RestAllowances [Workdays, restday] by system balances [added & Minus]
-#### Local Backup & Restore Your Data Easily
-#### 100%  Offline [Without Internet]
+    ميزات الإصدار : 1.4.0
+     - اضافه الاجازات [العارضه - الاعتيادى - المرضى]
+     - اضافه بدلات الراحه بنظام الرصيد [خصم  او اضافه]
+     - عمل نسخه احتياطيه محليه (تحفظ على جهازك)
+     - التطبيق يعمل كامل بدون انترنت 100% Offline 

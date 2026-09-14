@@ -9,7 +9,6 @@
 // coverage:ignore-file
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
-import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
@@ -88,7 +87,6 @@ import '../../features/settings/presentation/bloc/settings_bloc.dart' as _i585;
 import '../../shared/themes/theme_cubit.dart' as _i202;
 import '../database/app_database.dart' as _i982;
 import '../usecases/check_date_overlap_usecase.dart' as _i707;
-import '../utils/check_network_info.dart' as _i496;
 import '../utils/share_service.dart' as _i518;
 import 'register_module.dart' as _i291;
 
@@ -106,7 +104,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i917.LayoutCubit>(() => _i917.LayoutCubit());
     gh.lazySingleton<_i982.AppDatabase>(() => registerModule.appDatabase);
-    gh.lazySingleton<_i895.Connectivity>(() => registerModule.connectivity);
     gh.lazySingleton<_i518.ShareService>(() => _i518.ShareService());
     gh.lazySingleton<_i828.HolidaysLocalDataSource>(
       () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),
@@ -133,9 +130,6 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i657.RestAllowancesRepositoryImpl(
         gh<_i637.RestAllowancesLocalDataSource>(),
       ),
-    );
-    gh.lazySingleton<_i496.CheckNetworkInfo>(
-      () => _i496.CheckNetworkInfoImpl(gh<_i895.Connectivity>()),
     );
     gh.lazySingleton<_i674.SettingsRepository>(
       () => _i955.SettingsRepositoryImpl(gh<_i599.SettingsLocalDataSource>()),

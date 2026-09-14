@@ -15,9 +15,20 @@ import 'package:leave_manager/shared/widgets/buttons/app_outlined_button.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_text_button.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_confirm_dialog.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class DangerZoneSection extends StatelessWidget {
   const DangerZoneSection({super.key});
+
+  Future _launchPrivacyPolicy() async {
+    // قم باستبدال هذا الرابط بالرابط الفعلي لسياسة الخصوصية الخاصة بك
+    final Uri url = Uri.parse('https://sites.google.com/view/leavemanager/home'); 
+    
+    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+      debugPrint('Could not launch privacy policy URL');
+    }
+  }
+
 
   @override
   Widget build(BuildContext context) {
@@ -69,6 +80,16 @@ class DangerZoneSection extends StatelessWidget {
           icon: Icons.info_outline_rounded,
           label: 'عن المطور',
           onPressed: () => showAboutDeveloperBottomSheet(context),
+        ),
+
+        const SizedBox(height: AppSpacing.sm),
+        
+        // زر سياسة الخصوصية الجديد
+        AppTextButton(
+          foregroundColor: context.colorScheme.onSurfaceVariant,
+          icon: Icons.privacy_tip_outlined,
+          label: 'سياسة الخصوصية',
+          onPressed: _launchPrivacyPolicy,
         ),
       ],
     );
