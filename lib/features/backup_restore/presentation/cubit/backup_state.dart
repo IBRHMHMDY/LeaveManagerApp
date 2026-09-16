@@ -21,8 +21,7 @@ class BackupLoading extends BackupState {
 
 class BackupSuccess extends BackupState {
   final String message;
-  final bool requiresRestart; // إضافة متغير لتحديد الحاجة لإعادة التشغيل
-
+  final bool requiresRestart;
   const BackupSuccess(this.message, {this.requiresRestart = false});
 
   @override
