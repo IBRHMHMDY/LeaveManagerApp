@@ -1,4 +1,0 @@
--keep class com.dexterous.flutterlocalnotifications.** { *; }
--keep class io.flutter.plugins.timezone.** { *; }
--keep class java.time.** { *; }
--dontwarn java.time.**
