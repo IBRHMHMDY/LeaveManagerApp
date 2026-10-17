@@ -1853,6 +1853,578 @@ class RestAllowancesTableCompanion extends UpdateCompanion<RestAllowanceModel> {
   }
 }
 
+class $NotificationsTableTable extends NotificationsTable
+    with TableInfo<$NotificationsTableTable, NotificationModel> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $NotificationsTableTable(this.attachedDatabase, [this._alias]);
+  static const VerificationMeta _idMeta = const VerificationMeta('id');
+  @override
+  late final GeneratedColumn<int> id = GeneratedColumn<int>(
+    'id',
+    aliasedName,
+    false,
+    hasAutoIncrement: true,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'PRIMARY KEY AUTOINCREMENT',
+    ),
+  );
+  static const VerificationMeta _remoteIdMeta = const VerificationMeta(
+    'remoteId',
+  );
+  @override
+  late final GeneratedColumn<String> remoteId = GeneratedColumn<String>(
+    'remote_id',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _titleMeta = const VerificationMeta('title');
+  @override
+  late final GeneratedColumn<String> title = GeneratedColumn<String>(
+    'title',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _bodyMeta = const VerificationMeta('body');
+  @override
+  late final GeneratedColumn<String> body = GeneratedColumn<String>(
+    'body',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _imageUrlMeta = const VerificationMeta(
+    'imageUrl',
+  );
+  @override
+  late final GeneratedColumn<String> imageUrl = GeneratedColumn<String>(
+    'image_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _actionUrlMeta = const VerificationMeta(
+    'actionUrl',
+  );
+  @override
+  late final GeneratedColumn<String> actionUrl = GeneratedColumn<String>(
+    'action_url',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _payloadJsonMeta = const VerificationMeta(
+    'payloadJson',
+  );
+  @override
+  late final GeneratedColumn<String> payloadJson = GeneratedColumn<String>(
+    'payload_json',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _isReadMeta = const VerificationMeta('isRead');
+  @override
+  late final GeneratedColumn<bool> isRead = GeneratedColumn<bool>(
+    'is_read',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_read" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _receivedAtMeta = const VerificationMeta(
+    'receivedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> receivedAt = GeneratedColumn<DateTime>(
+    'received_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    id,
+    remoteId,
+    title,
+    body,
+    imageUrl,
+    actionUrl,
+    payloadJson,
+    isRead,
+    receivedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'notifications_table';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<NotificationModel> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('id')) {
+      context.handle(_idMeta, id.isAcceptableOrUnknown(data['id']!, _idMeta));
+    }
+    if (data.containsKey('remote_id')) {
+      context.handle(
+        _remoteIdMeta,
+        remoteId.isAcceptableOrUnknown(data['remote_id']!, _remoteIdMeta),
+      );
+    }
+    if (data.containsKey('title')) {
+      context.handle(
+        _titleMeta,
+        title.isAcceptableOrUnknown(data['title']!, _titleMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_titleMeta);
+    }
+    if (data.containsKey('body')) {
+      context.handle(
+        _bodyMeta,
+        body.isAcceptableOrUnknown(data['body']!, _bodyMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_bodyMeta);
+    }
+    if (data.containsKey('image_url')) {
+      context.handle(
+        _imageUrlMeta,
+        imageUrl.isAcceptableOrUnknown(data['image_url']!, _imageUrlMeta),
+      );
+    }
+    if (data.containsKey('action_url')) {
+      context.handle(
+        _actionUrlMeta,
+        actionUrl.isAcceptableOrUnknown(data['action_url']!, _actionUrlMeta),
+      );
+    }
+    if (data.containsKey('payload_json')) {
+      context.handle(
+        _payloadJsonMeta,
+        payloadJson.isAcceptableOrUnknown(
+          data['payload_json']!,
+          _payloadJsonMeta,
+        ),
+      );
+    }
+    if (data.containsKey('is_read')) {
+      context.handle(
+        _isReadMeta,
+        isRead.isAcceptableOrUnknown(data['is_read']!, _isReadMeta),
+      );
+    }
+    if (data.containsKey('received_at')) {
+      context.handle(
+        _receivedAtMeta,
+        receivedAt.isAcceptableOrUnknown(data['received_at']!, _receivedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {id};
+  @override
+  NotificationModel map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return NotificationModel(
+      id: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}id'],
+      )!,
+      remoteId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}remote_id'],
+      ),
+      title: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}title'],
+      )!,
+      body: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}body'],
+      )!,
+      imageUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}image_url'],
+      ),
+      actionUrl: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}action_url'],
+      ),
+      payloadJson: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}payload_json'],
+      ),
+      isRead: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_read'],
+      )!,
+      receivedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}received_at'],
+      )!,
+    );
+  }
+
+  @override
+  $NotificationsTableTable createAlias(String alias) {
+    return $NotificationsTableTable(attachedDatabase, alias);
+  }
+}
+
+class NotificationModel extends DataClass
+    implements Insertable<NotificationModel> {
+  /// المعرف التلقائي للإشعار في قاعدة البيانات المحلية.
+  final int id;
+
+  /// المعرف الفريد للإشعار القادم من الخادم أو FCM Message ID (اختياري لمنع التكرار).
+  final String? remoteId;
+
+  /// عنوان الإشعار.
+  final String title;
+
+  /// نص ومحتوى الإشعار.
+  final String body;
+
+  /// رابط الصورة المرفقة بالإشعار إن وجد.
+  final String? imageUrl;
+
+  /// مسار التوجيه الداخلي (Deep Link) أو الرابط الخارجي عند النقر على الإشعار.
+  final String? actionUrl;
+
+  /// البيانات الإضافية المرفقة مع الإشعار بصيغة JSON String.
+  final String? payloadJson;
+
+  /// حالة قراءة الإشعار (الافتراضي: غير مقروء false).
+  final bool isRead;
+
+  /// تاريخ ووقت استلام الإشعار.
+  final DateTime receivedAt;
+  const NotificationModel({
+    required this.id,
+    this.remoteId,
+    required this.title,
+    required this.body,
+    this.imageUrl,
+    this.actionUrl,
+    this.payloadJson,
+    required this.isRead,
+    required this.receivedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    map['id'] = Variable<int>(id);
+    if (!nullToAbsent || remoteId != null) {
+      map['remote_id'] = Variable<String>(remoteId);
+    }
+    map['title'] = Variable<String>(title);
+    map['body'] = Variable<String>(body);
+    if (!nullToAbsent || imageUrl != null) {
+      map['image_url'] = Variable<String>(imageUrl);
+    }
+    if (!nullToAbsent || actionUrl != null) {
+      map['action_url'] = Variable<String>(actionUrl);
+    }
+    if (!nullToAbsent || payloadJson != null) {
+      map['payload_json'] = Variable<String>(payloadJson);
+    }
+    map['is_read'] = Variable<bool>(isRead);
+    map['received_at'] = Variable<DateTime>(receivedAt);
+    return map;
+  }
+
+  NotificationsTableCompanion toCompanion(bool nullToAbsent) {
+    return NotificationsTableCompanion(
+      id: Value(id),
+      remoteId: remoteId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(remoteId),
+      title: Value(title),
+      body: Value(body),
+      imageUrl: imageUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(imageUrl),
+      actionUrl: actionUrl == null && nullToAbsent
+          ? const Value.absent()
+          : Value(actionUrl),
+      payloadJson: payloadJson == null && nullToAbsent
+          ? const Value.absent()
+          : Value(payloadJson),
+      isRead: Value(isRead),
+      receivedAt: Value(receivedAt),
+    );
+  }
+
+  factory NotificationModel.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return NotificationModel(
+      id: serializer.fromJson<int>(json['id']),
+      remoteId: serializer.fromJson<String?>(json['remoteId']),
+      title: serializer.fromJson<String>(json['title']),
+      body: serializer.fromJson<String>(json['body']),
+      imageUrl: serializer.fromJson<String?>(json['imageUrl']),
+      actionUrl: serializer.fromJson<String?>(json['actionUrl']),
+      payloadJson: serializer.fromJson<String?>(json['payloadJson']),
+      isRead: serializer.fromJson<bool>(json['isRead']),
+      receivedAt: serializer.fromJson<DateTime>(json['receivedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'id': serializer.toJson<int>(id),
+      'remoteId': serializer.toJson<String?>(remoteId),
+      'title': serializer.toJson<String>(title),
+      'body': serializer.toJson<String>(body),
+      'imageUrl': serializer.toJson<String?>(imageUrl),
+      'actionUrl': serializer.toJson<String?>(actionUrl),
+      'payloadJson': serializer.toJson<String?>(payloadJson),
+      'isRead': serializer.toJson<bool>(isRead),
+      'receivedAt': serializer.toJson<DateTime>(receivedAt),
+    };
+  }
+
+  NotificationModel copyWith({
+    int? id,
+    Value<String?> remoteId = const Value.absent(),
+    String? title,
+    String? body,
+    Value<String?> imageUrl = const Value.absent(),
+    Value<String?> actionUrl = const Value.absent(),
+    Value<String?> payloadJson = const Value.absent(),
+    bool? isRead,
+    DateTime? receivedAt,
+  }) => NotificationModel(
+    id: id ?? this.id,
+    remoteId: remoteId.present ? remoteId.value : this.remoteId,
+    title: title ?? this.title,
+    body: body ?? this.body,
+    imageUrl: imageUrl.present ? imageUrl.value : this.imageUrl,
+    actionUrl: actionUrl.present ? actionUrl.value : this.actionUrl,
+    payloadJson: payloadJson.present ? payloadJson.value : this.payloadJson,
+    isRead: isRead ?? this.isRead,
+    receivedAt: receivedAt ?? this.receivedAt,
+  );
+  NotificationModel copyWithCompanion(NotificationsTableCompanion data) {
+    return NotificationModel(
+      id: data.id.present ? data.id.value : this.id,
+      remoteId: data.remoteId.present ? data.remoteId.value : this.remoteId,
+      title: data.title.present ? data.title.value : this.title,
+      body: data.body.present ? data.body.value : this.body,
+      imageUrl: data.imageUrl.present ? data.imageUrl.value : this.imageUrl,
+      actionUrl: data.actionUrl.present ? data.actionUrl.value : this.actionUrl,
+      payloadJson: data.payloadJson.present
+          ? data.payloadJson.value
+          : this.payloadJson,
+      isRead: data.isRead.present ? data.isRead.value : this.isRead,
+      receivedAt: data.receivedAt.present
+          ? data.receivedAt.value
+          : this.receivedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationModel(')
+          ..write('id: $id, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('imageUrl: $imageUrl, ')
+          ..write('actionUrl: $actionUrl, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('isRead: $isRead, ')
+          ..write('receivedAt: $receivedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode => Object.hash(
+    id,
+    remoteId,
+    title,
+    body,
+    imageUrl,
+    actionUrl,
+    payloadJson,
+    isRead,
+    receivedAt,
+  );
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is NotificationModel &&
+          other.id == this.id &&
+          other.remoteId == this.remoteId &&
+          other.title == this.title &&
+          other.body == this.body &&
+          other.imageUrl == this.imageUrl &&
+          other.actionUrl == this.actionUrl &&
+          other.payloadJson == this.payloadJson &&
+          other.isRead == this.isRead &&
+          other.receivedAt == this.receivedAt);
+}
+
+class NotificationsTableCompanion extends UpdateCompanion<NotificationModel> {
+  final Value<int> id;
+  final Value<String?> remoteId;
+  final Value<String> title;
+  final Value<String> body;
+  final Value<String?> imageUrl;
+  final Value<String?> actionUrl;
+  final Value<String?> payloadJson;
+  final Value<bool> isRead;
+  final Value<DateTime> receivedAt;
+  const NotificationsTableCompanion({
+    this.id = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    this.title = const Value.absent(),
+    this.body = const Value.absent(),
+    this.imageUrl = const Value.absent(),
+    this.actionUrl = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.isRead = const Value.absent(),
+    this.receivedAt = const Value.absent(),
+  });
+  NotificationsTableCompanion.insert({
+    this.id = const Value.absent(),
+    this.remoteId = const Value.absent(),
+    required String title,
+    required String body,
+    this.imageUrl = const Value.absent(),
+    this.actionUrl = const Value.absent(),
+    this.payloadJson = const Value.absent(),
+    this.isRead = const Value.absent(),
+    this.receivedAt = const Value.absent(),
+  }) : title = Value(title),
+       body = Value(body);
+  static Insertable<NotificationModel> custom({
+    Expression<int>? id,
+    Expression<String>? remoteId,
+    Expression<String>? title,
+    Expression<String>? body,
+    Expression<String>? imageUrl,
+    Expression<String>? actionUrl,
+    Expression<String>? payloadJson,
+    Expression<bool>? isRead,
+    Expression<DateTime>? receivedAt,
+  }) {
+    return RawValuesInsertable({
+      if (id != null) 'id': id,
+      if (remoteId != null) 'remote_id': remoteId,
+      if (title != null) 'title': title,
+      if (body != null) 'body': body,
+      if (imageUrl != null) 'image_url': imageUrl,
+      if (actionUrl != null) 'action_url': actionUrl,
+      if (payloadJson != null) 'payload_json': payloadJson,
+      if (isRead != null) 'is_read': isRead,
+      if (receivedAt != null) 'received_at': receivedAt,
+    });
+  }
+
+  NotificationsTableCompanion copyWith({
+    Value<int>? id,
+    Value<String?>? remoteId,
+    Value<String>? title,
+    Value<String>? body,
+    Value<String?>? imageUrl,
+    Value<String?>? actionUrl,
+    Value<String?>? payloadJson,
+    Value<bool>? isRead,
+    Value<DateTime>? receivedAt,
+  }) {
+    return NotificationsTableCompanion(
+      id: id ?? this.id,
+      remoteId: remoteId ?? this.remoteId,
+      title: title ?? this.title,
+      body: body ?? this.body,
+      imageUrl: imageUrl ?? this.imageUrl,
+      actionUrl: actionUrl ?? this.actionUrl,
+      payloadJson: payloadJson ?? this.payloadJson,
+      isRead: isRead ?? this.isRead,
+      receivedAt: receivedAt ?? this.receivedAt,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (id.present) {
+      map['id'] = Variable<int>(id.value);
+    }
+    if (remoteId.present) {
+      map['remote_id'] = Variable<String>(remoteId.value);
+    }
+    if (title.present) {
+      map['title'] = Variable<String>(title.value);
+    }
+    if (body.present) {
+      map['body'] = Variable<String>(body.value);
+    }
+    if (imageUrl.present) {
+      map['image_url'] = Variable<String>(imageUrl.value);
+    }
+    if (actionUrl.present) {
+      map['action_url'] = Variable<String>(actionUrl.value);
+    }
+    if (payloadJson.present) {
+      map['payload_json'] = Variable<String>(payloadJson.value);
+    }
+    if (isRead.present) {
+      map['is_read'] = Variable<bool>(isRead.value);
+    }
+    if (receivedAt.present) {
+      map['received_at'] = Variable<DateTime>(receivedAt.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('NotificationsTableCompanion(')
+          ..write('id: $id, ')
+          ..write('remoteId: $remoteId, ')
+          ..write('title: $title, ')
+          ..write('body: $body, ')
+          ..write('imageUrl: $imageUrl, ')
+          ..write('actionUrl: $actionUrl, ')
+          ..write('payloadJson: $payloadJson, ')
+          ..write('isRead: $isRead, ')
+          ..write('receivedAt: $receivedAt')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -1862,6 +2434,8 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $HolidaysTableTable holidaysTable = $HolidaysTableTable(this);
   late final $RestAllowancesTableTable restAllowancesTable =
       $RestAllowancesTableTable(this);
+  late final $NotificationsTableTable notificationsTable =
+      $NotificationsTableTable(this);
   late final Index idxLeaveDates = Index(
     'idx_leave_dates',
     'CREATE INDEX idx_leave_dates ON leave_records_table (start_date, end_date)',
@@ -1883,6 +2457,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     leaveRecordsTable,
     holidaysTable,
     restAllowancesTable,
+    notificationsTable,
     idxLeaveDates,
     idxHolidayDates,
     idxExtraworkDates,
@@ -3108,6 +3683,293 @@ typedef $$RestAllowancesTableTableProcessedTableManager =
       RestAllowanceModel,
       PrefetchHooks Function({bool holidayId})
     >;
+typedef $$NotificationsTableTableCreateCompanionBuilder =
+    NotificationsTableCompanion Function({
+      Value<int> id,
+      Value<String?> remoteId,
+      required String title,
+      required String body,
+      Value<String?> imageUrl,
+      Value<String?> actionUrl,
+      Value<String?> payloadJson,
+      Value<bool> isRead,
+      Value<DateTime> receivedAt,
+    });
+typedef $$NotificationsTableTableUpdateCompanionBuilder =
+    NotificationsTableCompanion Function({
+      Value<int> id,
+      Value<String?> remoteId,
+      Value<String> title,
+      Value<String> body,
+      Value<String?> imageUrl,
+      Value<String?> actionUrl,
+      Value<String?> payloadJson,
+      Value<bool> isRead,
+      Value<DateTime> receivedAt,
+    });
+
+class $$NotificationsTableTableFilterComposer
+    extends Composer<_$AppDatabase, $NotificationsTableTable> {
+  $$NotificationsTableTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnFilters<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get imageUrl => $composableBuilder(
+    column: $table.imageUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get actionUrl => $composableBuilder(
+    column: $table.actionUrl,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isRead => $composableBuilder(
+    column: $table.isRead,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get receivedAt => $composableBuilder(
+    column: $table.receivedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$NotificationsTableTableOrderingComposer
+    extends Composer<_$AppDatabase, $NotificationsTableTable> {
+  $$NotificationsTableTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<int> get id => $composableBuilder(
+    column: $table.id,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get remoteId => $composableBuilder(
+    column: $table.remoteId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get title => $composableBuilder(
+    column: $table.title,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get body => $composableBuilder(
+    column: $table.body,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get imageUrl => $composableBuilder(
+    column: $table.imageUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get actionUrl => $composableBuilder(
+    column: $table.actionUrl,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isRead => $composableBuilder(
+    column: $table.isRead,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get receivedAt => $composableBuilder(
+    column: $table.receivedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$NotificationsTableTableAnnotationComposer
+    extends Composer<_$AppDatabase, $NotificationsTableTable> {
+  $$NotificationsTableTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumn<int> get id =>
+      $composableBuilder(column: $table.id, builder: (column) => column);
+
+  GeneratedColumn<String> get remoteId =>
+      $composableBuilder(column: $table.remoteId, builder: (column) => column);
+
+  GeneratedColumn<String> get title =>
+      $composableBuilder(column: $table.title, builder: (column) => column);
+
+  GeneratedColumn<String> get body =>
+      $composableBuilder(column: $table.body, builder: (column) => column);
+
+  GeneratedColumn<String> get imageUrl =>
+      $composableBuilder(column: $table.imageUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get actionUrl =>
+      $composableBuilder(column: $table.actionUrl, builder: (column) => column);
+
+  GeneratedColumn<String> get payloadJson => $composableBuilder(
+    column: $table.payloadJson,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<bool> get isRead =>
+      $composableBuilder(column: $table.isRead, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get receivedAt => $composableBuilder(
+    column: $table.receivedAt,
+    builder: (column) => column,
+  );
+}
+
+class $$NotificationsTableTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $NotificationsTableTable,
+          NotificationModel,
+          $$NotificationsTableTableFilterComposer,
+          $$NotificationsTableTableOrderingComposer,
+          $$NotificationsTableTableAnnotationComposer,
+          $$NotificationsTableTableCreateCompanionBuilder,
+          $$NotificationsTableTableUpdateCompanionBuilder,
+          (
+            NotificationModel,
+            BaseReferences<
+              _$AppDatabase,
+              $NotificationsTableTable,
+              NotificationModel
+            >,
+          ),
+          NotificationModel,
+          PrefetchHooks Function()
+        > {
+  $$NotificationsTableTableTableManager(
+    _$AppDatabase db,
+    $NotificationsTableTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$NotificationsTableTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$NotificationsTableTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$NotificationsTableTableAnnotationComposer(
+                $db: db,
+                $table: table,
+              ),
+          updateCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                Value<String> title = const Value.absent(),
+                Value<String> body = const Value.absent(),
+                Value<String?> imageUrl = const Value.absent(),
+                Value<String?> actionUrl = const Value.absent(),
+                Value<String?> payloadJson = const Value.absent(),
+                Value<bool> isRead = const Value.absent(),
+                Value<DateTime> receivedAt = const Value.absent(),
+              }) => NotificationsTableCompanion(
+                id: id,
+                remoteId: remoteId,
+                title: title,
+                body: body,
+                imageUrl: imageUrl,
+                actionUrl: actionUrl,
+                payloadJson: payloadJson,
+                isRead: isRead,
+                receivedAt: receivedAt,
+              ),
+          createCompanionCallback:
+              ({
+                Value<int> id = const Value.absent(),
+                Value<String?> remoteId = const Value.absent(),
+                required String title,
+                required String body,
+                Value<String?> imageUrl = const Value.absent(),
+                Value<String?> actionUrl = const Value.absent(),
+                Value<String?> payloadJson = const Value.absent(),
+                Value<bool> isRead = const Value.absent(),
+                Value<DateTime> receivedAt = const Value.absent(),
+              }) => NotificationsTableCompanion.insert(
+                id: id,
+                remoteId: remoteId,
+                title: title,
+                body: body,
+                imageUrl: imageUrl,
+                actionUrl: actionUrl,
+                payloadJson: payloadJson,
+                isRead: isRead,
+                receivedAt: receivedAt,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map((e) => (e.readTable(table), BaseReferences(db, table, e)))
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$NotificationsTableTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $NotificationsTableTable,
+      NotificationModel,
+      $$NotificationsTableTableFilterComposer,
+      $$NotificationsTableTableOrderingComposer,
+      $$NotificationsTableTableAnnotationComposer,
+      $$NotificationsTableTableCreateCompanionBuilder,
+      $$NotificationsTableTableUpdateCompanionBuilder,
+      (
+        NotificationModel,
+        BaseReferences<
+          _$AppDatabase,
+          $NotificationsTableTable,
+          NotificationModel
+        >,
+      ),
+      NotificationModel,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -3120,4 +3982,6 @@ class $AppDatabaseManager {
       $$HolidaysTableTableTableManager(_db, _db.holidaysTable);
   $$RestAllowancesTableTableTableManager get restAllowancesTable =>
       $$RestAllowancesTableTableTableManager(_db, _db.restAllowancesTable);
+  $$NotificationsTableTableTableManager get notificationsTable =>
+      $$NotificationsTableTableTableManager(_db, _db.notificationsTable);
 }

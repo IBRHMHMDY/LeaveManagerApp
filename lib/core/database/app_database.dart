@@ -2,6 +2,7 @@ import 'dart:io';
 import 'package:drift/drift.dart';
 import 'package:drift/native.dart';
 import 'package:leave_manager/core/database/tables/holidays_table.dart';
+import 'package:leave_manager/core/database/tables/notifications_table.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:path/path.dart' as p;
 import 'tables/settings_table.dart';
@@ -16,13 +17,14 @@ part 'app_database.g.dart';
     LeaveRecordsTable,
     HolidaysTable,
     RestAllowancesTable,
+    NotificationsTable,
   ],
 )
 class AppDatabase extends _$AppDatabase {
   AppDatabase() : super(_openConnection());
 
   @override
-  int get schemaVersion => 4;
+  int get schemaVersion => 5;
 
   @override
   MigrationStrategy get migration {
@@ -44,6 +46,10 @@ class AppDatabase extends _$AppDatabase {
         if (from < 4) {
           await m.addColumn(settingsTable, settingsTable.totalSickLeaves);
           await m.addColumn(settingsTable, settingsTable.financialYearType);
+        }
+        // schemaVersion => 5 (إضافة جدول الإشعارات)
+        if (from < 5) {
+          await m.createTable(notificationsTable);
         }
       },
     );
