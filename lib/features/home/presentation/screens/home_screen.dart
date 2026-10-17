@@ -4,25 +4,30 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
-import 'package:leave_manager/features/home/presentation/widgets/home_header.dart';
-import 'package:leave_manager/features/home/presentation/widgets/upcoming_holiday_card.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_cubit.dart';
 import 'package:leave_manager/features/home/presentation/cubit/home_state.dart';
+import 'package:leave_manager/features/home/presentation/widgets/alert_banners.dart';
+import 'package:leave_manager/features/home/presentation/widgets/balances_loading_shimmer.dart';
+import 'package:leave_manager/features/home/presentation/widgets/current_month_leaves_section.dart';
+import 'package:leave_manager/features/home/presentation/widgets/home_header.dart';
+import 'package:leave_manager/features/home/presentation/widgets/leaves_balances_section.dart';
+import 'package:leave_manager/features/home/presentation/widgets/rest_stats_card.dart';
+import 'package:leave_manager/features/home/presentation/widgets/upcoming_holiday_card.dart';
+import 'package:leave_manager/features/home/presentation/widgets/welcome_card.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
+import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'package:leave_manager/features/notifications/presentation/bloc/notifications_state.dart';
+import 'package:leave_manager/features/notifications/presentation/widgets/notification_bell_button.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_state.dart';
-import 'package:leave_manager/features/home/presentation/widgets/rest_stats_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
-import 'package:leave_manager/features/home/presentation/widgets/balances_loading_shimmer.dart';
-import 'package:leave_manager/features/home/presentation/widgets/leaves_balances_section.dart';
-import 'package:leave_manager/features/home/presentation/widgets/current_month_leaves_section.dart';
-import 'package:leave_manager/features/home/presentation/widgets/welcome_card.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
-import 'package:leave_manager/features/home/presentation/widgets/alert_banners.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 
+/// الشاشة الرئيسية لتطبيق مدير إجازاتي.
 class HomeScreen extends StatefulWidget {
+  /// منشئ ثابت.
   const HomeScreen({super.key});
 
   @override
@@ -41,6 +46,10 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: const AppAppBar(
         customTitle: HomeHeader(),
+        actions: [
+          NotificationBellButton(),
+          SizedBox(width: AppSpacing.sm),
+        ],
       ),
       body: MultiBlocListener(
         listeners: [
@@ -64,6 +73,16 @@ class _HomeScreenState extends State<HomeScreen> {
             listener: (context, state) {
               if (state is RestAllowanceActionSuccess) {
                 context.read<HomeCubit>().loadHomeData();
+              }
+            },
+          ),
+          BlocListener<NotificationsBloc, NotificationsState>(
+            listener: (context, state) {
+              if (state is IncomingNotificationAlertState) {
+                AppToast.showSuccess(
+                  context,
+                  '${state.notification.title}: ${state.notification.body}',
+                );
               }
             },
           ),
@@ -95,6 +114,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       role: state.settings.jobTitle,
                     ),
                     const SizedBox(height: AppSpacing.md),
+
                     // Upcoming Holiday
                     BlocBuilder<HolidaysCubit, HolidaysState>(
                       builder: (context, holidayState) {
@@ -117,17 +137,19 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     const SizedBox(height: AppSpacing.md),
+
                     // Alert Banner
                     const AlertBanners(
                       alertType: AlertType.info,
                       message:
-                          'تنبيه: اقترب موعد نهاية السنة المالية، يرجى تسوية رصيد إجازاتك.',
+                          'يرجى مراجعة رصيد الإجازات الاعتيادية والعارضة قبل نهاية السنة المالية.',
                     ),
                     LeavesBalancesSection(
                       balance: state.balance,
                       settings: state.settings,
                     ),
                     const SizedBox(height: AppSpacing.md),
+
                     BlocBuilder<RestAllowancesBloc, RestAllowancesState>(
                       builder: (context, restState) {
                         if (restState is RestAllowancesLoaded) {
@@ -144,7 +166,6 @@ class _HomeScreenState extends State<HomeScreen> {
                       },
                     ),
                     const SizedBox(height: AppSpacing.lg),
-
                     const SizedBox(height: AppSpacing.lg),
                     CurrentMonthLeavesSection(
                       leaves: state.currentMonthLeaves,
