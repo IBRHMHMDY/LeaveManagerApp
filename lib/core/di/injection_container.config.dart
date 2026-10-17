@@ -55,6 +55,32 @@ import '../../features/leaves/domain/usecases/delete_leave_usecase.dart'
 import '../../features/leaves/domain/usecases/get_current_year_leaves_usecase.dart'
     as _i972;
 import '../../features/leaves/presentation/blocs/leaves_bloc.dart' as _i562;
+import '../../features/notifications/data/datasources/notifications_local_data_source.dart'
+    as _i1034;
+import '../../features/notifications/data/datasources/notifications_remote_data_source.dart'
+    as _i951;
+import '../../features/notifications/data/repositories/notifications_repository_impl.dart'
+    as _i201;
+import '../../features/notifications/domain/repositories/notifications_repository.dart'
+    as _i563;
+import '../../features/notifications/domain/usecases/clear_all_notifications_usecase.dart'
+    as _i154;
+import '../../features/notifications/domain/usecases/delete_notification_usecase.dart'
+    as _i169;
+import '../../features/notifications/domain/usecases/get_local_notifications_usecase.dart'
+    as _i820;
+import '../../features/notifications/domain/usecases/get_unread_notifications_count_usecase.dart'
+    as _i677;
+import '../../features/notifications/domain/usecases/mark_all_notifications_as_read_usecase.dart'
+    as _i730;
+import '../../features/notifications/domain/usecases/mark_notification_as_read_usecase.dart'
+    as _i889;
+import '../../features/notifications/domain/usecases/save_notification_usecase.dart'
+    as _i740;
+import '../../features/notifications/domain/usecases/sync_device_with_server_usecase.dart'
+    as _i568;
+import '../../features/notifications/presentation/bloc/notifications_bloc.dart'
+    as _i1041;
 import '../../features/rest_allowances/data/datasources/rest_allowances_local_data_source.dart'
     as _i637;
 import '../../features/rest_allowances/data/repositories/rest_allowances_repository_impl.dart'
@@ -91,6 +117,7 @@ import '../database/app_database.dart' as _i982;
 import '../network/dio_client.dart' as _i667;
 import '../network/interceptors/app_key_interceptor.dart' as _i833;
 import '../network/network_info.dart' as _i932;
+import '../services/push_notification_service.dart' as _i63;
 import '../usecases/check_date_overlap_usecase.dart' as _i707;
 import '../utils/share_service.dart' as _i518;
 import '../utils/store_launcher_service.dart' as _i967;
@@ -135,6 +162,12 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i599.SettingsLocalDataSource>(
       () => _i599.SettingsLocalDataSourceImpl(gh<_i982.AppDatabase>()),
+    );
+    gh.lazySingleton<_i1034.NotificationsLocalDataSource>(
+      () => _i1034.NotificationsLocalDataSourceImpl(
+        gh<_i982.AppDatabase>(),
+        gh<_i558.FlutterSecureStorage>(),
+      ),
     );
     gh.lazySingleton<_i1005.LeavesLocalDataSource>(
       () => _i1005.LeavesLocalDataSourceImpl(gh<_i982.AppDatabase>()),
@@ -191,6 +224,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i290.RestoreFromLocalUseCase>(),
       ),
     );
+    gh.lazySingleton<_i951.NotificationsRemoteDataSource>(
+      () => _i951.NotificationsRemoteDataSourceImpl(gh<_i667.DioClient>()),
+    );
     gh.lazySingleton<_i787.CheckSettingsExistUseCase>(
       () => _i787.CheckSettingsExistUseCase(gh<_i674.SettingsRepository>()),
     );
@@ -218,6 +254,13 @@ extension GetItInjectableX on _i174.GetIt {
         restAllowancesRepository: gh<_i314.RestAllowancesRepository>(),
         holidaysRepository: gh<_i171.HolidaysRepository>(),
         getSettings: gh<_i1029.GetSettingsUseCase>(),
+      ),
+    );
+    gh.lazySingleton<_i563.NotificationsRepository>(
+      () => _i201.NotificationsRepositoryImpl(
+        gh<_i951.NotificationsRemoteDataSource>(),
+        gh<_i1034.NotificationsLocalDataSource>(),
+        gh<_i932.NetworkInfo>(),
       ),
     );
     gh.lazySingleton<_i1053.GetFinancialYearHolidaysUseCase>(
@@ -268,6 +311,50 @@ extension GetItInjectableX on _i174.GetIt {
         saveSettings: gh<_i109.SaveSettingsUseCase>(),
       ),
     );
+    gh.lazySingleton<_i154.ClearAllNotificationsUseCase>(
+      () => _i154.ClearAllNotificationsUseCase(
+        gh<_i563.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i169.DeleteNotificationUseCase>(
+      () =>
+          _i169.DeleteNotificationUseCase(gh<_i563.NotificationsRepository>()),
+    );
+    gh.lazySingleton<_i820.GetLocalNotificationsUseCase>(
+      () => _i820.GetLocalNotificationsUseCase(
+        gh<_i563.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i677.GetUnreadNotificationsCountUseCase>(
+      () => _i677.GetUnreadNotificationsCountUseCase(
+        gh<_i563.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i730.MarkAllNotificationsAsReadUseCase>(
+      () => _i730.MarkAllNotificationsAsReadUseCase(
+        gh<_i563.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i889.MarkNotificationAsReadUseCase>(
+      () => _i889.MarkNotificationAsReadUseCase(
+        gh<_i563.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i740.SaveNotificationUseCase>(
+      () => _i740.SaveNotificationUseCase(gh<_i563.NotificationsRepository>()),
+    );
+    gh.lazySingleton<_i568.SyncDeviceWithServerUseCase>(
+      () => _i568.SyncDeviceWithServerUseCase(
+        gh<_i563.NotificationsRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i63.PushNotificationService>(
+      () => _i63.PushNotificationService(
+        gh<_i568.SyncDeviceWithServerUseCase>(),
+        gh<_i740.SaveNotificationUseCase>(),
+      ),
+      dispose: (i) => i.dispose(),
+    );
     gh.factory<_i673.RestAllowancesBloc>(
       () => _i673.RestAllowancesBloc(
         getExtraWorkRecords: gh<_i804.GetExtraWorkRecordsUseCase>(),
@@ -282,6 +369,19 @@ extension GetItInjectableX on _i174.GetIt {
         calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
         checkDateOverlap: gh<_i707.CheckDateOverlapUseCase>(),
         getSettings: gh<_i1029.GetSettingsUseCase>(),
+      ),
+    );
+    gh.factory<_i1041.NotificationsBloc>(
+      () => _i1041.NotificationsBloc(
+        syncDeviceWithServer: gh<_i568.SyncDeviceWithServerUseCase>(),
+        saveNotification: gh<_i740.SaveNotificationUseCase>(),
+        getLocalNotifications: gh<_i820.GetLocalNotificationsUseCase>(),
+        getUnreadCount: gh<_i677.GetUnreadNotificationsCountUseCase>(),
+        markAsRead: gh<_i889.MarkNotificationAsReadUseCase>(),
+        markAllAsRead: gh<_i730.MarkAllNotificationsAsReadUseCase>(),
+        deleteNotification: gh<_i169.DeleteNotificationUseCase>(),
+        clearAllNotifications: gh<_i154.ClearAllNotificationsUseCase>(),
+        pushNotificationService: gh<_i63.PushNotificationService>(),
       ),
     );
     gh.factory<_i562.LeavesBloc>(

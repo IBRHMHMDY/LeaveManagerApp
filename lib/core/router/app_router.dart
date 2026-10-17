@@ -2,33 +2,56 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
-import 'package:leave_manager/features/splash/presentation/screens/splash_screen.dart';
-import 'package:leave_manager/features/layout/presentation/screens/main_layout.dart';
 import 'package:leave_manager/features/holidays/presentation/screens/holidays_screen.dart';
 import 'package:leave_manager/features/home/presentation/screens/home_screen.dart';
+import 'package:leave_manager/features/layout/presentation/screens/main_layout.dart';
 import 'package:leave_manager/features/leaves/presentation/screens/leave_screen.dart';
+import 'package:leave_manager/features/notifications/presentation/screens/notifications_screen.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/screens/rest_allowances_screen.dart';
 import 'package:leave_manager/features/settings/presentation/screens/settings_screen.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/settings_header.dart';
+import 'package:leave_manager/features/splash/presentation/screens/splash_screen.dart';
 
+/// مفتاح الملاحة الجذري للتطبيق لفتح الشاشات المستقلة فوق BottomNavigationBar.
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>(
   debugLabel: 'root',
 );
 
-class AppRouter {
+/// الموجه المركزي للتطبيق (GoRouter) وفق معايير AMD 2026.
+abstract final class AppRouter {
+  /// مسار شاشة البداية.
   static const String splash = '/';
+
+  /// مسار الشاشة الرئيسية.
   static const String home = '/home';
+
+  /// مسار شاشة الإجازات.
   static const String leaves = '/leaves';
+
+  /// مسار شاشة العطلات الرسمية.
   static const String holidays = '/holidays';
+
+  /// مسار شاشة بدلات الراحة.
   static const String restAllowances = '/rest_allowances';
+
+  /// مسار شاشة الإعدادات.
   static const String settings = '/settings';
+
+  /// مسار شاشة الإعداد لأول مرة.
   static const String setup = '/setup';
 
+  /// مسار شاشة سجل الإشعارات (مضاف في المرحلة الخامسة).
+  static const String notifications = '/notifications';
+
+  /// إعدادات GoRouter شاملة كافة المسارات والـ StatefulShellRoute.
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: splash,
     routes: [
-      GoRoute(path: splash, builder: (context, state) => const SplashScreen()),
+      GoRoute(
+        path: splash,
+        builder: (context, state) => const SplashScreen(),
+      ),
       GoRoute(
         path: setup,
         builder: (context, state) => const Scaffold(
@@ -37,10 +60,16 @@ class AppRouter {
         ),
       ),
       GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
         path: holidays,
         builder: (context, state) => const HolidaysScreen(),
       ),
-      // Bottom Navigation باستخدام StatefulShellRoute
+      GoRoute(
+        parentNavigatorKey: _rootNavigatorKey,
+        path: notifications,
+        builder: (context, state) => const NotificationsScreen(),
+      ),
+      // Bottom Navigation StatefulShellRoute
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainLayout(navigationShell: navigationShell);
@@ -55,7 +84,6 @@ class AppRouter {
               ),
             ],
           ),
-
           // Branch (1): Leaves
           StatefulShellBranch(
             routes: [
@@ -65,28 +93,28 @@ class AppRouter {
               ),
             ],
           ),
-
           // Branch (2): Rest Allowances
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: restAllowances,
                 builder: (context, state) {
-                  // استلام كائن Holiday من الـ extra لتمريره للشاشة[cite: 1]
-                  final holiday = state.extra as Holiday?;
+                  final holiday = state.extra is Holiday
+                      ? state.extra as Holiday
+                      : null;
                   return RestAllowancesScreen(initialHoliday: holiday);
                 },
               ),
             ],
           ),
-
           // Branch (3): Settings
           StatefulShellBranch(
             routes: [
               GoRoute(
                 path: settings,
                 builder: (context, state) {
-                  final isFirstTime = state.extra as bool? ?? false;
+                  final isFirstTime =
+                      state.extra is bool ? state.extra as bool : false;
                   return SettingsScreen(isFirstTime: isFirstTime);
                 },
               ),

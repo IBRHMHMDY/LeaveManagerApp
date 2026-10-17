@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_state.dart';
@@ -9,9 +10,6 @@ import 'package:leave_manager/shared/widgets/displays/app_tooltip.dart';
 
 /// زر أيقونة الإشعارات المزود بشارة (Badge) تعرض عدد الإشعارات غير المقروءة.
 class NotificationBellButton extends StatelessWidget {
-  /// مسار شاشة الإشعارات في GoRouter.
-  static const String notificationsRoute = '/notifications';
-
   /// منشئ ثابت للزر.
   const NotificationBellButton({super.key});
 
@@ -29,7 +27,7 @@ class NotificationBellButton extends StatelessWidget {
           message: 'الإشعارات',
           preferBelow: true,
           child: IconButton(
-            onPressed: () => context.push(notificationsRoute),
+            onPressed: () => context.push(AppRouter.notifications),
             icon: Badge(
               isLabelVisible: unreadCount > 0,
               backgroundColor: context.colorScheme.error,
