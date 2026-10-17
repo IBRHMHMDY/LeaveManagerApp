@@ -24,7 +24,7 @@ class LocalBackupDataSourceImpl implements LocalBackupDataSource {
   Future<String> backupToLocal() async {
     final dbFile = await getDatabaseFile();
     if (!await dbFile.exists()) {
-      throw DatabaseException('قاعدة البيانات غير موجودة.');
+      throw const DatabaseException('قاعدة البيانات غير موجودة.');
     }
 
     try {
@@ -41,7 +41,7 @@ class LocalBackupDataSourceImpl implements LocalBackupDataSource {
       // نرجع رسالة نجاح بدلاً من المسار لمنع المستخدم من معرفته
       return 'تم حفظ النسخة المحلية بأمان.';
     } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء حفظ الملف الاحتياطي.');
+      throw const DatabaseException('حدث خطأ أثناء حفظ الملف الاحتياطي.');
     }
   }
 
@@ -52,7 +52,7 @@ class LocalBackupDataSourceImpl implements LocalBackupDataSource {
       final backupDir = Directory(p.join(appDir.path, 'backups'));
 
       if (!await backupDir.exists()) {
-        throw ValidationException('لا توجد أي نسخ احتياطية محفوظة محلياً.');
+        throw const ValidationException('لا توجد أي نسخ احتياطية محفوظة محلياً.');
       }
 
       // جلب جميع الملفات التي تنتهي بـ .sqlite
@@ -63,7 +63,7 @@ class LocalBackupDataSourceImpl implements LocalBackupDataSource {
           .toList();
 
       if (backupFiles.isEmpty) {
-        throw ValidationException('لا توجد أي نسخ احتياطية محفوظة محلياً.');
+        throw const ValidationException('لا توجد أي نسخ احتياطية محفوظة محلياً.');
       }
 
       // ترتيب الملفات تنازلياً حسب تاريخ التعديل لجلب الأحدث (Latest)
@@ -75,7 +75,7 @@ class LocalBackupDataSourceImpl implements LocalBackupDataSource {
       await latestBackup.copy(currentDbFile.path);
     } catch (e) {
       if (e is ValidationException) rethrow; // لتمرير رسالة عدم وجود نسخ
-      throw DatabaseException('حدث خطأ أثناء استعادة النسخة المحلية.');
+      throw const DatabaseException('حدث خطأ أثناء استعادة النسخة المحلية.');
     }
   }
 }

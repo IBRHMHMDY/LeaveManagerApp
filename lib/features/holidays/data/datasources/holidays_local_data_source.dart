@@ -36,7 +36,7 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
       final result = await query.map((row) => row.read(countExp)).getSingle();
       return (result ?? 0) > 0;
     } catch (e) {
-      throw DatabaseException('فشل في التحقق من وجود العطلات');
+      throw const DatabaseException('فشل في التحقق من وجود العطلات');
     }
   }
 
@@ -70,7 +70,7 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
       });
     } catch (e, stackTrace) {
       debugPrint('JSON Seeding Error: $e\n$stackTrace');
-      throw DatabaseException('حدث خطأ أثناء تحميل بيانات الإجازات الأولية.');
+      throw const DatabaseException('حدث خطأ أثناء تحميل بيانات الإجازات الأولية.');
     }
   }
 
@@ -108,7 +108,7 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
     } catch (e, stackTrace) {
       // استخدام try/catch في طبقة Data مع إضافة نوع الاستثناء
       debugPrint('JSON Seeding Error: $e\n$stackTrace');
-      throw DatabaseException('حدث خطأ أثناء تحديث العطلات.');
+      throw const DatabaseException('حدث خطأ أثناء تحديث العطلات.');
     }
   }
 
@@ -123,7 +123,7 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
             ..orderBy([(t) => OrderingTerm.asc(t.startDate)])) // ترتيب تصاعدي
           .get();
     } catch (e) {
-      throw DatabaseException('فشل في جلب عطلات السنة المالية');
+      throw const DatabaseException('فشل في جلب عطلات السنة المالية');
     }
   }
 
@@ -138,7 +138,7 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
 
       return await query.getSingleOrNull();
     } catch (e) {
-      throw DatabaseException('فشل في جلب العطلة القادمة');
+      throw const DatabaseException('فشل في جلب العطلة القادمة');
     }
   }
 }

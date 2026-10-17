@@ -26,7 +26,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
       final result = await query.map((row) => row.read(countExp)).getSingle();
       return (result ?? 0) > 0;
     } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء التحقق من الإعدادات');
+      throw const DatabaseException('حدث خطأ أثناء التحقق من الإعدادات');
     }
   }
 
@@ -35,7 +35,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
     try {
       return await (db.select(db.settingsTable)..limit(1)).getSingle();
     } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء جلب الإعدادات');
+      throw const DatabaseException('حدث خطأ أثناء جلب الإعدادات');
     }
   }
 
@@ -48,7 +48,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
       );
     } catch (e) {
       debugPrint('Database Error: $e');
-      throw DatabaseException('حدث خطأ أثناء حفظ الإعدادات');
+      throw const DatabaseException('حدث خطأ أثناء حفظ الإعدادات');
     }
   }
 
@@ -60,7 +60,7 @@ class SettingsLocalDataSourceImpl implements SettingsLocalDataSource {
         await db.delete(db.restAllowancesTable).go();
       });
     } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء مسح السجلات');
+      throw const DatabaseException('حدث خطأ أثناء مسح السجلات');
     }
   }
 }

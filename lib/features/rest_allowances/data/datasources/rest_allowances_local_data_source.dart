@@ -29,7 +29,7 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
       await db.into(db.restAllowancesTable).insert(companion);
     } catch (e) {
       debugPrint('Database Error: $e');
-      throw DatabaseException('حدث خطأ أثناء حفظ السجل.');
+      throw const DatabaseException('حدث خطأ أثناء حفظ السجل.');
     }
   }
 
@@ -41,7 +41,7 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
             ..orderBy([(t) => OrderingTerm.desc(t.workStartDate)]))
           .get();
     } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء جلب السجلات.');
+      throw const DatabaseException('حدث خطأ أثناء جلب السجلات.');
     }
   }
 
@@ -62,7 +62,7 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
             .getSingle();
 
         if (original.isUsed) {
-          throw DatabaseException('هذا الرصيد تم استخدامه مسبقاً.');
+          throw const DatabaseException('هذا الرصيد تم استخدامه مسبقاً.');
         }
 
         if (original.daysCount == usedDaysCount) {
@@ -103,13 +103,13 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
             ),
           );
         } else {
-          throw DatabaseException('عدد أيام بدل الراحة المطلوبة يتجاوز الرصيد المتاح.');
+          throw const DatabaseException('عدد أيام بدل الراحة المطلوبة يتجاوز الرصيد المتاح.');
         }
       });
     } catch (e) {
       debugPrint('Transaction Error: $e');
       if (e is DatabaseException) rethrow;
-      throw DatabaseException('فشل في تحويل الرصيد إلى بدل راحة.');
+      throw const DatabaseException('فشل في تحويل الرصيد إلى بدل راحة.');
     }
   }
 
@@ -118,7 +118,7 @@ class RestAllowancesLocalDataSourceImpl implements RestAllowancesLocalDataSource
     try {
       await (db.delete(db.restAllowancesTable)..where((tbl) => tbl.id.equals(id))).go();
     } catch (e) {
-      throw DatabaseException('حدث خطأ أثناء محاولة الحذف.');
+      throw const DatabaseException('حدث خطأ أثناء محاولة الحذف.');
     }
   }
 }

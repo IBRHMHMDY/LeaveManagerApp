@@ -23,7 +23,7 @@ class LeavesLocalDataSourceImpl implements LeavesLocalDataSource {
     try {
       await db.into(db.leaveRecordsTable).insert(companion);
     } catch (e) {
-      throw DatabaseException('فشل في تسجيل الإجازة');
+      throw const DatabaseException('فشل في تسجيل الإجازة');
     }
   }
 
@@ -35,7 +35,7 @@ class LeavesLocalDataSourceImpl implements LeavesLocalDataSource {
             ..orderBy([(t) => OrderingTerm.desc(t.startDate)]))
           .get();
     } catch (e) {
-      throw DatabaseException('فشل في جلب سجلات الإجازات');
+      throw const DatabaseException('فشل في جلب سجلات الإجازات');
     }
   }
 
@@ -44,7 +44,7 @@ class LeavesLocalDataSourceImpl implements LeavesLocalDataSource {
     try {
       await (db.delete(db.leaveRecordsTable)..where((tbl) => tbl.id.equals(id))).go();
     } catch (e) {
-      throw DatabaseException('فشل في حذف الإجازة');
+      throw const DatabaseException('فشل في حذف الإجازة');
     }
   }
   
