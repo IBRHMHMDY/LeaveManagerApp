@@ -1,8 +1,10 @@
 // lib/features/notifications/presentation/bloc/notifications_bloc.dart
+import 'dart:async';
 import 'package:dartz/dartz.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/errors/failures.dart';
+import 'package:leave_manager/core/services/push_notification_service.dart';
 import 'package:leave_manager/core/usecases/base_usecase.dart';
 import 'package:leave_manager/features/notifications/domain/entities/app_notification_entity.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/clear_all_notifications_usecase.dart';
@@ -27,8 +29,11 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   final MarkAllNotificationsAsReadUseCase _markAllAsRead;
   final DeleteNotificationUseCase _deleteNotification;
   final ClearAllNotificationsUseCase _clearAllNotifications;
+  final PushNotificationService _pushNotificationService;
 
-  /// منشئ الكلاس يستقبل كافة الـ UseCases عبر الحقن التلقائي (Injectable).
+  StreamSubscription<AppNotificationEntity>? _foregroundNotificationSubscription;
+
+  /// منشئ الكلاس يستقبل كافة الـ UseCases وخدمة الإشعارات عبر الحقن التلقائي.
   NotificationsBloc({
     required SyncDeviceWithServerUseCase syncDeviceWithServer,
     required SaveNotificationUseCase saveNotification,
@@ -38,6 +43,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     required MarkAllNotificationsAsReadUseCase markAllAsRead,
     required DeleteNotificationUseCase deleteNotification,
     required ClearAllNotificationsUseCase clearAllNotifications,
+    required PushNotificationService pushNotificationService,
   })  : _syncDeviceWithServer = syncDeviceWithServer,
         _saveNotification = saveNotification,
         _getLocalNotifications = getLocalNotifications,
@@ -46,6 +52,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         _markAllAsRead = markAllAsRead,
         _deleteNotification = deleteNotification,
         _clearAllNotifications = clearAllNotifications,
+        _pushNotificationService = pushNotificationService,
         super(const NotificationsInitial()) {
     on<LoadNotificationsEvent>(_onLoadNotifications);
     on<SyncDeviceTokenEvent>(_onSyncDeviceToken);
@@ -54,6 +61,13 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     on<MarkAllNotificationsReadEvent>(_onMarkAllNotificationsRead);
     on<DeleteNotificationItemEvent>(_onDeleteNotificationItem);
     on<ClearAllNotificationsEvent>(_onClearAllNotifications);
+
+    // الاستماع للإشعارات الواردة أثناء فتح التطبيق
+    _foregroundNotificationSubscription = _pushNotificationService
+        .onForegroundNotificationStream
+        .listen((notification) {
+      add(ReceiveIncomingNotificationEvent(notification));
+    });
   }
 
   /// معالجة جلب قائمة الإشعارات وعدد غير المقروء بالتوازي لتحسين الأداء.
@@ -88,7 +102,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     );
   }
 
-  /// معالجة مزامنة الجهاز في الخلفية بصمت دون إزعاج المستخدم في وضع Offline.
+  /// معالجة مزامنة الجهاز في الخلفية بصمت.
   Future<void> _onSyncDeviceToken(
     SyncDeviceTokenEvent event,
     Emitter<NotificationsState> emit,
@@ -105,7 +119,9 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     result.fold(
       (failure) => emit(NotificationsError(failure.message)),
       (_) {
-        emit(IncomingNotificationAlertState(event.notification));
+        if (!event.notification.isRead) {
+          emit(IncomingNotificationAlertState(event.notification));
+        }
         add(const LoadNotificationsEvent());
       },
     );
@@ -182,5 +198,12 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         add(const LoadNotificationsEvent());
       },
     );
+  }
+
+  /// إغلاق اشتراك الـ Stream حتماً عند إغلاق الـ BLoC لمنع تسريب الذاكرة (Memory Leak).
+  @override
+  Future<void> close() async {
+    await _foregroundNotificationSubscription?.cancel();
+    return super.close();
   }
 }

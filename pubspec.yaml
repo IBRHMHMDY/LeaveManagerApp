@@ -54,7 +54,8 @@ dev_dependencies:
   flutter_native_splash: ^2.4.7   # لتسريع عرض الشاشه الاساسيه عند بدء التطبيق
   change_app_package_name: ^1.5.0 # تغيير اسم المكتبه الخاص بالتطبيق
   flutter_launcher_icons: ^0.14.4 #التحكم فى ايقونه التطبيق
-
+  bloc_test: ^9.1.0
+  mocktail: ^1.0.0
 flutter:
   # Material Icons font is
   uses-material-design: true

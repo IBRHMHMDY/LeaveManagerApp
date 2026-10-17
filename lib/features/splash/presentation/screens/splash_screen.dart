@@ -1,23 +1,30 @@
-// lib/app/splash/splash_screen.dart
+// lib/features/splash/presentation/screens/splash_screen.dart
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
-import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
-import 'package:leave_manager/features/settings/presentation/widgets/app_version.dart';
-import 'package:leave_manager/features/splash/presentation/widgets/custom_app_logo.dart';
+import 'package:leave_manager/core/services/push_notification_service.dart';
 import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_event.dart';
+import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'package:leave_manager/features/notifications/presentation/bloc/notifications_event.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_event.dart';
+import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_event.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
+import 'package:leave_manager/features/settings/presentation/widgets/app_version.dart';
+import 'package:leave_manager/features/splash/presentation/widgets/custom_app_logo.dart';
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
-import '../../../settings/presentation/bloc/settings_bloc.dart';
 
+/// شاشة الإقلاع والتهيئة الأولية للتطبيق.
 class SplashScreen extends StatefulWidget {
+  /// منشئ ثابت.
   const SplashScreen({super.key});
 
   @override
@@ -26,10 +33,10 @@ class SplashScreen extends StatefulWidget {
 
 class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _logoScaleAnimation;
-  late Animation<Offset> _textSlideAnimation;
-  late Animation<double> _fadeAnimation;
+  late final AnimationController _animationController;
+  late final Animation<double> _logoScaleAnimation;
+  late final Animation<Offset> _textSlideAnimation;
+  late final Animation<double> _fadeAnimation;
 
   @override
   void initState() {
@@ -50,11 +57,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     _textSlideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
-          ),
-        );
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
@@ -73,12 +80,18 @@ class _SplashScreenState extends State<SplashScreen>
       if (mounted) {
         context.read<SettingsBloc>().add(CheckSettingsEvent());
       }
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('Splash Init Error: $e\n$stackTrace');
       if (mounted) {
-        AppToast.showError(context, 'حدث خطأ أثناء التهيئة.');
+        AppToast.showError(context, 'حدث خطأ أثناء تهيئة التطبيق.');
         context.go(AppRouter.setup);
       }
     }
+  }
+
+  /// تشغيل خدمة الإشعارات ومزامنة الجهاز في الخلفية دون تعطيل الانتقال للشاشة الرئيسية.
+  void _triggerBackgroundPushSync() {
+    unawaited(sl<PushNotificationService>().initialize());
   }
 
   @override
@@ -96,6 +109,11 @@ class _SplashScreenState extends State<SplashScreen>
           context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
           context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
           context.read<HolidaysCubit>().loadHolidays();
+          context
+              .read<NotificationsBloc>()
+              .add(const LoadNotificationsEvent());
+
+          _triggerBackgroundPushSync();
 
           SystemChrome.setEnabledSystemUIMode(
             SystemUiMode.manual,
@@ -103,6 +121,12 @@ class _SplashScreenState extends State<SplashScreen>
           );
           context.go(AppRouter.home);
         } else if (state is SettingsNotFound) {
+          context
+              .read<NotificationsBloc>()
+              .add(const LoadNotificationsEvent());
+
+          _triggerBackgroundPushSync();
+
           SystemChrome.setEnabledSystemUIMode(
             SystemUiMode.manual,
             overlays: SystemUiOverlay.values,
@@ -125,9 +149,7 @@ class _SplashScreenState extends State<SplashScreen>
                 height: 250,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: context.colorScheme.primary.withOpacity(
-                    0.06,
-                  ), // بديل withAlpha(15)
+                  color: context.colorScheme.primary.withAlpha(15),
                 ),
               ),
             ),
@@ -139,7 +161,7 @@ class _SplashScreenState extends State<SplashScreen>
                 height: 200,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: context.colorScheme.secondary.withOpacity(0.06),
+                  color: context.colorScheme.secondary.withAlpha(15),
                 ),
               ),
             ),
@@ -174,7 +196,7 @@ class _SplashScreenState extends State<SplashScreen>
                             ),
                             decoration: BoxDecoration(
                               color: context.colorScheme.primaryContainer
-                                  .withOpacity(0.6), // بديل withAlpha(150)
+                                  .withAlpha(150),
                               borderRadius: BorderRadius.circular(20),
                             ),
                             child: Text(
@@ -205,7 +227,7 @@ class _SplashScreenState extends State<SplashScreen>
                       height: 32,
                       child: CircularProgressIndicator(
                         strokeWidth: 3.5,
-                        color: context.colorScheme.primary.withOpacity(0.6),
+                        color: context.colorScheme.primary.withAlpha(150),
                         strokeCap: StrokeCap.round,
                       ),
                     ),
