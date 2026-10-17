@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "758698045364",
+    "project_id": "notifierssystem",
+    "storage_bucket": "notifierssystem.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:758698045364:android:bd6e9df6ed8eaa88bc8ce1",
+        "android_client_info": {
+          "package_name": "com.ibrahimhamdy.leavemanager"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAeEXs49kXjzGkdkROhwgIka9EGJ-jXOAM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
