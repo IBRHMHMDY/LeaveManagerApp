@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/router/app_router.dart';
-import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
-import 'package:leave_manager/core/utils/extenstions/string_extension.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/date_extension.dart';
+import 'package:leave_manager/core/utils/extensions/string_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 
 class UpcomingHolidayCard extends StatelessWidget {

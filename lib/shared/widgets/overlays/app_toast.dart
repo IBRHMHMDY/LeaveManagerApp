@@ -1,7 +1,7 @@
 // lib/shared/widgets/show_toast.dart
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 class AppToast {
   static OverlayEntry? _currentOverlay;

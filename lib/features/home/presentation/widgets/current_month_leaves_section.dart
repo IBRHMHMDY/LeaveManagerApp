@@ -1,8 +1,8 @@
 // lib/features/home/presentation/widgets/build_current_month_leaves.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/date_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_record_entity.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/leave_card.dart';
 import 'package:leave_manager/features/rest_allowances/domain/entities/extra_work_record_entity.dart';

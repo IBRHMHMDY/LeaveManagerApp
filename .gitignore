@@ -52,3 +52,11 @@ android/key.properties
 
 # Environment File
 .env
+
+# Build files
+/build/
+android/build/
+android/app/build/
+android/.gradle/
+
+firebase.json

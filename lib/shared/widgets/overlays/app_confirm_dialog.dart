@@ -1,7 +1,7 @@
 // lib/shared/widgets/overlays/app_confirm_dialog.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 class AppConfirmDialog extends StatelessWidget {
   final String title;

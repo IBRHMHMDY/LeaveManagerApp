@@ -1,7 +1,7 @@
 // lib/shared/widgets/buttons/share_app_button.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/core/utils/share_service.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 

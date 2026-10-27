@@ -1,6 +1,6 @@
 // lib/app/splash/widgets/custom_app_logo_icon.dart
 import 'package:flutter/material.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 class CustomAppLogoIcon extends StatelessWidget {
   // تم تنظيف الـ Constructor

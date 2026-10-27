@@ -2,8 +2,8 @@
 import 'package:flutter/material.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/date_extension.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/date_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 class AppDateRangePicker extends StatelessWidget {
   final DateTime? startDate;

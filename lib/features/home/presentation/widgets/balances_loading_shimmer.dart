@@ -1,6 +1,6 @@
 // lib/features/home/presentation/widgets/balances_loading_shimmer.dart
 import 'package:flutter/material.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 

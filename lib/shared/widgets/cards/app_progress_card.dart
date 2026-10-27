@@ -1,7 +1,7 @@
 // lib/shared/widgets/cards/app_progress_card.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 /// بطاقة شريط التقدم العامة لعرض الإحصائيات أو الأرصدة
 /// مصممة لتكون قابلة لإعادة الاستخدام مع دعم الوضعين الفاتح والمظلم

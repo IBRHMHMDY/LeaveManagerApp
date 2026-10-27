@@ -1,6 +1,6 @@
 // lib/app/splash/widgets/custom_app_logo.dart
 import 'package:flutter/material.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 class CustomAppLogo extends StatelessWidget {
   // تم إزالة BuildContext من الـ Constructor لعدم الحاجة إليه

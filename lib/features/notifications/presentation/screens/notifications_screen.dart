@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/presentation/widgets/leave_list_shimmer.dart';
 import 'package:leave_manager/features/notifications/domain/entities/app_notification_entity.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';

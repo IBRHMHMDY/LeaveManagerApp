@@ -1,7 +1,7 @@
 // lib/shared/widgets/inputs/app_filter_chips.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 /// نموذج بيانات لتمثيل عنصر واحد داخل خيارات الفلترة
 class AppFilterChipItem<T> {

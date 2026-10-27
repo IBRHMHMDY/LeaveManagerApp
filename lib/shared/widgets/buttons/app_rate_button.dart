@@ -1,6 +1,6 @@
 // lib/shared/widgets/buttons/app_rate_button.dart
 import 'package:flutter/material.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/core/utils/store_launcher_service.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 

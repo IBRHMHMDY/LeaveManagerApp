@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_cubit.dart';
 import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_state.dart';
 import 'package:leave_manager/core/utils/store_launcher_service.dart';

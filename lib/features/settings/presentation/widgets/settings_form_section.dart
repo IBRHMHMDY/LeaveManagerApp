@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/enums/financial_year_type.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/shared/widgets/inputs/app_counter_row.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
 

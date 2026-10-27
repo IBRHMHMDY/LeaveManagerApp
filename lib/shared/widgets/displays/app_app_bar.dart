@@ -2,7 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/router/app_router.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 /// ويدجت عامة لـ AppBar تدعم التخصيص الكامل للعنوان، الأيقونات، والتوسيط.
 /// مطابقة لمعايير Flutter 2026 (Immutable State, Const Constructors, Null Safety).

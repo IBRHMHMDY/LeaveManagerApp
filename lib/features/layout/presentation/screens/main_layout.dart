@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/core/utils/layout_constants.dart';
 import 'package:leave_manager/features/layout/presentation/cubit/layout_cubit.dart';
 import 'package:leave_manager/features/layout/presentation/cubit/layout_state.dart';

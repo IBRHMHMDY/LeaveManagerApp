@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/router/app_router.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/features/leaves/domain/entities/leave_balance_entity.dart';
 import 'package:leave_manager/features/settings/domain/entities/settings_entity.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart'; // يجلب كل الويدجتس العامة

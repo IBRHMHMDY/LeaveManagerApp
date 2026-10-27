@@ -1,7 +1,7 @@
 // lib/shared/widgets/inputs/app_number_counter.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 /// ويدجت عام لعداد أرقام (زيادة ونقصان) يدعم الحدود الدنيا والقصوى
 class AppCounterColumn extends StatelessWidget {

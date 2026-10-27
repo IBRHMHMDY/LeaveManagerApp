@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 class AppIconButton extends StatelessWidget {
   final VoidCallback? onPressed; // Nullable لتمكين تعطيل الزر (Disabled state)

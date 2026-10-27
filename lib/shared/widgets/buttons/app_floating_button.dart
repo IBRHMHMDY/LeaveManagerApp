@@ -1,6 +1,6 @@
 // lib/shared/widgets/buttons/app_floating_button.dart
 import 'package:flutter/material.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 enum _FloatingType { iconOnly, extended }
 

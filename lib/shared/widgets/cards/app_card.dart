@@ -1,7 +1,7 @@
 // lib/shared/widgets/cards/app_card.dart
 import 'package:flutter/material.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
-import 'package:leave_manager/core/utils/extenstions/theme_extension.dart';
+import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 
 class AppCard extends StatelessWidget {
   final Widget child;

@@ -5,10 +5,10 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 abstract final class ApiConstants {
   /// الرابط الأساسي للـ API من ملف البيئة.
   static String get baseUrl =>
-      dotenv.env['NOTIFIER_BASE_URL'] ?? 'https://localhost/api/v1';
+      dotenv.env['BASE_URL'] ?? 'https://localhost/api/v1';
 
   /// مفتاح المصادقة الخاص بتطبيق Leave Manager.
-  static String get appKey => dotenv.env['NOTIFIER_APP_KEY'] ?? '';
+  static String get appKey => dotenv.env['APP_KEY'] ?? '';
 
   /// اسم الترويسة المطلوبة في Middleware (VerifyAppKey) داخل نظام Laravel.
   static const String appKeyHeader = 'X-App-Key';
