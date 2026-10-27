@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/services/firebase_background_handler.dart';
+import 'package:leave_manager/firebase_options.dart';
 
 /// مسؤول عن تهيئة كافة الخدمات الأساسية قبل استدعاء runApp.
 abstract final class AppBootstrapper {
@@ -23,7 +24,9 @@ abstract final class AppBootstrapper {
     // 3. تهيئة خدمات Firebase وتسجيل معالج الرسائل الخلفية
     try {
       if (Firebase.apps.isEmpty) {
-        await Firebase.initializeApp();
+        await Firebase.initializeApp(
+          options: DefaultFirebaseOptions.currentPlatform,
+        );
       }
       FirebaseMessaging.onBackgroundMessage(
         firebaseMessagingBackgroundHandler,

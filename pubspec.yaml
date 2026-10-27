@@ -42,6 +42,7 @@ dependencies:
   # Firebase & Push Notifications
   firebase_core: ^3.8.0
   firebase_messaging: ^15.1.0
+  flutter_local_notifications: ^18.0.1
   permission_handler: ^11.3.0
   
 dev_dependencies:
@@ -60,6 +61,7 @@ flutter:
   # Material Icons font is
   uses-material-design: true
   assets:
+    - .env
     - assets/fonts/
     - assets/json/
   fonts:

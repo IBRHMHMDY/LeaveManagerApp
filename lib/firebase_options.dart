@@ -53,10 +53,10 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAeEXs49kXjzGkdkROhwgIka9EGJ-jXOAM',
-    appId: '1:758698045364:android:bd6e9df6ed8eaa88bc8ce1',
-    messagingSenderId: '758698045364',
-    projectId: 'notifierssystem',
-    storageBucket: 'notifierssystem.firebasestorage.app',
+    apiKey: 'AIzaSyBtR-0vorQEt_lIkOnnGNs7omF4wPGRTBw',
+    appId: '1:179629962060:android:c504d1c931948cf579d5e9',
+    messagingSenderId: '179629962060',
+    projectId: 'leavemanager-96d97',
+    storageBucket: 'leavemanager-96d97.firebasestorage.app',
   );
 }

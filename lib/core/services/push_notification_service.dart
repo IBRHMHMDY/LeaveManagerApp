@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/utils/AppVersions/app_version_service.dart';
@@ -15,14 +16,19 @@ import 'package:leave_manager/features/notifications/domain/usecases/sync_device
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-/// الخدمة المركزية لإدارة إشعارات الدفع (FCM)، الصلاحيات، ومزامنة الجهاز مع الخادم.
-/// ملتزمة بمعايير AMD 2026 في إدارة الـ Streams ومنع Memory Leaks.
+/// معرف قناة الإشعارات عالية الأهمية (يجب أن يطابق القيمة في AndroidManifest.xml).
+const String kHighImportanceChannelId =
+    'leave_manager_high_importance_channel';
+
+/// الخدمة المركزية لإدارة إشعارات الدفع (FCM)، القنوات المحلية، ومزامنة الجهاز.
+/// ملتزمة بمعايير وثيقة AMD 2026 في إدارة الـ Streams ومنع Memory Leaks.
 @lazySingleton
 class PushNotificationService {
   final SyncDeviceWithServerUseCase _syncDeviceWithServer;
   final SaveNotificationUseCase _saveNotification;
+  final FlutterLocalNotificationsPlugin _localNotificationsPlugin =
+      FlutterLocalNotificationsPlugin();
 
-  /// بث داخلي لإبلاغ طبقة الـ Presentation (NotificationsBloc) بوصول إشعار جديد.
   final StreamController<AppNotificationEntity> _foregroundMessageController =
       StreamController<AppNotificationEntity>.broadcast();
 
@@ -38,16 +44,15 @@ class PushNotificationService {
     this._saveNotification,
   );
 
-  /// Stream يستمع إليه [NotificationsBloc] لتحديث الواجهة فور وصول إشعار أثناء فتح التطبيق.
+  /// Stream يستمع إليه [NotificationsBloc] لتحديث الواجهة فور وصول إشعار.
   Stream<AppNotificationEntity> get onForegroundNotificationStream =>
       _foregroundMessageController.stream;
 
-  /// تهيئة مستمعات Firebase، طلب الصلاحيات، ومزامنة التوكن في الخلفية بدون حجب الواجهة.
+  /// تهيئة القنوات المحلية، مستمعات Firebase، طلب الصلاحيات، ومزامنة الـ Token.
   Future<void> initialize() async {
     if (_isInitialized) return;
 
     try {
-      // التحقق من أن Firebase مهيأ بنجاح قبل استدعاء FirebaseMessaging
       if (Firebase.apps.isEmpty) {
         debugPrint('PushNotificationService: Firebase is not initialized.');
         return;
@@ -55,46 +60,50 @@ class PushNotificationService {
 
       final messaging = FirebaseMessaging.instance;
 
-      // 1. طلب الصلاحيات (Android 13+ & iOS)
+      // 1. طلب الصلاحيات أولاً (Android 13+ & iOS)
       final hasPermission = await _requestNotificationPermissions(messaging);
       if (!hasPermission) {
         debugPrint('PushNotificationService: Notification permission denied.');
         return;
       }
 
-      // 2. إعداد خيارات العرض الأمامي لنظام iOS
+      // 2. تهيئة قناة الإشعارات المحلية للأندرويد و iOS
+      await _initLocalNotificationsChannel();
+
+      // 3. إعداد خيارات العرض الأمامي لنظام iOS
       await messaging.setForegroundNotificationPresentationOptions(
         alert: true,
         badge: true,
         sound: true,
       );
 
-      // 3. الاستماع للرسائل أثناء فتح التطبيق (Foreground)
+      // 4. الاستماع للرسائل أثناء فتح التطبيق (Foreground)
       _onMessageSubscription = FirebaseMessaging.onMessage.listen(
         _handleForegroundMessage,
       );
 
-      // 4. الاستماع لنقر المستخدم على الإشعار عندما يكون التطبيق في الخلفية (Background)
+      // 5. الاستماع لنقر المستخدم على الإشعار من الخلفية (Background)
       _onMessageOpenedAppSubscription =
           FirebaseMessaging.onMessageOpenedApp.listen(
         _handleNotificationTapFromBackground,
       );
 
-      // 5. التحقق مما إذا كان التطبيق قد فُتح من وضع الإغلاق التام (Terminated) عبر إشعار
+      // 6. التحقق مما إذا كان التطبيق قد فُتح من وضع الإغلاق التام (Terminated)
       final initialMessage = await messaging.getInitialMessage();
       if (initialMessage != null) {
         await _handleNotificationTapFromBackground(initialMessage);
       }
 
-      // 6. الاستماع لتجديد رمز الـ FCM تلقائياً ومزامنته مع AppsNotifiersSystem
+      // 7. الاستماع لتجديد رمز الـ FCM تلقائياً ومزامنته مع الخادم
       _onTokenRefreshSubscription = messaging.onTokenRefresh.listen(
         (newToken) => _syncTokenWithServer(newToken, forceSync: true),
       );
 
-      // 7. جلب التوكن الحالي ومزامنته مع الخادم بصمت
+      // 8. جلب التوكن الحالي ومزامنته مع الخادم
       final currentToken = await messaging.getToken();
       if (currentToken != null && currentToken.isNotEmpty) {
-        await _syncTokenWithServer(currentToken);
+        debugPrint('FCM Device Token: $currentToken');
+        await _syncTokenWithServer(currentToken, forceSync: true);
       }
 
       _isInitialized = true;
@@ -103,7 +112,41 @@ class PushNotificationService {
     }
   }
 
-  /// طلب صلاحيات الإشعارات باستخدام permission_handler و FirebaseMessaging.
+  /// إنشاء قناة إشعارات عالية الأهمية على نظام Android لضمان ظهور التنبيه وصوته.
+  Future<void> _initLocalNotificationsChannel() async {
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/launcher_icon');
+    const iosSettings = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(
+      android: androidSettings,
+      iOS: iosSettings,
+    );
+
+    await _localNotificationsPlugin.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: (NotificationResponse response) {
+        _navigateByActionUrl(response.payload);
+      },
+    );
+
+    if (Platform.isAndroid) {
+      const androidChannel = AndroidNotificationChannel(
+        kHighImportanceChannelId,
+        'إشعارات مدير إجازاتي الهامة',
+        description: 'قناة مخصصة لاستقبال التنبيهات والتحديثات الإدارية.',
+        importance: Importance.max,
+        playSound: true,
+        enableVibration: true,
+      );
+
+      await _localNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+              AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(androidChannel);
+    }
+  }
+
+  /// طلب صلاحيات الإشعارات للنظام.
   Future<bool> _requestNotificationPermissions(
     FirebaseMessaging messaging,
   ) async {
@@ -154,27 +197,51 @@ class PushNotificationService {
     }
   }
 
-  /// معالجة الإشعار الوارد أثناء استخدام الموظف للتطبيق (Foreground).
+  /// معالجة الإشعار الوارد أثناء فتح التطبيق وإظهار إشعار محلي في شريط النظام أيضاً.
   Future<void> _handleForegroundMessage(RemoteMessage message) async {
     final entity = message.toDomainEntity();
     if (!_foregroundMessageController.isClosed) {
       _foregroundMessageController.add(entity);
     }
+
+    // إظهار إشعار فعلي في شريط الهاتف العلوي حتى لو كان التطبيق مفتوحاً
+    const androidDetails = AndroidNotificationDetails(
+      kHighImportanceChannelId,
+      'إشعارات مدير إجازاتي الهامة',
+      channelDescription: 'قناة مخصصة لاستقبال التنبيهات والتحديثات الإدارية.',
+      importance: Importance.max,
+      priority: Priority.high,
+      icon: '@mipmap/launcher_icon',
+    );
+
+    const notificationDetails = NotificationDetails(android: androidDetails);
+
+    await _localNotificationsPlugin.show(
+      entity.hashCode,
+      entity.title,
+      entity.body,
+      notificationDetails,
+      payload: entity.actionUrl,
+    );
   }
 
-  /// معالجة نقر الموظف على الإشعار من شريط إشعارات النظام (Background / Terminated).
+  /// معالجة نقر الموظف على الإشعار من الخلفية (Background / Terminated).
   Future<void> _handleNotificationTapFromBackground(
     RemoteMessage message,
   ) async {
     final entity = message.toDomainEntity().copyWith(isRead: true);
     await _saveNotification(entity);
 
-    // تحديث الواجهة إذا كان التطبيق مفتوحاً في الخلفية
     if (!_foregroundMessageController.isClosed) {
       _foregroundMessageController.add(entity);
     }
 
-    final actionUrl = entity.actionUrl?.trim();
+    await _navigateByActionUrl(entity.actionUrl);
+  }
+
+  /// توجيه المستخدم بناءً على الرابط المرفق في الإشعار عبر GoRouter.
+  Future<void> _navigateByActionUrl(String? rawActionUrl) async {
+    final actionUrl = rawActionUrl?.trim();
     if (actionUrl != null && actionUrl.isNotEmpty) {
       if (actionUrl.startsWith('/')) {
         AppRouter.router.push(actionUrl);
@@ -187,12 +254,10 @@ class PushNotificationService {
         }
       }
     }
-
-    // التوجيه الافتراضي إلى شاشة سجل الإشعارات
-    AppRouter.router.push('/notifications');
+    AppRouter.router.push(AppRouter.notifications);
   }
 
-  /// إغلاق جميع الـ Streams والاشتراكات لمنع تسريب الذاكرة (Memory Leaks) عند إعادة تشغيل التطبيق.
+  /// إغلاق جميع الـ Streams والاشتراكات لمنع تسريب الذاكرة (Memory Leaks).
   @disposeMethod
   Future<void> dispose() async {
     await _onMessageSubscription?.cancel();

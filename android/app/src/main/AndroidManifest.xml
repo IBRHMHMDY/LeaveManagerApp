@@ -11,6 +11,16 @@
         android:allowBackup="false"
         android:fullBackupContent="false"
         android:enableOnBackInvokedCallback="true">
+        
+        <!-- تحديد قناة الإشعارات الافتراضية عالية الأهمية لـ Firebase Messaging -->
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_channel_id"
+            android:value="leave_manager_high_importance_channel" />
+
+        <meta-data
+            android:name="com.google.firebase.messaging.default_notification_icon"
+            android:resource="@mipmap/launcher_icon" />
+
         <activity
             android:name=".MainActivity"
             android:exported="true"
