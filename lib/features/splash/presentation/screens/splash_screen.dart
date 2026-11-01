@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
+import 'package:leave_manager/core/network/network_info.dart';
 import 'package:leave_manager/core/router/app_router.dart';
 import 'package:leave_manager/core/services/push_notification_service.dart';
 import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
@@ -90,8 +91,18 @@ class _SplashScreenState extends State<SplashScreen>
   }
 
   /// تشغيل خدمة الإشعارات ومزامنة الجهاز في الخلفية دون تعطيل الانتقال للشاشة الرئيسية.
-  void _triggerBackgroundPushSync() {
-    unawaited(sl<PushNotificationService>().initialize());
+  Future<void> _triggerBackgroundPushSync() async {
+    try {
+      final isConnected = await sl<NetworkInfo>().isConnected;
+      if (!isConnected) {
+        if (mounted) AppToast.showWarning(context, 'التطبيق يعمل في وضع عدم الاتصال، تمت جدولة ربط الجهاز لاحقاً.');
+        return;
+      }
+      await sl<PushNotificationService>().initialize();
+      // سيتم إرسال حدث SyncDeviceTokenEvent تلقائياً بعد تهيئة الإشعارات بنجاح
+    } catch (e) {
+      debugPrint('Background sync bypassed: $e');
+    }
   }
 
   @override

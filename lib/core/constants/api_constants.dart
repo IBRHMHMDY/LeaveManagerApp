@@ -14,10 +14,10 @@ abstract final class ApiConstants {
   static const String appKeyHeader = 'X-App-Key';
 
   /// نقطة النهاية لمزامنة بيانات الجهاز ورمز FCM.
-  static const String syncDeviceEndpoint = '/devices/sync';
+  static const String syncDevice = '/devices/sync';
 
   /// نقطة النهاية للتحقق من تحديثات التطبيق.
-  static const String checkUpdateEndpoint = '/updates/check';
+  static const String checkUpdate = '/updates/check';
 
   /// مهلة الاتصال والرد الافتراضية.
   static const Duration connectTimeout = Duration(seconds: 15);

@@ -76,3 +76,11 @@ class NotificationsError extends NotificationsState {
   @override
   List<Object?> get props => [message];
 }
+
+/// حالة رفض صلاحية الإشعارات لعرض رسالة توجيهية
+class NotificationPermissionDeniedState extends NotificationsState {
+  final String message;
+  const NotificationPermissionDeniedState(this.message);
+  @override
+  List<Object?> get props => [message];
+}

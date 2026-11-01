@@ -17,6 +17,7 @@ import 'package:leave_manager/features/home/presentation/widgets/welcome_card.da
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_bloc.dart';
 import 'package:leave_manager/features/leaves/presentation/blocs/leaves_state.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
+import 'package:leave_manager/features/notifications/presentation/bloc/notifications_event.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_state.dart';
 import 'package:leave_manager/features/notifications/presentation/widgets/notification_bell_button.dart';
 import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_allowances_bloc.dart';
@@ -39,6 +40,11 @@ class _HomeScreenState extends State<HomeScreen> {
   void initState() {
     super.initState();
     context.read<HomeCubit>().loadHomeData();
+
+    // طلب الصلاحيات بمرونة بعد الدخول للشاشة الرئيسية
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      context.read<NotificationsBloc>().add(const RequestNotificationPermissionEvent());
+    });
   }
 
   @override
@@ -83,6 +89,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   context,
                   '${state.notification.title}: ${state.notification.body}',
                 );
+              } else if (state is NotificationPermissionDeniedState) {
+                AppToast.showWarning(context, state.message);
               }
             },
           ),

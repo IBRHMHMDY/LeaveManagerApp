@@ -60,3 +60,4 @@ android/app/build/
 android/.gradle/
 
 firebase.json
+firebase_options.dart

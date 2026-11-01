@@ -1,6 +1,7 @@
 // lib/features/notifications/presentation/bloc/notifications_bloc.dart
 import 'dart:async';
 import 'package:dartz/dartz.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/errors/failures.dart';
@@ -31,7 +32,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   final ClearAllNotificationsUseCase _clearAllNotifications;
   final PushNotificationService _pushNotificationService;
 
-  StreamSubscription<AppNotificationEntity>? _foregroundNotificationSubscription;
+  StreamSubscription<AppNotificationEntity>?
+  _foregroundNotificationSubscription;
 
   /// منشئ الكلاس يستقبل كافة الـ UseCases وخدمة الإشعارات عبر الحقن التلقائي.
   NotificationsBloc({
@@ -44,16 +46,16 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     required DeleteNotificationUseCase deleteNotification,
     required ClearAllNotificationsUseCase clearAllNotifications,
     required PushNotificationService pushNotificationService,
-  })  : _syncDeviceWithServer = syncDeviceWithServer,
-        _saveNotification = saveNotification,
-        _getLocalNotifications = getLocalNotifications,
-        _getUnreadCount = getUnreadCount,
-        _markAsRead = markAsRead,
-        _markAllAsRead = markAllAsRead,
-        _deleteNotification = deleteNotification,
-        _clearAllNotifications = clearAllNotifications,
-        _pushNotificationService = pushNotificationService,
-        super(const NotificationsInitial()) {
+  }) : _syncDeviceWithServer = syncDeviceWithServer,
+       _saveNotification = saveNotification,
+       _getLocalNotifications = getLocalNotifications,
+       _getUnreadCount = getUnreadCount,
+       _markAsRead = markAsRead,
+       _markAllAsRead = markAllAsRead,
+       _deleteNotification = deleteNotification,
+       _clearAllNotifications = clearAllNotifications,
+       _pushNotificationService = pushNotificationService,
+       super(const NotificationsInitial()) {
     on<LoadNotificationsEvent>(_onLoadNotifications);
     on<SyncDeviceTokenEvent>(_onSyncDeviceToken);
     on<ReceiveIncomingNotificationEvent>(_onReceiveIncomingNotification);
@@ -61,13 +63,14 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     on<MarkAllNotificationsReadEvent>(_onMarkAllNotificationsRead);
     on<DeleteNotificationItemEvent>(_onDeleteNotificationItem);
     on<ClearAllNotificationsEvent>(_onClearAllNotifications);
+    on<RequestNotificationPermissionEvent>(_onRequestNotificationPermission);
 
     // الاستماع للإشعارات الواردة أثناء فتح التطبيق
     _foregroundNotificationSubscription = _pushNotificationService
         .onForegroundNotificationStream
         .listen((notification) {
-      add(ReceiveIncomingNotificationEvent(notification));
-    });
+          add(ReceiveIncomingNotificationEvent(notification));
+        });
   }
 
   /// معالجة جلب قائمة الإشعارات وعدد غير المقروء بالتوازي لتحسين الأداء.
@@ -88,18 +91,17 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         results[0] as Either<Failure, List<AppNotificationEntity>>;
     final countResult = results[1] as Either<Failure, int>;
 
-    listResult.fold(
-      (failure) => emit(NotificationsError(failure.message)),
-      (notifications) {
-        final unreadCount = countResult.getOrElse(() => 0);
-        emit(
-          NotificationsLoaded(
-            notifications: List.unmodifiable(notifications),
-            unreadCount: unreadCount,
-          ),
-        );
-      },
-    );
+    listResult.fold((failure) => emit(NotificationsError(failure.message)), (
+      notifications,
+    ) {
+      final unreadCount = countResult.getOrElse(() => 0);
+      emit(
+        NotificationsLoaded(
+          notifications: List.unmodifiable(notifications),
+          unreadCount: unreadCount,
+        ),
+      );
+    });
   }
 
   /// معالجة مزامنة الجهاز في الخلفية بصمت.
@@ -116,15 +118,12 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     Emitter<NotificationsState> emit,
   ) async {
     final result = await _saveNotification(event.notification);
-    result.fold(
-      (failure) => emit(NotificationsError(failure.message)),
-      (_) {
-        if (!event.notification.isRead) {
-          emit(IncomingNotificationAlertState(event.notification));
-        }
-        add(const LoadNotificationsEvent());
-      },
-    );
+    result.fold((failure) => emit(NotificationsError(failure.message)), (_) {
+      if (!event.notification.isRead) {
+        emit(IncomingNotificationAlertState(event.notification));
+      }
+      add(const LoadNotificationsEvent());
+    });
   }
 
   /// معالجة تحديد إشعار واحد كمقروء.
@@ -133,13 +132,10 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     Emitter<NotificationsState> emit,
   ) async {
     final result = await _markAsRead(event.notificationId);
-    result.fold(
-      (failure) {
-        emit(NotificationsError(failure.message));
-        add(const LoadNotificationsEvent());
-      },
-      (_) => add(const LoadNotificationsEvent()),
-    );
+    result.fold((failure) {
+      emit(NotificationsError(failure.message));
+      add(const LoadNotificationsEvent());
+    }, (_) => add(const LoadNotificationsEvent()));
   }
 
   /// معالجة تحديد جميع الإشعارات كمقروءة.
@@ -155,9 +151,7 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       },
       (_) {
         emit(
-          const NotificationsActionSuccess(
-            'تم تحديد جميع الإشعارات كمقروءة.',
-          ),
+          const NotificationsActionSuccess('تم تحديد جميع الإشعارات كمقروءة.'),
         );
         add(const LoadNotificationsEvent());
       },
@@ -198,6 +192,25 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
         add(const LoadNotificationsEvent());
       },
     );
+  }
+
+  Future<void> _onRequestNotificationPermission(
+    RequestNotificationPermissionEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
+    try {
+      final isGranted = await _pushNotificationService
+          .requestNotificationPermissions();
+      if (!isGranted) {
+        emit(
+          const NotificationPermissionDeniedState(
+            'تم تعطيل الإشعارات، يمكنك تفعيلها لاحقاً من الإعدادات.',
+          ),
+        );
+      }
+    } catch (e) {
+      debugPrint('Permission Request Error: $e');
+    }
   }
 
   /// إغلاق اشتراك الـ Stream حتماً عند إغلاق الـ BLoC لمنع تسريب الذاكرة (Memory Leak).

@@ -77,3 +77,8 @@ class ClearAllNotificationsEvent extends NotificationsEvent {
   /// منشئ ثابت.
   const ClearAllNotificationsEvent();
 }
+
+/// المرحلة 3: حدث طلب صلاحية الإشعارات بمرونة
+class RequestNotificationPermissionEvent extends NotificationsEvent {
+  const RequestNotificationPermissionEvent();
+}

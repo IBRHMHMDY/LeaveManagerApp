@@ -26,7 +26,7 @@ class NotificationsRemoteDataSourceImpl
   Future<void> syncDevice(DeviceSyncRequestModel requestModel) async {
     try {
       final response = await _dioClient.dio.post<Map<String, dynamic>>(
-        ApiConstants.syncDeviceEndpoint,
+        ApiConstants.syncDevice,
         data: requestModel.toJson(),
       );
 

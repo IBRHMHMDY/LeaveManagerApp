@@ -348,13 +348,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i563.NotificationsRepository>(),
       ),
     );
-    gh.lazySingleton<_i63.PushNotificationService>(
-      () => _i63.PushNotificationService(
-        gh<_i568.SyncDeviceWithServerUseCase>(),
-        gh<_i740.SaveNotificationUseCase>(),
-      ),
-      dispose: (i) => i.dispose(),
-    );
     gh.factory<_i673.RestAllowancesBloc>(
       () => _i673.RestAllowancesBloc(
         getExtraWorkRecords: gh<_i804.GetExtraWorkRecordsUseCase>(),
@@ -370,6 +363,10 @@ extension GetItInjectableX on _i174.GetIt {
         checkDateOverlap: gh<_i707.CheckDateOverlapUseCase>(),
         getSettings: gh<_i1029.GetSettingsUseCase>(),
       ),
+    );
+    gh.lazySingleton<_i63.PushNotificationService>(
+      () => _i63.PushNotificationService(gh<_i740.SaveNotificationUseCase>()),
+      dispose: (i) => i.dispose(),
     );
     gh.factory<_i1041.NotificationsBloc>(
       () => _i1041.NotificationsBloc(
