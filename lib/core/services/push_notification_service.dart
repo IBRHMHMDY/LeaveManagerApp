@@ -6,13 +6,13 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
-import 'package:leave_manager/core/utils/AppVersions/app_version_service.dart';
 import 'package:leave_manager/features/notifications/data/models/notification_mapper.dart';
 import 'package:leave_manager/features/notifications/domain/entities/app_notification_entity.dart';
 import 'package:leave_manager/features/notifications/domain/entities/device_sync_params.dart';
 import 'package:leave_manager/features/notifications/domain/usecases/save_notification_usecase.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
 import 'package:leave_manager/features/notifications/presentation/bloc/notifications_event.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -69,7 +69,7 @@ class PushNotificationService {
   void _dispatchSyncEvent(String token) async {
     try {
       final osType = Platform.isIOS ? 'ios' : 'android';
-      final appVersion = await AppVersionService.getVersionOnly();
+      final appVersion = (await PackageInfo.fromPlatform()).version;
       
       final params = DeviceSyncParams(
         fcmToken: token,

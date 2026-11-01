@@ -1,6 +1,7 @@
 // lib/core/router/app_router.dart
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:leave_manager/features/app_updates/presentation/screens/force_update_screen.dart';
 import 'package:leave_manager/features/holidays/domain/entities/holiday_entity.dart';
 import 'package:leave_manager/features/holidays/presentation/screens/holidays_screen.dart';
 import 'package:leave_manager/features/home/presentation/screens/home_screen.dart';
@@ -40,18 +41,17 @@ abstract final class AppRouter {
   /// مسار شاشة الإعداد لأول مرة.
   static const String setup = '/setup';
 
-  /// مسار شاشة سجل الإشعارات (مضاف في المرحلة الخامسة).
+  /// مسار شاشة سجل الإشعارات .
   static const String notifications = '/notifications';
+
+  static const String forceUpdate = '/force-update';
 
   /// إعدادات GoRouter شاملة كافة المسارات والـ StatefulShellRoute.
   static final GoRouter router = GoRouter(
     navigatorKey: _rootNavigatorKey,
     initialLocation: splash,
     routes: [
-      GoRoute(
-        path: splash,
-        builder: (context, state) => const SplashScreen(),
-      ),
+      GoRoute(path: splash, builder: (context, state) => const SplashScreen()),
       GoRoute(
         path: setup,
         builder: (context, state) => const Scaffold(
@@ -68,6 +68,14 @@ abstract final class AppRouter {
         parentNavigatorKey: _rootNavigatorKey,
         path: notifications,
         builder: (context, state) => const NotificationsScreen(),
+      ),
+      GoRoute(
+        path: forceUpdate,
+        builder: (context, state) {
+          // استقبال رسالة مخصصة من الباكند إن وجدت
+          final message = state.extra as String?;
+          return ForceUpdateScreen(message: message);
+        },
       ),
       // Bottom Navigation StatefulShellRoute
       StatefulShellRoute.indexedStack(
@@ -113,8 +121,9 @@ abstract final class AppRouter {
               GoRoute(
                 path: settings,
                 builder: (context, state) {
-                  final isFirstTime =
-                      state.extra is bool ? state.extra as bool : false;
+                  final isFirstTime = state.extra is bool
+                      ? state.extra as bool
+                      : false;
                   return SettingsScreen(isFirstTime: isFirstTime);
                 },
               ),

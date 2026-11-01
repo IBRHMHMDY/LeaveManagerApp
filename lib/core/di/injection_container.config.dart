@@ -15,6 +15,16 @@ import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
 import 'package:shared_preferences/shared_preferences.dart' as _i460;
 
+import '../../features/app_updates/data/datasources/app_updates_remote_data_source.dart'
+    as _i402;
+import '../../features/app_updates/data/repositories/app_updates_repository_impl.dart'
+    as _i522;
+import '../../features/app_updates/domain/repositories/app_updates_repository.dart'
+    as _i381;
+import '../../features/app_updates/domain/usecases/check_update_usecase.dart'
+    as _i745;
+import '../../features/app_updates/presentation/cubit/app_update_cubit.dart'
+    as _i948;
 import '../../features/backup_restore/data/datasources/local_backup_data_source.dart'
     as _i776;
 import '../../features/backup_restore/data/repositories/backup_repository_impl.dart'
@@ -207,6 +217,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i606.InitializeHolidaysUseCase>(
       () => _i606.InitializeHolidaysUseCase(gh<_i171.HolidaysRepository>()),
     );
+    gh.lazySingleton<_i402.AppUpdatesRemoteDataSource>(
+      () => _i402.AppUpdatesRemoteDataSourceImpl(gh<_i667.DioClient>()),
+    );
     gh.lazySingleton<_i388.LeaveRepository>(
       () => _i408.LeaveRepositoryImpl(gh<_i1005.LeavesLocalDataSource>()),
     );
@@ -216,6 +229,12 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i804.GetExtraWorkRecordsUseCase>(
       () => _i804.GetExtraWorkRecordsUseCase(
         gh<_i314.RestAllowancesRepository>(),
+      ),
+    );
+    gh.lazySingleton<_i381.AppUpdatesRepository>(
+      () => _i522.AppUpdatesRepositoryImpl(
+        gh<_i402.AppUpdatesRemoteDataSource>(),
+        gh<_i932.NetworkInfo>(),
       ),
     );
     gh.factory<_i877.BackupCubit>(
@@ -283,6 +302,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1029.GetSettingsUseCase>(),
       ),
     );
+    gh.lazySingleton<_i745.CheckUpdateUseCase>(
+      () => _i745.CheckUpdateUseCase(gh<_i381.AppUpdatesRepository>()),
+    );
     gh.factory<_i120.HolidaysCubit>(
       () => _i120.HolidaysCubit(
         gh<_i606.InitializeHolidaysUseCase>(),
@@ -347,6 +369,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i568.SyncDeviceWithServerUseCase(
         gh<_i563.NotificationsRepository>(),
       ),
+    );
+    gh.factory<_i948.AppUpdateCubit>(
+      () => _i948.AppUpdateCubit(gh<_i745.CheckUpdateUseCase>()),
     );
     gh.factory<_i673.RestAllowancesBloc>(
       () => _i673.RestAllowancesBloc(

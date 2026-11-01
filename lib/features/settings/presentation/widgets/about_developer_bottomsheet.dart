@@ -3,10 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:leave_manager/core/constants/app_colors.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
+import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
-import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_cubit.dart';
-import 'package:leave_manager/core/utils/AppVersions/cubit/app_version_state.dart';
 import 'package:leave_manager/core/utils/store_launcher_service.dart';
+import 'package:leave_manager/features/app_updates/presentation/cubit/app_update_cubit.dart';
+import 'package:leave_manager/features/app_updates/presentation/cubit/app_update_state.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_outlined_button.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_primary_button.dart';
 import 'package:leave_manager/shared/widgets/buttons/app_share_button.dart';
@@ -78,18 +79,13 @@ class _AboutDeveloperContentState extends State<_AboutDeveloperContent> {
           Text('مدير اجازاتى', style: context.textTheme.headlineLarge),
           const SizedBox(height: AppSpacing.sm),
           BlocProvider(
-            create: (context) => AppVersionCubit()..fetchVersion(),
-            child: BlocBuilder<AppVersionCubit, AppVersionState>(
+            create: (context) => sl<AppUpdateCubit>()..fetchVersionOnly(),
+            child: BlocBuilder<AppUpdateCubit, AppUpdateState>(
               builder: (context, state) {
-                if (state is AppVersionLoading) {
-                  return const AppVersionDisplay(
-                    version: '',
-                    isLoading: true, // سيعرض مؤشر التحميل
-                  );
+                if (state is AppUpdateLoading) {
+                  return const AppVersionDisplay(version: '', isLoading: true);
                 } else if (state is AppVersionLoaded) {
-                  return AppVersionDisplay(
-                    version: state.version, // سيعرض رقم الإصدار
-                  );
+                  return AppVersionDisplay(version: state.version);
                 }
                 return const SizedBox.shrink();
               },
