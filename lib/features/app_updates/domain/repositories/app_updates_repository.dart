@@ -8,5 +8,6 @@ abstract class AppUpdatesRepository {
   Future<Either<Failure, AppUpdateInfo>> checkUpdate({
     required String currentVersion,
     required String osType,
+    required String deviceId,
   });
 }

@@ -12,6 +12,7 @@ abstract class AppUpdatesRemoteDataSource {
   Future<AppUpdateModel> checkUpdate({
     required String currentVersion,
     required String osType,
+    required String deviceId
   });
 }
 
@@ -25,6 +26,7 @@ class AppUpdatesRemoteDataSourceImpl implements AppUpdatesRemoteDataSource {
   Future<AppUpdateModel> checkUpdate({
     required String currentVersion,
     required String osType,
+    required String deviceId
   }) async {
     try {
       final response = await _dioClient.dio.get(
@@ -32,7 +34,7 @@ class AppUpdatesRemoteDataSourceImpl implements AppUpdatesRemoteDataSource {
         queryParameters: {
           'app_version': currentVersion,
           'os_type': osType,
-          'device_id': 'flutter_$osType',
+          'device_id': deviceId,
         },
       );
 

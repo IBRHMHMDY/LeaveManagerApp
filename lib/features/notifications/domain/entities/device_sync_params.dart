@@ -13,6 +13,9 @@ class DeviceSyncParams extends Equatable {
   /// إصدار التطبيق الحالي (مثال: '1.4.0').
   final String appVersion;
 
+  /// معرف الجهاز الفريد
+  final String deviceId;
+
   /// اسم أو طراز الجهاز (اختياري).
   final String? deviceModel;
 
@@ -24,6 +27,7 @@ class DeviceSyncParams extends Equatable {
     required this.fcmToken,
     required this.osType,
     required this.appVersion,
+    required this.deviceId,
     this.deviceModel,
     this.forceSync = false,
   });
@@ -33,6 +37,7 @@ class DeviceSyncParams extends Equatable {
         fcmToken,
         osType,
         appVersion,
+        deviceId,
         deviceModel,
         forceSync,
       ];

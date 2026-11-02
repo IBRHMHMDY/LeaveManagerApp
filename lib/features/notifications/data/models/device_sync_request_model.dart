@@ -14,6 +14,9 @@ class DeviceSyncRequestModel extends Equatable {
   /// رقم إصدار التطبيق الحالي.
   final String appVersion;
 
+  /// معرف الجهاز الفريد
+  final String deviceId;
+
   /// طراز أو اسم الجهاز (اختياري).
   final String? deviceModel;
 
@@ -22,6 +25,7 @@ class DeviceSyncRequestModel extends Equatable {
     required this.fcmToken,
     required this.osType,
     required this.appVersion,
+    required this.deviceId,
     this.deviceModel,
   });
 
@@ -31,6 +35,7 @@ class DeviceSyncRequestModel extends Equatable {
       fcmToken: params.fcmToken,
       osType: params.osType,
       appVersion: params.appVersion,
+      deviceId: params.deviceId,
       deviceModel: params.deviceModel,
     );
   }
@@ -41,11 +46,12 @@ class DeviceSyncRequestModel extends Equatable {
       'fcm_token': fcmToken,
       'os_type': osType,
       'app_version': appVersion,
+      'device_id': deviceId,
       if (deviceModel != null && deviceModel!.trim().isNotEmpty)
         'device_model': deviceModel,
     };
   }
 
   @override
-  List<Object?> get props => [fcmToken, osType, appVersion, deviceModel];
+  List<Object?> get props => [fcmToken, osType, appVersion, deviceId, deviceModel];
 }

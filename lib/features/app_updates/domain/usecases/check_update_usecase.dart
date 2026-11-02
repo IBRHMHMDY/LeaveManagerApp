@@ -10,12 +10,14 @@ import 'package:leave_manager/features/app_updates/domain/repositories/app_updat
 class CheckUpdateParams {
   final String currentVersion;
   final String osType;
+  final String deviceId;
 
-  CheckUpdateParams({required this.currentVersion, required this.osType});
+  CheckUpdateParams({required this.currentVersion, required this.osType, required this.deviceId});
 }
 
 @lazySingleton
-class CheckUpdateUseCase implements BaseUseCase<AppUpdateInfo, CheckUpdateParams> {
+class CheckUpdateUseCase
+    implements BaseUseCase<AppUpdateInfo, CheckUpdateParams> {
   final AppUpdatesRepository repository;
 
   const CheckUpdateUseCase(this.repository);
@@ -25,6 +27,7 @@ class CheckUpdateUseCase implements BaseUseCase<AppUpdateInfo, CheckUpdateParams
     return await repository.checkUpdate(
       currentVersion: params.currentVersion,
       osType: params.osType,
+      deviceId: params.deviceId,
     );
   }
 }

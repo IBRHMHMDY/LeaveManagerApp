@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/network/network_info.dart';
 import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/core/services/device_identity_service.dart';
 import 'package:leave_manager/core/services/push_notification_service.dart';
 import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/features/app_updates/presentation/cubit/app_update_cubit.dart';
@@ -117,7 +118,7 @@ class _SplashScreenState extends State<SplashScreen>
       if (fcmToken != null) {
         final osType = Platform.isAndroid ? 'android' : 'ios';
         final appVersion = (await PackageInfo.fromPlatform()).version;
-
+        final deviceId = await sl<DeviceIdentityService>().getDeviceId();
         if (mounted) {
           context.read<NotificationsBloc>().add(
             SyncDeviceTokenEvent(
@@ -125,6 +126,7 @@ class _SplashScreenState extends State<SplashScreen>
                 fcmToken: fcmToken,
                 osType: osType,
                 appVersion: appVersion,
+                deviceId: deviceId,
                 forceSync: true,
               ),
             ),

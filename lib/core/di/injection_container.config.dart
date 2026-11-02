@@ -129,6 +129,7 @@ import '../database/app_database.dart' as _i982;
 import '../network/dio_client.dart' as _i667;
 import '../network/interceptors/app_key_interceptor.dart' as _i833;
 import '../network/network_info.dart' as _i932;
+import '../services/device_identity_service.dart' as _i218;
 import '../services/push_notification_service.dart' as _i63;
 import '../usecases/check_date_overlap_usecase.dart' as _i707;
 import '../utils/share_service.dart' as _i518;
@@ -203,6 +204,9 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.factory<_i202.ThemeCubit>(
       () => _i202.ThemeCubit(sharedPreferences: gh<_i460.SharedPreferences>()),
+    );
+    gh.lazySingleton<_i218.DeviceIdentityService>(
+      () => _i218.DeviceIdentityService(gh<_i558.FlutterSecureStorage>()),
     );
     gh.lazySingleton<_i171.HolidaysRepository>(
       () => _i106.HolidaysRepositoryImpl(gh<_i828.HolidaysLocalDataSource>()),
@@ -376,7 +380,10 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i203.TrackNotificationUseCase(gh<_i563.NotificationsRepository>()),
     );
     gh.factory<_i948.AppUpdateCubit>(
-      () => _i948.AppUpdateCubit(gh<_i745.CheckUpdateUseCase>()),
+      () => _i948.AppUpdateCubit(
+        gh<_i745.CheckUpdateUseCase>(),
+        gh<_i218.DeviceIdentityService>(),
+      ),
     );
     gh.factory<_i673.RestAllowancesBloc>(
       () => _i673.RestAllowancesBloc(

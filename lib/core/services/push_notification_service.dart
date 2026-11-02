@@ -8,6 +8,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/di/injection_container.dart';
 import 'package:leave_manager/core/router/app_router.dart';
+import 'package:leave_manager/core/services/device_identity_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:leave_manager/features/notifications/data/models/notification_mapper.dart';
 import 'package:leave_manager/features/notifications/domain/entities/app_notification_entity.dart';
@@ -80,11 +81,12 @@ class PushNotificationService {
     try {
       final osType = Platform.isIOS ? 'ios' : 'android';
       final appVersion = (await PackageInfo.fromPlatform()).version;
-      
+      final deviceId = await sl<DeviceIdentityService>().getDeviceId();
       final params = DeviceSyncParams(
         fcmToken: token,
         osType: osType,
         appVersion: appVersion,
+        deviceId: deviceId,
         deviceModel: Platform.operatingSystemVersion,
       );
       

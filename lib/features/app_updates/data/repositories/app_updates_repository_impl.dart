@@ -21,6 +21,7 @@ class AppUpdatesRepositoryImpl implements AppUpdatesRepository {
   Future<Either<Failure, AppUpdateInfo>> checkUpdate({
     required String currentVersion,
     required String osType,
+    required String deviceId,
   }) async {
     if (!await _networkInfo.isConnected) {
       return const Left(NetworkFailure());
@@ -30,6 +31,7 @@ class AppUpdatesRepositoryImpl implements AppUpdatesRepository {
       final remoteData = await _remoteDataSource.checkUpdate(
         currentVersion: currentVersion,
         osType: osType,
+        deviceId: deviceId,
       );
       return Right(remoteData);
     } on ServerException catch (e, stackTrace) {

@@ -3,6 +3,7 @@
 import 'dart:io';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:injectable/injectable.dart';
+import 'package:leave_manager/core/services/device_identity_service.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:leave_manager/features/app_updates/domain/usecases/check_update_usecase.dart';
 import 'app_update_state.dart';
@@ -10,8 +11,9 @@ import 'app_update_state.dart';
 @injectable
 class AppUpdateCubit extends Cubit<AppUpdateState> {
   final CheckUpdateUseCase _checkUpdateUseCase;
-
-  AppUpdateCubit(this._checkUpdateUseCase) : super(AppUpdateInitial());
+  final DeviceIdentityService _deviceIdentityService;
+  
+  AppUpdateCubit(this._checkUpdateUseCase, this._deviceIdentityService) : super(AppUpdateInitial());
 
   // دالة مخصصة لجلب رقم الإصدار فقط (لعرضه في الإعدادات)
   Future<void> fetchVersionOnly() async {
@@ -25,9 +27,10 @@ class AppUpdateCubit extends Cubit<AppUpdateState> {
     emit(AppUpdateLoading());
     final packageInfo = await PackageInfo.fromPlatform();
     final osType = Platform.isAndroid ? 'android' : 'ios';
+    final deviceId = await _deviceIdentityService.getDeviceId();
 
     final result = await _checkUpdateUseCase(
-      CheckUpdateParams(currentVersion: packageInfo.version, osType: osType),
+      CheckUpdateParams(currentVersion: packageInfo.version, osType: osType, deviceId: deviceId),
     );
 
     result.fold(

@@ -36,7 +36,7 @@ dependencies:
   connectivity_plus: ^6.1.0
 
   # Security & Environment
-  flutter_dotenv: ^5.2.0
+  flutter_dotenv: ^6.0.1
   flutter_secure_storage: ^9.2.0
 
   # Firebase & Push Notifications
@@ -44,6 +44,7 @@ dependencies:
   firebase_messaging: ^15.1.0
   flutter_local_notifications: ^18.0.1
   permission_handler: ^11.3.0
+  uuid: ^4.6.0
   
 dev_dependencies:
   flutter_test:
