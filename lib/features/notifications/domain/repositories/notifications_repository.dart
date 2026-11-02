@@ -9,7 +9,11 @@ import 'package:leave_manager/features/notifications/domain/entities/device_sync
 abstract class NotificationsRepository {
   /// مزامنة بيانات الجهاز ورمز FCM مع خادم AppsNotifiersSystem.
   Future<Either<Failure, Unit>> syncDeviceWithServer(DeviceSyncParams params);
-
+  // دالة  لتتبع الإشعار
+  Future<Either<Failure, Unit>> trackNotification({
+    required String remoteId,
+    required String event,
+  });
   /// حفظ إشعار جديد وارد من Firebase في قاعدة البيانات المحلية (Drift).
   Future<Either<Failure, Unit>> saveNotification(
     AppNotificationEntity notification,

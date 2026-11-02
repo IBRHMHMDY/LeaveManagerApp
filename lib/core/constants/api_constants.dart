@@ -18,6 +18,9 @@ abstract final class ApiConstants {
 
   /// نقطة النهاية للتحقق من تحديثات التطبيق.
   static const String checkUpdate = '/updates/check';
+  
+  /// نقطه النهايه لتتبع الاشعارات
+  static const String trackNotification = '/notifications/track';
 
   /// مهلة الاتصال والرد الافتراضية.
   static const Duration connectTimeout = Duration(seconds: 15);

@@ -89,6 +89,8 @@ import '../../features/notifications/domain/usecases/save_notification_usecase.d
     as _i740;
 import '../../features/notifications/domain/usecases/sync_device_with_server_usecase.dart'
     as _i568;
+import '../../features/notifications/domain/usecases/track_notification_usecase.dart'
+    as _i203;
 import '../../features/notifications/presentation/bloc/notifications_bloc.dart'
     as _i1041;
 import '../../features/rest_allowances/data/datasources/rest_allowances_local_data_source.dart'
@@ -370,6 +372,9 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i563.NotificationsRepository>(),
       ),
     );
+    gh.lazySingleton<_i203.TrackNotificationUseCase>(
+      () => _i203.TrackNotificationUseCase(gh<_i563.NotificationsRepository>()),
+    );
     gh.factory<_i948.AppUpdateCubit>(
       () => _i948.AppUpdateCubit(gh<_i745.CheckUpdateUseCase>()),
     );
@@ -393,6 +398,15 @@ extension GetItInjectableX on _i174.GetIt {
       () => _i63.PushNotificationService(gh<_i740.SaveNotificationUseCase>()),
       dispose: (i) => i.dispose(),
     );
+    gh.factory<_i562.LeavesBloc>(
+      () => _i562.LeavesBloc(
+        calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
+        getCurrentYearLeaves: gh<_i972.GetCurrentYearLeavesUseCase>(),
+        addLeave: gh<_i442.AddLeaveUseCase>(),
+        resetLeaves: gh<_i7.ResetBalancesUseCase>(),
+        deleteLeave: gh<_i501.DeleteLeaveUseCase>(),
+      ),
+    );
     gh.factory<_i1041.NotificationsBloc>(
       () => _i1041.NotificationsBloc(
         syncDeviceWithServer: gh<_i568.SyncDeviceWithServerUseCase>(),
@@ -404,15 +418,7 @@ extension GetItInjectableX on _i174.GetIt {
         deleteNotification: gh<_i169.DeleteNotificationUseCase>(),
         clearAllNotifications: gh<_i154.ClearAllNotificationsUseCase>(),
         pushNotificationService: gh<_i63.PushNotificationService>(),
-      ),
-    );
-    gh.factory<_i562.LeavesBloc>(
-      () => _i562.LeavesBloc(
-        calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
-        getCurrentYearLeaves: gh<_i972.GetCurrentYearLeavesUseCase>(),
-        addLeave: gh<_i442.AddLeaveUseCase>(),
-        resetLeaves: gh<_i7.ResetBalancesUseCase>(),
-        deleteLeave: gh<_i501.DeleteLeaveUseCase>(),
+        trackNotification: gh<_i203.TrackNotificationUseCase>(),
       ),
     );
     return this;

@@ -1,4 +1,5 @@
 // lib/features/notifications/data/datasources/notifications_remote_data_source.dart
+
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
@@ -7,35 +8,34 @@ import 'package:leave_manager/core/errors/exceptions.dart';
 import 'package:leave_manager/core/network/dio_client.dart';
 import 'package:leave_manager/features/notifications/data/models/device_sync_request_model.dart';
 
-/// العقد البرمجي لمصدر البيانات البعيد الخاص بمزامنة الجهاز مع الخادم.
 abstract class NotificationsRemoteDataSource {
-  /// إرسال بيانات الجهاز ورمز FCM إلى نقطة النهاية في نظام AppsNotifiersSystem.
+  
   Future<void> syncDevice(DeviceSyncRequestModel requestModel);
+  
+  // الدالة الجديدة
+  Future<void> trackNotification({
+    required String remoteId,
+    required String event,
+  });
 }
 
-/// التنفيذ الفعلي لمصدر البيانات البعيد باستخدام [DioClient].
 @LazySingleton(as: NotificationsRemoteDataSource)
-class NotificationsRemoteDataSourceImpl
-    implements NotificationsRemoteDataSource {
+class NotificationsRemoteDataSourceImpl implements NotificationsRemoteDataSource {
   final DioClient _dioClient;
 
-  /// منشئ الكلاس يستقبل [DioClient] عبر الحقن التلقائي للتبعيات.
   const NotificationsRemoteDataSourceImpl(this._dioClient);
 
   @override
   Future<void> syncDevice(DeviceSyncRequestModel requestModel) async {
     try {
-      final response = await _dioClient.dio.post<Map<String, dynamic>>(
+      final response = await _dioClient.dio.post(
         ApiConstants.syncDevice,
         data: requestModel.toJson(),
       );
 
       final statusCode = response.statusCode ?? 500;
       if (statusCode < 200 || statusCode >= 300) {
-        throw ServerException(
-          'فشلت مزامنة الجهاز مع الخادم.',
-          statusCode: statusCode,
-        );
+        throw ServerException('فشل مزامنة الجهاز', statusCode: statusCode);
       }
     } on DioException catch (dioError, stackTrace) {
       debugPrint('Dio Sync Device Error: $dioError\n$stackTrace');
@@ -43,7 +43,34 @@ class NotificationsRemoteDataSourceImpl
     } catch (e, stackTrace) {
       debugPrint('Unexpected Sync Device Error: $e\n$stackTrace');
       if (e is ServerException) rethrow;
-      throw const ServerException('حدث خطأ غير متوقع أثناء مزامنة الجهاز.');
+      throw const ServerException('حدث خطأ غير متوقع.');
+    }
+  }
+
+  @override
+  Future<void> trackNotification({
+    required String remoteId,
+    required String event,
+  }) async {
+    try {
+      final response = await _dioClient.dio.post(
+        ApiConstants.trackNotification,
+        data: {
+          'notification_id': remoteId, // نرسل الـ remoteId للباكند
+          'event': event,
+        },
+      );
+
+      final statusCode = response.statusCode ?? 500;
+      if (statusCode < 200 || statusCode >= 300) {
+        throw ServerException('فشل تتبع الإشعار', statusCode: statusCode);
+      }
+    } on DioException catch (dioError) {
+      debugPrint('Dio Track Notification Error: $dioError');
+      throw ServerException.fromDioException(dioError);
+    } catch (e) {
+      debugPrint('Unexpected Track Notification Error: $e');
+      throw const ServerException('حدث خطأ غير متوقع.');
     }
   }
 }

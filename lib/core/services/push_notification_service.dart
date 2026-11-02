@@ -168,6 +168,11 @@ class PushNotificationService {
     final entity = message.toDomainEntity().copyWith(isRead: true);
     await _saveNotification(entity);
 
+    // تتبع حالة فتح الإشعار (OPENED)
+    if (entity.remoteId != null) {
+      sl<NotificationsBloc>().add(TrackNotificationStatusEvent(entity.remoteId!, 'OPENED'));
+    }
+
     if (!_foregroundMessageController.isClosed) {
       _foregroundMessageController.add(entity);
     }

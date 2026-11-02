@@ -82,3 +82,13 @@ class ClearAllNotificationsEvent extends NotificationsEvent {
 class RequestNotificationPermissionEvent extends NotificationsEvent {
   const RequestNotificationPermissionEvent();
 }
+
+class TrackNotificationStatusEvent extends NotificationsEvent {
+  final String remoteId;
+  final String event; // 'OPENED', 'DELIVERED'
+
+  const TrackNotificationStatusEvent(this.remoteId, this.event);
+
+  @override
+  List<Object?> get props => [remoteId, event];
+}
