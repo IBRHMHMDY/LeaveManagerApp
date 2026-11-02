@@ -6,6 +6,7 @@ import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/core/utils/store_launcher_service.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class ForceUpdateScreen extends StatelessWidget {
   final String? message;
@@ -52,10 +53,10 @@ class ForceUpdateScreen extends StatelessWidget {
                 AppPrimaryButton(
                   label: 'تحديث الآن',
                   icon: Icons.download_rounded,
-                  onPressed: () {
-                    StoreLauncherService().launchPlayStore(
-                      appId: 'com.ibrahimhamdy.leavemanager',
-                    );
+                  onPressed: () async {
+                    // الحل الديناميكي: جلب معرف التطبيق أياً كان اسمه
+                    final packageInfo = await PackageInfo.fromPlatform();
+                    StoreLauncherService().launchPlayStore(appId: packageInfo.packageName);
                   },
                 ),
                 const SizedBox(height: AppSpacing.md),

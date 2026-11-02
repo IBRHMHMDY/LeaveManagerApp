@@ -6,6 +6,7 @@ import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/core/utils/extensions/theme_extension.dart';
 import 'package:leave_manager/core/utils/store_launcher_service.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
+import 'package:package_info_plus/package_info_plus.dart';
 
 class UpdateAlertDialog extends StatelessWidget {
   final String? message;
@@ -66,10 +67,11 @@ class UpdateAlertDialog extends StatelessWidget {
           ),
           AppPrimaryButton(
             label: 'تحديث',
-            onPressed: () {
+            onPressed: () async{
               context.pop();
+              final packageInfo = await PackageInfo.fromPlatform();
               StoreLauncherService().launchPlayStore(
-                appId: 'com.ibrahimhamdy.leavemanager',
+                appId: packageInfo.packageName,
               );
               onSkip(); // إكمال الدخول للتطبيق بعد تحويله للمتجر
             },

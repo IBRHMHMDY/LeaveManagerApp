@@ -64,11 +64,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     _textSlideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-      CurvedAnimation(
-        parent: _animationController,
-        curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
-      ),
-    );
+          CurvedAnimation(
+            parent: _animationController,
+            curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+          ),
+        );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
@@ -97,17 +97,21 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  Future<void> _triggerBackgroundPushSync() async {
+  Future<String?> _triggerBackgroundPushSync() async {
     try {
       final isConnected = await sl<NetworkInfo>().isConnected;
       if (!isConnected) {
         if (mounted) {
           AppToast.showWarning(
-              context, 'لا يوجد اتصال بالإنترنت، لم يتم مزامنة الإشعارات.');
+            context,
+            'لا يوجد اتصال بالإنترنت، لم يتم مزامنة الإشعارات.',
+          );
         }
-        return;
+        return null;
       }
-      await sl<PushNotificationService>().initialize();
+
+      final pushService = sl<PushNotificationService>();
+      await pushService.initialize();
 
       final fcmToken = await FirebaseMessaging.instance.getToken();
       if (fcmToken != null) {
@@ -116,18 +120,25 @@ class _SplashScreenState extends State<SplashScreen>
 
         if (mounted) {
           context.read<NotificationsBloc>().add(
-                SyncDeviceTokenEvent(
-                  DeviceSyncParams(
-                    fcmToken: fcmToken,
-                    osType: osType,
-                    appVersion: appVersion,
-                  ),
-                ),
-              );
+            SyncDeviceTokenEvent(
+              DeviceSyncParams(
+                fcmToken: fcmToken,
+                osType: osType,
+                appVersion: appVersion,
+                forceSync: true,
+              ),
+            ),
+          );
         }
       }
+
+      // جلب وتفريغ المسار المحفوظ
+      final route = pushService.initialActionUrl;
+      pushService.initialActionUrl = null;
+      return route;
     } catch (e) {
       debugPrint('Background sync bypassed: $e');
+      return null;
     }
   }
 
@@ -141,15 +152,15 @@ class _SplashScreenState extends State<SplashScreen>
   Widget build(BuildContext context) {
     return MultiBlocListener(
       listeners: [
-        // مستمع تحديثات التطبيق
         BlocListener<AppUpdateCubit, AppUpdateState>(
           listener: (context, state) {
             if (state is AppUpdateAvailable) {
               if (state.updateInfo.forceUpdate) {
-                // توجيه إجباري ولا نكمل الإقلاع
-                context.go(AppRouter.forceUpdate, extra: state.updateInfo.message);
+                context.go(
+                  AppRouter.forceUpdate,
+                  extra: state.updateInfo.message,
+                );
               } else {
-                // تحديث اختياري
                 showDialog(
                   context: context,
                   barrierDismissible: false,
@@ -162,41 +173,52 @@ class _SplashScreenState extends State<SplashScreen>
                 );
               }
             } else if (state is AppUpdateError) {
-              // ظهور توست يخبر المستخدم بالخطأ بشكل ودود
               AppToast.showWarning(context, state.message);
-              // إكمال دورة حياة التطبيق بسلام رغم الخطأ
               context.read<SettingsBloc>().add(CheckSettingsEvent());
             } else if (state is AppVersionLoaded) {
-              // إذا نجح الفحص ولم يجد تحديثاً (أو بعد عرض الخطأ مباشرة)
-              // نتأكد أننا لم نقم بتشغيل الإعدادات مرتين
               if (context.read<SettingsBloc>().state is SettingsInitial) {
-                 context.read<SettingsBloc>().add(CheckSettingsEvent());
+                context.read<SettingsBloc>().add(CheckSettingsEvent());
               }
             }
           },
         ),
-        
-        // مستمع إعدادات التطبيق (الخطوة 3)
+
+        // تعديل مستمع الإعدادات للتعامل مع الـ Deep Link
         BlocListener<SettingsBloc, SettingsState>(
-          listener: (context, state) {
+          listener: (context, state) async {
             if (state is SettingsExists) {
               context.read<SettingsBloc>().add(LoadSettingsEvent());
               context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
               context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
               context.read<HolidaysCubit>().loadHolidays();
-              context.read<NotificationsBloc>().add(const LoadNotificationsEvent());
+              context.read<NotificationsBloc>().add(
+                const LoadNotificationsEvent(),
+              );
 
-              _triggerBackgroundPushSync();
+              // انتظار التهيئة وقراءة الرابط القادم من الإشعار
+              final pendingRoute = await _triggerBackgroundPushSync();
+
+              if (!context.mounted) return;
 
               SystemChrome.setEnabledSystemUIMode(
                 SystemUiMode.manual,
                 overlays: SystemUiOverlay.values,
               );
-              context.go(AppRouter.home); // الخطوة 4
-            } else if (state is SettingsNotFound) {
-              context.read<NotificationsBloc>().add(const LoadNotificationsEvent());
 
-              _triggerBackgroundPushSync();
+              // التوجيه بناءً على الرابط بدلاً من الرئيسية بشكل أعمى
+              if (pendingRoute != null && pendingRoute.startsWith('/')) {
+                context.go(pendingRoute);
+              } else {
+                context.go(AppRouter.home);
+              }
+            } else if (state is SettingsNotFound) {
+              context.read<NotificationsBloc>().add(
+                const LoadNotificationsEvent(),
+              );
+
+              final _ = await _triggerBackgroundPushSync();
+
+              if (!context.mounted) return;
 
               SystemChrome.setEnabledSystemUIMode(
                 SystemUiMode.manual,
