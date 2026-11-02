@@ -12,11 +12,10 @@ class AppUpdateModel extends AppUpdateInfo {
 
   factory AppUpdateModel.fromJson(Map<String, dynamic> json) {
     return AppUpdateModel(
-      // مطابقة مفاتيح الباكند بالضبط
-      updateRequired: json['update_available'] ?? false, 
+      updateRequired: json['update_available'] ?? false,
       forceUpdate: json['is_force_update'] ?? false,
-      message: json['force_reason']?.toString() 
-          ?? json['maintenance_message']?.toString() 
+      // أولوية العرض لرسالة الصيانة، ثم ملاحظات الإصدار
+      message: json['maintenance_message']?.toString() 
           ?? json['release_notes']?.toString(),
       storeUrl: json['store_url']?.toString(),
     );

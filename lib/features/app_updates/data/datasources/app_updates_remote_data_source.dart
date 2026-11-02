@@ -32,13 +32,14 @@ class AppUpdatesRemoteDataSourceImpl implements AppUpdatesRemoteDataSource {
         queryParameters: {
           'app_version': currentVersion,
           'os_type': osType,
+          'device_id': 'flutter_$osType',
         },
       );
 
       final statusCode = response.statusCode ?? 500;
       if (statusCode >= 200 && statusCode < 300 && response.data != null) {
         final data = response.data!['data'];
-
+        
         if (data == null) {
           return const AppUpdateModel(
             updateRequired: false,
@@ -58,7 +59,6 @@ class AppUpdatesRemoteDataSourceImpl implements AppUpdatesRemoteDataSource {
     } on DioException catch (dioError, stackTrace) {
       debugPrint('Dio Check Update Error: $dioError\n$stackTrace');
       
-      // تجاوز أخطاء الخادم (500) أو (404) لمنع قفل التطبيق
       if (dioError.response?.statusCode == 500 || dioError.response?.statusCode == 404) {
          debugPrint('تجاوز خطأ الخادم، سيتم إكمال الإقلاع دون تحديثات.');
          return const AppUpdateModel(
@@ -68,6 +68,14 @@ class AppUpdatesRemoteDataSourceImpl implements AppUpdatesRemoteDataSource {
            storeUrl: null,
          );
       }
+
+      // معالجة صريحة لأخطاء الاتصال والانقطاع
+      if (dioError.type == DioExceptionType.connectionTimeout || 
+          dioError.type == DioExceptionType.receiveTimeout ||
+          dioError.type == DioExceptionType.connectionError) {
+        throw const ServerException('انتهت مهلة الاتصال بالخادم، يرجى التحقق من جودة الإنترنت والمحاولة لاحقاً.');
+      }
+
       throw ServerException.fromDioException(dioError);
     } catch (e, stackTrace) {
       debugPrint('Unexpected Check Update Error: $e\n$stackTrace');

@@ -31,7 +31,12 @@ class AppUpdateCubit extends Cubit<AppUpdateState> {
     );
 
     result.fold(
-      (failure) => emit(AppUpdateError(failure.message)),
+      (failure) {
+        // نرسل الخطأ أولاً
+        emit(AppUpdateError(failure.message));
+        // ثم نرسل رقم الإصدار كحالة نهائية حتى لا يتعطل واجهة المستخدم
+        emit(AppVersionLoaded(version: packageInfo.version));
+      },
       (updateInfo) {
         if (updateInfo.updateRequired) {
           emit(AppUpdateAvailable(updateInfo));

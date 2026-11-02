@@ -1,4 +1,5 @@
 // lib/features/splash/presentation/screens/splash_screen.dart
+
 import 'dart:async';
 import 'dart:io';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -30,9 +31,7 @@ import 'package:leave_manager/features/splash/presentation/widgets/custom_app_lo
 import 'package:leave_manager/shared/widgets/overlays/app_toast.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 
-/// شاشة الإقلاع والتهيئة الأولية للتطبيق.
 class SplashScreen extends StatefulWidget {
-  /// منشئ ثابت.
   const SplashScreen({super.key});
 
   @override
@@ -65,11 +64,11 @@ class _SplashScreenState extends State<SplashScreen>
 
     _textSlideAnimation =
         Tween<Offset>(begin: const Offset(0, 0.3), end: Offset.zero).animate(
-          CurvedAnimation(
-            parent: _animationController,
-            curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
-          ),
-        );
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.4, 1.0, curve: Curves.easeOutCubic),
+      ),
+    );
 
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
@@ -86,10 +85,8 @@ class _SplashScreenState extends State<SplashScreen>
     try {
       await Future.delayed(const Duration(milliseconds: 3000));
       if (mounted) {
-        // فحص التحديثات أولاً
+        // الخطوة 1: فحص التحديثات أولاً (سيتم إكمال الدورة عبر الـ Listener)
         context.read<AppUpdateCubit>().checkForUpdates();
-        // فحص الاعدادات المحليه ثانيا
-        context.read<SettingsBloc>().add(CheckSettingsEvent());
       }
     } catch (e, stackTrace) {
       debugPrint('Splash Init Error: $e\n$stackTrace');
@@ -100,22 +97,18 @@ class _SplashScreenState extends State<SplashScreen>
     }
   }
 
-  /// تشغيل خدمة الإشعارات ومزامنة الجهاز في الخلفية دون تعطيل الانتقال للشاشة الرئيسية.
   Future<void> _triggerBackgroundPushSync() async {
     try {
       final isConnected = await sl<NetworkInfo>().isConnected;
       if (!isConnected) {
         if (mounted) {
           AppToast.showWarning(
-            context,
-            'لا يوجد اتصال بالإنترنت، لم يتم مزامنة الإشعارات.',
-          );
+              context, 'لا يوجد اتصال بالإنترنت، لم يتم مزامنة الإشعارات.');
         }
         return;
       }
       await sl<PushNotificationService>().initialize();
 
-      // جلب بيانات الجهاز وإرسال حدث المزامنة
       final fcmToken = await FirebaseMessaging.instance.getToken();
       if (fcmToken != null) {
         final osType = Platform.isAndroid ? 'android' : 'ios';
@@ -123,14 +116,14 @@ class _SplashScreenState extends State<SplashScreen>
 
         if (mounted) {
           context.read<NotificationsBloc>().add(
-            SyncDeviceTokenEvent(
-              DeviceSyncParams(
-                fcmToken: fcmToken,
-                osType: osType,
-                appVersion: appVersion,
-              ),
-            ),
-          );
+                SyncDeviceTokenEvent(
+                  DeviceSyncParams(
+                    fcmToken: fcmToken,
+                    osType: osType,
+                    appVersion: appVersion,
+                  ),
+                ),
+              );
         }
       }
     } catch (e) {
@@ -146,167 +139,178 @@ class _SplashScreenState extends State<SplashScreen>
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AppUpdateCubit, AppUpdateState>(
-      listener: (context, state) {
-        if (state is AppUpdateAvailable) {
-          if (state.updateInfo.forceUpdate) {
-            // توجيه إجباري لشاشة التحديث
-            context.go(AppRouter.forceUpdate, extra: state.updateInfo.message);
-          } else {
-            showDialog(
-              context: context,
-              barrierDismissible: false, // إجبار المستخدم على اختيار أحد الزرين
-              builder: (dialogContext) => UpdateAlertDialog(
-                message: state.updateInfo.message,
-                onSkip: () {
-                  // عند اختيار "لاحقاً" نكمل دورة الإقلاع الطبيعية
-                  context.read<SettingsBloc>().add(CheckSettingsEvent());
-                },
-              ),
-            );
-          }
-        } else if (state is AppVersionLoaded || state is AppUpdateError) {
-          // لا يوجد تحديث أو فشل الاتصال (نكمل دورة الحياة العادية)
-          context.read<SettingsBloc>().add(CheckSettingsEvent());
-        }
-      },
-      child: BlocListener<SettingsBloc, SettingsState>(
-        listener: (context, state) {
-          if (state is SettingsExists) {
-            context.read<SettingsBloc>().add(LoadSettingsEvent());
-            context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
-            context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
-            context.read<HolidaysCubit>().loadHolidays();
-            context.read<NotificationsBloc>().add(
-              const LoadNotificationsEvent(),
-            );
-
-            _triggerBackgroundPushSync();
-
-            SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.manual,
-              overlays: SystemUiOverlay.values,
-            );
-            context.go(AppRouter.home);
-          } else if (state is SettingsNotFound) {
-            context.read<NotificationsBloc>().add(
-              const LoadNotificationsEvent(),
-            );
-
-            _triggerBackgroundPushSync();
-
-            SystemChrome.setEnabledSystemUIMode(
-              SystemUiMode.manual,
-              overlays: SystemUiOverlay.values,
-            );
-            context.go(AppRouter.setup);
-          } else if (state is SettingsError) {
-            AppToast.showError(context, state.message);
-            context.go(AppRouter.setup);
-          }
-        },
-        child: Scaffold(
-          backgroundColor: context.colorScheme.surface,
-          body: Stack(
-            children: [
-              Positioned(
-                top: -100,
-                right: -50,
-                child: Container(
-                  width: 250,
-                  height: 250,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: context.colorScheme.primary.withAlpha(15),
+    return MultiBlocListener(
+      listeners: [
+        // مستمع تحديثات التطبيق
+        BlocListener<AppUpdateCubit, AppUpdateState>(
+          listener: (context, state) {
+            if (state is AppUpdateAvailable) {
+              if (state.updateInfo.forceUpdate) {
+                // توجيه إجباري ولا نكمل الإقلاع
+                context.go(AppRouter.forceUpdate, extra: state.updateInfo.message);
+              } else {
+                // تحديث اختياري
+                showDialog(
+                  context: context,
+                  barrierDismissible: false,
+                  builder: (dialogContext) => UpdateAlertDialog(
+                    message: state.updateInfo.message,
+                    onSkip: () {
+                      context.read<SettingsBloc>().add(CheckSettingsEvent());
+                    },
                   ),
+                );
+              }
+            } else if (state is AppUpdateError) {
+              // ظهور توست يخبر المستخدم بالخطأ بشكل ودود
+              AppToast.showWarning(context, state.message);
+              // إكمال دورة حياة التطبيق بسلام رغم الخطأ
+              context.read<SettingsBloc>().add(CheckSettingsEvent());
+            } else if (state is AppVersionLoaded) {
+              // إذا نجح الفحص ولم يجد تحديثاً (أو بعد عرض الخطأ مباشرة)
+              // نتأكد أننا لم نقم بتشغيل الإعدادات مرتين
+              if (context.read<SettingsBloc>().state is SettingsInitial) {
+                 context.read<SettingsBloc>().add(CheckSettingsEvent());
+              }
+            }
+          },
+        ),
+        
+        // مستمع إعدادات التطبيق (الخطوة 3)
+        BlocListener<SettingsBloc, SettingsState>(
+          listener: (context, state) {
+            if (state is SettingsExists) {
+              context.read<SettingsBloc>().add(LoadSettingsEvent());
+              context.read<LeavesBloc>().add(LoadBalancesAndLeavesEvent());
+              context.read<RestAllowancesBloc>().add(LoadRestAllowancesEvent());
+              context.read<HolidaysCubit>().loadHolidays();
+              context.read<NotificationsBloc>().add(const LoadNotificationsEvent());
+
+              _triggerBackgroundPushSync();
+
+              SystemChrome.setEnabledSystemUIMode(
+                SystemUiMode.manual,
+                overlays: SystemUiOverlay.values,
+              );
+              context.go(AppRouter.home); // الخطوة 4
+            } else if (state is SettingsNotFound) {
+              context.read<NotificationsBloc>().add(const LoadNotificationsEvent());
+
+              _triggerBackgroundPushSync();
+
+              SystemChrome.setEnabledSystemUIMode(
+                SystemUiMode.manual,
+                overlays: SystemUiOverlay.values,
+              );
+              context.go(AppRouter.setup);
+            } else if (state is SettingsError) {
+              AppToast.showError(context, state.message);
+              context.go(AppRouter.setup);
+            }
+          },
+        ),
+      ],
+      child: Scaffold(
+        backgroundColor: context.colorScheme.surface,
+        body: Stack(
+          children: [
+            Positioned(
+              top: -100,
+              right: -50,
+              child: Container(
+                width: 250,
+                height: 250,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: context.colorScheme.primary.withAlpha(15),
                 ),
               ),
-              Positioned(
-                bottom: -80,
-                left: -80,
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: context.colorScheme.secondary.withAlpha(15),
-                  ),
+            ),
+            Positioned(
+              bottom: -80,
+              left: -80,
+              child: Container(
+                width: 200,
+                height: 200,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: context.colorScheme.secondary.withAlpha(15),
                 ),
               ),
-              Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    ScaleTransition(
-                      scale: _logoScaleAnimation,
-                      child: const CustomAppLogo(),
-                    ),
-                    const SizedBox(height: 32),
-                    SlideTransition(
-                      position: _textSlideAnimation,
-                      child: FadeTransition(
-                        opacity: _fadeAnimation,
-                        child: Column(
-                          children: [
-                            Text(
-                              'مدير إجازاتي',
-                              style: context.textTheme.headlineMedium?.copyWith(
+            ),
+            Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ScaleTransition(
+                    scale: _logoScaleAnimation,
+                    child: const CustomAppLogo(),
+                  ),
+                  const SizedBox(height: 32),
+                  SlideTransition(
+                    position: _textSlideAnimation,
+                    child: FadeTransition(
+                      opacity: _fadeAnimation,
+                      child: Column(
+                        children: [
+                          Text(
+                            'مدير إجازاتي',
+                            style: context.textTheme.headlineMedium?.copyWith(
+                              fontWeight: FontWeight.w900,
+                              color: context.colorScheme.primary,
+                              letterSpacing: 1.2,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: context.colorScheme.primaryContainer
+                                  .withAlpha(150),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            child: Text(
+                              'تتبع إجازاتك بذكاء وسهولة',
+                              style: context.textTheme.titleSmall?.copyWith(
+                                color: context.colorScheme.onSurface,
                                 fontWeight: FontWeight.w900,
-                                color: context.colorScheme.primary,
-                                letterSpacing: 1.2,
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: context.colorScheme.primaryContainer
-                                    .withAlpha(150),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Text(
-                                'تتبع إجازاتك بذكاء وسهولة',
-                                style: context.textTheme.titleSmall?.copyWith(
-                                  color: context.colorScheme.onSurface,
-                                  fontWeight: FontWeight.w900,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
+                  ),
+                ],
+              ),
+            ),
+            Positioned(
+              bottom: 48,
+              left: 0,
+              right: 0,
+              child: FadeTransition(
+                opacity: _fadeAnimation,
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: 32,
+                      height: 32,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 3.5,
+                        color: context.colorScheme.primary.withAlpha(150),
+                        strokeCap: StrokeCap.round,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    const AppVersion(),
                   ],
                 ),
               ),
-              Positioned(
-                bottom: 48,
-                left: 0,
-                right: 0,
-                child: FadeTransition(
-                  opacity: _fadeAnimation,
-                  child: Column(
-                    children: [
-                      SizedBox(
-                        width: 32,
-                        height: 32,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 3.5,
-                          color: context.colorScheme.primary.withAlpha(150),
-                          strokeCap: StrokeCap.round,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      const AppVersion(),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
