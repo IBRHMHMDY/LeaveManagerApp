@@ -163,6 +163,9 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i967.StoreLauncherService>(
       () => _i967.StoreLauncherService(),
     );
+    gh.lazySingleton<_i218.DeviceIdentityService>(
+      () => _i218.DeviceIdentityServiceImpl(gh<_i558.FlutterSecureStorage>()),
+    );
     gh.lazySingleton<_i828.HolidaysLocalDataSource>(
       () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),
     );
@@ -206,9 +209,6 @@ extension GetItInjectableX on _i174.GetIt {
     );
     gh.lazySingleton<_i667.DioClient>(
       () => _i667.DioClient(gh<_i361.Dio>(), gh<_i724.ApiInterceptor>()),
-    );
-    gh.lazySingleton<_i218.DeviceIdentityService>(
-      () => _i218.DeviceIdentityService(gh<_i558.FlutterSecureStorage>()),
     );
     gh.lazySingleton<_i171.HolidaysRepository>(
       () => _i106.HolidaysRepositoryImpl(gh<_i828.HolidaysLocalDataSource>()),
