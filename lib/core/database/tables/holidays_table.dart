@@ -7,5 +7,5 @@ class HolidaysTable extends Table {
   TextColumn get name => text()();
   DateTimeColumn get startDate => dateTime()();
   DateTimeColumn get endDate => dateTime()();
-  IntColumn get daysCount => integer()();
+  IntColumn get daysCount => integer().withDefault(const Constant(1))();
 }

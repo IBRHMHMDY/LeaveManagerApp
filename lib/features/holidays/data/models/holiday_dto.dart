@@ -4,7 +4,6 @@ class HolidayDto {
   final DateTime startDate;
   final DateTime endDate;
   final int daysCount;
-  final bool isActive;
 
   const HolidayDto({
     required this.id,
@@ -12,7 +11,7 @@ class HolidayDto {
     required this.startDate,
     required this.endDate,
     required this.daysCount,
-    required this.isActive,
+
   });
 
   factory HolidayDto.fromJson(Map<String, dynamic> json) {
@@ -22,7 +21,6 @@ class HolidayDto {
       startDate: DateTime.parse(json['start_date'] as String),
       endDate: DateTime.parse(json['end_date'] as String),
       daysCount: json['days_count'] as int? ?? 1,
-      isActive: json['is_active'] as bool? ?? true,
     );
   }
 }
