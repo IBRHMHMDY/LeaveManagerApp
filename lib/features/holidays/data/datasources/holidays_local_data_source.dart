@@ -39,7 +39,7 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
           name: dto.name,
           startDate: dto.startDate,
           endDate: dto.endDate,
-          daysCount: dto.daysCount,
+          daysCount: Value(dto.daysCount),
         );
       }).toList();
 

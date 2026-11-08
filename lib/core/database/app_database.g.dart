@@ -933,7 +933,8 @@ class $HolidaysTableTable extends HolidaysTable
     aliasedName,
     false,
     type: DriftSqlType.int,
-    requiredDuringInsert: true,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
   );
   @override
   List<GeneratedColumn> get $columns => [
@@ -987,8 +988,6 @@ class $HolidaysTableTable extends HolidaysTable
         _daysCountMeta,
         daysCount.isAcceptableOrUnknown(data['days_count']!, _daysCountMeta),
       );
-    } else if (isInserting) {
-      context.missing(_daysCountMeta);
     }
     return context;
   }
@@ -1153,11 +1152,10 @@ class HolidaysTableCompanion extends UpdateCompanion<HolidayModel> {
     required String name,
     required DateTime startDate,
     required DateTime endDate,
-    required int daysCount,
+    this.daysCount = const Value.absent(),
   }) : name = Value(name),
        startDate = Value(startDate),
-       endDate = Value(endDate),
-       daysCount = Value(daysCount);
+       endDate = Value(endDate);
   static Insertable<HolidayModel> custom({
     Expression<int>? id,
     Expression<String>? name,
@@ -2938,7 +2936,7 @@ typedef $$HolidaysTableTableCreateCompanionBuilder =
       required String name,
       required DateTime startDate,
       required DateTime endDate,
-      required int daysCount,
+      Value<int> daysCount,
     });
 typedef $$HolidaysTableTableUpdateCompanionBuilder =
     HolidaysTableCompanion Function({
@@ -3177,7 +3175,7 @@ class $$HolidaysTableTableTableManager
                 required String name,
                 required DateTime startDate,
                 required DateTime endDate,
-                required int daysCount,
+                Value<int> daysCount = const Value.absent(),
               }) => HolidaysTableCompanion.insert(
                 id: id,
                 name: name,

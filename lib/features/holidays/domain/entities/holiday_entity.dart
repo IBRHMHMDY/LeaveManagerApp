@@ -7,14 +7,12 @@ class Holiday extends Equatable {
   final DateTime endDate;
   final int daysCount;
 
-
   const Holiday({
     required this.id,
     required this.name,
     required this.startDate,
     required this.endDate,
     required this.daysCount,
-
   });
 
   int get daysLeft {
