@@ -3,10 +3,11 @@ import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/database/app_database.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
+import 'package:leave_manager/features/holidays/data/models/holiday_dto.dart';
 
 abstract class HolidaysLocalDataSource {
   Future<bool> hasHolidays();
-  Future<void> cacheHolidays(List<HolidayModel> holidays);
+  Future<void> cacheHolidays(List<HolidayDto> holidays);
   Future<List<HolidayModel>> getFinancialYearHolidays(DateTime start, DateTime end);
   Future<HolidayModel?> getUpcomingHoliday(DateTime today);
 }
@@ -30,15 +31,15 @@ class HolidaysLocalDataSourceImpl implements HolidaysLocalDataSource {
   }
 
   @override
-  Future<void> cacheHolidays(List<HolidayModel> holidays) async {
+  Future<void> cacheHolidays(List<HolidayDto> holidays) async {
     try {
-      final List<HolidaysTableCompanion> companions = holidays.map((model) {
+      final List<HolidaysTableCompanion> companions = holidays.map((dto) {
         return HolidaysTableCompanion.insert(
-          id: Value(model.id),
-          name: model.name,
-          startDate: model.startDate,
-          endDate: model.endDate,
-          daysCount: model.daysCount,
+          id: Value(dto.id),
+          name: dto.name,
+          startDate: dto.startDate,
+          endDate: dto.endDate,
+          daysCount: dto.daysCount,
         );
       }).toList();
 

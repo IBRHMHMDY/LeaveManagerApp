@@ -32,7 +32,7 @@ class HolidaysRepositoryImpl implements HolidaysRepository {
         // التحقق من وجود عطلات محلية إذا لم يكن هناك إنترنت
         final hasHolidays = await localDataSource.hasHolidays();
         if (!hasHolidays) {
-          // يمكن إرجاع تنبيه أنه لا توجد بيانات أصلية
+          return const Left(DatabaseFailure('لا توجد بيانات للعطلات'));
         }
       }
       return const Right(unit);

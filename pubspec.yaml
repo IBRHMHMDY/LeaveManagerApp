@@ -64,7 +64,6 @@ flutter:
   assets:
     - .env
     - assets/fonts/
-    - assets/json/
   fonts:
     - family: Cairo
       fonts:
