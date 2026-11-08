@@ -84,3 +84,11 @@ class NotificationPermissionDeniedState extends NotificationsState {
   @override
   List<Object?> get props => [message];
 }
+
+class NotificationNavigationRequestedState extends NotificationsState {
+  final String actionUrl;
+  const NotificationNavigationRequestedState(this.actionUrl);
+
+  @override
+  List<Object?> get props => [actionUrl];
+}

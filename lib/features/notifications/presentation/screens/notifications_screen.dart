@@ -33,24 +33,34 @@ class _NotificationsScreenState extends State<NotificationsScreen> {
     BuildContext context,
     AppNotificationEntity notification,
   ) async {
-    // 1. تحديد الإشعار كمقروء إذا كان غير مقروء
+    // 1. تحديث حالة القراءة محلياً
     if (!notification.isRead) {
       context.read<NotificationsBloc>().add(
             MarkNotificationReadEvent(notification.id),
           );
     }
 
-    // 2. التعامل مع رابط التوجيه (Action URL) إن وجد
+    // 2. إرسال حدث التتبع (OPENED) للباك إند
+    if (notification.remoteId != null) {
+      context.read<NotificationsBloc>().add(
+        TrackNotificationStatusEvent(
+          notification.remoteId!, 
+          'OPENED',
+        ),
+      );
+    }
+
+    // 3. التوجيه بناءً على مسار الـ Action URL (Deep Linking)
     final actionUrl = notification.actionUrl?.trim();
     if (actionUrl == null || actionUrl.isEmpty) return;
 
     if (actionUrl.startsWith('/')) {
-      // توجيه داخلي عبر GoRouter (مثل /holidays أو /rest_allowances)
+      // التوجيه الداخلي لشاشات التطبيق مثل /holidays أو /rest_allowances
       if (context.mounted) {
         context.push(actionUrl);
       }
     } else {
-      // رابط خارجي عبر متصفح النظام
+      // فتح روابط خارجية في المتصفح
       final uri = Uri.tryParse(actionUrl);
       if (uri != null) {
         await launchUrl(uri, mode: LaunchMode.externalApplication);

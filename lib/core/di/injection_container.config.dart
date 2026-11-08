@@ -161,6 +161,9 @@ extension GetItInjectableX on _i174.GetIt {
       () => coreInjectableModule.secureStorage,
     );
     gh.lazySingleton<_i724.ApiInterceptor>(() => _i724.ApiInterceptor());
+    gh.lazySingleton<_i63.PushNotificationService>(
+      () => _i63.PushNotificationService(),
+    );
     gh.lazySingleton<_i518.ShareService>(() => _i518.ShareService());
     gh.lazySingleton<_i967.StoreLauncherService>(
       () => _i967.StoreLauncherService(),
@@ -363,6 +366,20 @@ extension GetItInjectableX on _i174.GetIt {
         getSettings: gh<_i1029.GetSettingsUseCase>(),
       ),
     );
+    gh.factory<_i1041.NotificationsBloc>(
+      () => _i1041.NotificationsBloc(
+        syncDeviceWithServer: gh<_i568.SyncDeviceWithServerUseCase>(),
+        saveNotification: gh<_i740.SaveNotificationUseCase>(),
+        getLocalNotifications: gh<_i820.GetLocalNotificationsUseCase>(),
+        getUnreadCount: gh<_i677.GetUnreadNotificationsCountUseCase>(),
+        markAsRead: gh<_i889.MarkNotificationAsReadUseCase>(),
+        markAllAsRead: gh<_i730.MarkAllNotificationsAsReadUseCase>(),
+        deleteNotification: gh<_i169.DeleteNotificationUseCase>(),
+        clearAllNotifications: gh<_i154.ClearAllNotificationsUseCase>(),
+        pushNotificationService: gh<_i63.PushNotificationService>(),
+        trackNotification: gh<_i203.TrackNotificationUseCase>(),
+      ),
+    );
     gh.lazySingleton<_i1053.GetFinancialYearHolidaysUseCase>(
       () => _i1053.GetFinancialYearHolidaysUseCase(
         gh<_i171.HolidaysRepository>(),
@@ -404,10 +421,6 @@ extension GetItInjectableX on _i174.GetIt {
         gh<_i1053.GetFinancialYearHolidaysUseCase>(),
       ),
     );
-    gh.lazySingleton<_i63.PushNotificationService>(
-      () => _i63.PushNotificationService(gh<_i740.SaveNotificationUseCase>()),
-      dispose: (i) => i.dispose(),
-    );
     gh.factory<_i562.LeavesBloc>(
       () => _i562.LeavesBloc(
         calculateBalances: gh<_i952.CalculateBalancesUseCase>(),
@@ -423,20 +436,6 @@ extension GetItInjectableX on _i174.GetIt {
         addExtraWork: gh<_i693.AddExtraWorkUseCase>(),
         useRestAllowance: gh<_i474.UseRestAllowanceUseCase>(),
         deleteExtraWork: gh<_i785.DeleteExtraWorkUseCase>(),
-      ),
-    );
-    gh.factory<_i1041.NotificationsBloc>(
-      () => _i1041.NotificationsBloc(
-        syncDeviceWithServer: gh<_i568.SyncDeviceWithServerUseCase>(),
-        saveNotification: gh<_i740.SaveNotificationUseCase>(),
-        getLocalNotifications: gh<_i820.GetLocalNotificationsUseCase>(),
-        getUnreadCount: gh<_i677.GetUnreadNotificationsCountUseCase>(),
-        markAsRead: gh<_i889.MarkNotificationAsReadUseCase>(),
-        markAllAsRead: gh<_i730.MarkAllNotificationsAsReadUseCase>(),
-        deleteNotification: gh<_i169.DeleteNotificationUseCase>(),
-        clearAllNotifications: gh<_i154.ClearAllNotificationsUseCase>(),
-        pushNotificationService: gh<_i63.PushNotificationService>(),
-        trackNotification: gh<_i203.TrackNotificationUseCase>(),
       ),
     );
     return this;

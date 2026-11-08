@@ -1,225 +1,118 @@
-// lib/core/services/push_notification_service.dart
-
 import 'dart:async';
-import 'dart:io';
+import 'dart:convert';
 import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:injectable/injectable.dart';
-import 'package:leave_manager/core/di/injection_container.dart';
-import 'package:leave_manager/core/router/app_router.dart';
-import 'package:leave_manager/core/services/device_identity_service.dart';
-import 'package:package_info_plus/package_info_plus.dart';
 import 'package:leave_manager/features/notifications/data/models/notification_mapper.dart';
 import 'package:leave_manager/features/notifications/domain/entities/app_notification_entity.dart';
-import 'package:leave_manager/features/notifications/domain/entities/device_sync_params.dart';
-import 'package:leave_manager/features/notifications/domain/usecases/save_notification_usecase.dart';
-import 'package:leave_manager/features/notifications/presentation/bloc/notifications_bloc.dart';
-import 'package:leave_manager/features/notifications/presentation/bloc/notifications_event.dart';
 import 'package:permission_handler/permission_handler.dart';
-import 'package:url_launcher/url_launcher.dart';
 
-const String kHighImportanceChannelId = 'leave_manager_high_importance_channel';
+@pragma('vm:entry-point')
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  debugPrint("Handling a background message: ${message.messageId}");
+}
 
-@lazySingleton
+@LazySingleton()
 class PushNotificationService {
-  final SaveNotificationUseCase _saveNotification;
-  final FlutterLocalNotificationsPlugin _localNotificationsPlugin = FlutterLocalNotificationsPlugin();
-
-  final StreamController<AppNotificationEntity> _foregroundMessageController = StreamController<AppNotificationEntity>.broadcast();
-
-  StreamSubscription<RemoteMessage>? _onMessageSubscription;
-  StreamSubscription<RemoteMessage>? _onMessageOpenedAppSubscription;
-  StreamSubscription<String>? _onTokenRefreshSubscription;
-
-  bool _isInitialized = false;
+  final FirebaseMessaging _fcm = FirebaseMessaging.instance;
+  final FlutterLocalNotificationsPlugin _localNotifications = FlutterLocalNotificationsPlugin();
   
-  // حفظ مسار التوجيه عند قدوم الإشعار والتطبيق مغلق تماماً
+  // Stream الخاص بالإشعارات أثناء فتح التطبيق (Foreground)
+  final _foregroundNotificationController = StreamController<AppNotificationEntity>.broadcast();
+  Stream<AppNotificationEntity> get onForegroundNotificationStream => _foregroundNotificationController.stream;
+
+  // Stream الخاص بالإشعارات التي تم فتحها من الخلفية (Background) - (تمت إضافته هنا)
+  final _openedNotificationController = StreamController<AppNotificationEntity>.broadcast();
+  Stream<AppNotificationEntity> get onNotificationOpenedStream => _openedNotificationController.stream;
+
   String? initialActionUrl;
 
-  PushNotificationService(this._saveNotification);
-
-  Stream<AppNotificationEntity> get onForegroundNotificationStream => _foregroundMessageController.stream;
-
   Future<void> initialize() async {
-    if (_isInitialized) return;
-    try {
-      await _initLocalNotificationsChannel();
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
 
-      final fcmToken = await FirebaseMessaging.instance.getToken();
-      if (fcmToken != null) {
-        _dispatchSyncEvent(fcmToken);
-      }
+    const androidInit = AndroidInitializationSettings('@mipmap/launcher_icon'); 
+    const iosInit = DarwinInitializationSettings();
+    const initSettings = InitializationSettings(android: androidInit, iOS: iosInit);
 
-      _onTokenRefreshSubscription = FirebaseMessaging.instance.onTokenRefresh.listen((newToken) {
-        _dispatchSyncEvent(newToken);
-      });
+    await _localNotifications.initialize(
+      initSettings,
+      onDidReceiveNotificationResponse: _handleLocalNotificationTap,
+    );
 
-      _onMessageSubscription = FirebaseMessaging.onMessage.listen(_handleForegroundMessage);
-      _onMessageOpenedAppSubscription = FirebaseMessaging.onMessageOpenedApp.listen(_handleNotificationTapFromBackground);
-
-      // التقاط الإشعار المفتوح إذا كان التطبيق مغلقاً تماماً (Terminated)
-      final initialMessage = await FirebaseMessaging.instance.getInitialMessage();
-      if (initialMessage != null) {
-        final entity = initialMessage.toDomainEntity().copyWith(isRead: true);
-        await _saveNotification(entity);
-        
-        if (entity.remoteId != null) {
-          sl<NotificationsBloc>().add(TrackNotificationStatusEvent(entity.remoteId!, 'OPENED'));
-        }
-        // تخزين المسار ليتم استخدامه لاحقاً بعد انتهاء الـ Splash
-        initialActionUrl = entity.actionUrl;
-      }
-
-      _isInitialized = true;
-    } catch (e) {
-      debugPrint('Silent Push Init Error: $e');
+    // 1. حالة التطبيق مغلق تماماً (Terminated) وتم فتحه من الإشعار
+    final initialMessage = await _fcm.getInitialMessage();
+    if (initialMessage != null) {
+      final entity = initialMessage.toDomainEntity();
+      initialActionUrl = entity.actionUrl;
     }
-  }
 
-  void _dispatchSyncEvent(String token) async {
-    try {
-      final osType = Platform.isIOS ? 'ios' : 'android';
-      final appVersion = (await PackageInfo.fromPlatform()).version;
-      final deviceId = await sl<DeviceIdentityService>().getDeviceId();
-      final params = DeviceSyncParams(
-        fcmToken: token,
-        osType: osType,
-        appVersion: appVersion,
-        deviceId: deviceId,
-        deviceModel: Platform.operatingSystemVersion,
-      );
-      
-      sl<NotificationsBloc>().add(SyncDeviceTokenEvent(params));
-    } catch (e) {
-      debugPrint('Dispatch Sync Event Error: $e');
-    }
+    // 2. حالة التطبيق في الخلفية (Background) وتم فتحه من الإشعار
+    FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) {
+      final entity = message.toDomainEntity();
+      _openedNotificationController.add(entity); // تمرير البيانات للـ BLoC
+    });
+
+    // 3. حالة التطبيق مفتوح ومستخدم حالياً (Foreground)
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      final entity = message.toDomainEntity();
+      _foregroundNotificationController.add(entity);
+      _showLocalNotification(message); 
+    });
   }
 
   Future<bool> requestNotificationPermissions() async {
-    try {
-      if (Platform.isAndroid) {
-        final status = await Permission.notification.status;
-        if (status.isDenied) {
-          final result = await Permission.notification.request();
-          if (!result.isGranted) return false;
-        }
-      }
-
-      final settings = await FirebaseMessaging.instance.requestPermission(
-        alert: true,
-        badge: true,
-        sound: true,
-        provisional: false,
-      );
-
-      return settings.authorizationStatus == AuthorizationStatus.authorized ||
-             settings.authorizationStatus == AuthorizationStatus.provisional;
-    } catch (e, stackTrace) {
-      debugPrint('Permission Request Error: $e\n$stackTrace');
-      return false;
-    }
-  }
-
-  Future<void> _initLocalNotificationsChannel() async {
-    const androidSettings = AndroidInitializationSettings('@mipmap/launcher_icon');
-    const iosSettings = DarwinInitializationSettings();
-    const initSettings = InitializationSettings(android: androidSettings, iOS: iosSettings);
-
-    await _localNotificationsPlugin.initialize(
-      initSettings,
-      onDidReceiveNotificationResponse: (NotificationResponse response) {
-        _navigateByActionUrl(response.payload);
-      },
+    final status = await Permission.notification.request();
+    if (status.isGranted) return true;
+    
+    final settings = await _fcm.requestPermission(
+      alert: true, 
+      badge: true, 
+      sound: true,
     );
-
-    if (Platform.isAndroid) {
-      const androidChannel = AndroidNotificationChannel(
-        kHighImportanceChannelId,
-        'إشعارات مدير إجازاتي الهامة',
-        description: 'قناة مخصصة لاستقبال التنبيهات والتحديثات الإدارية.',
-        importance: Importance.max,
-        playSound: true,
-        enableVibration: true,
-      );
-
-      await _localNotificationsPlugin
-          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>()
-          ?.createNotificationChannel(androidChannel);
-    }
+    return settings.authorizationStatus == AuthorizationStatus.authorized;
   }
 
-  Future<void> _handleForegroundMessage(RemoteMessage message) async {
-    final entity = message.toDomainEntity();
-    if (!_foregroundMessageController.isClosed) {
-      _foregroundMessageController.add(entity);
-    }
-
-    // إضافة الإرسال لحدث DELIVERED عند الاستلام في الـ Foreground
-    if (entity.remoteId != null) {
-      sl<NotificationsBloc>().add(TrackNotificationStatusEvent(entity.remoteId!, 'DELIVERED'));
-    }
+  Future<void> _showLocalNotification(RemoteMessage message) async {
+    final notification = message.notification;
+    if (notification == null) return;
 
     const androidDetails = AndroidNotificationDetails(
-      kHighImportanceChannelId,
-      'إشعارات مدير إجازاتي الهامة',
-      channelDescription: 'قناة مخصصة لاستقبال التنبيهات والتحديثات الإدارية.',
+      'leave_manager_high_importance', 
+      'إشعارات هامة',
       importance: Importance.max,
       priority: Priority.high,
       icon: '@mipmap/launcher_icon',
     );
+    const iosDetails = DarwinNotificationDetails();
+    const details = NotificationDetails(android: androidDetails, iOS: iosDetails);
 
-    const notificationDetails = NotificationDetails(android: androidDetails);
-
-    await _localNotificationsPlugin.show(
-      entity.hashCode,
-      entity.title,
-      entity.body,
-      notificationDetails,
-      payload: entity.actionUrl,
+    await _localNotifications.show(
+      notification.hashCode,
+      notification.title,
+      notification.body,
+      details,
+      payload: jsonEncode(message.data),
     );
   }
 
-  Future<void> _handleNotificationTapFromBackground(RemoteMessage message) async {
-    final entity = message.toDomainEntity().copyWith(isRead: true);
-    await _saveNotification(entity);
-
-    if (entity.remoteId != null) {
-      sl<NotificationsBloc>().add(TrackNotificationStatusEvent(entity.remoteId!, 'OPENED'));
-    }
-
-    if (!_foregroundMessageController.isClosed) {
-      _foregroundMessageController.add(entity);
-    }
-
-    await _navigateByActionUrl(entity.actionUrl);
-  }
-
-  Future<void> _navigateByActionUrl(String? rawActionUrl) async {
-    final actionUrl = rawActionUrl?.trim();
-    if (actionUrl != null && actionUrl.isNotEmpty) {
-      if (actionUrl.startsWith('/')) {
-        AppRouter.router.push(actionUrl);
-        return;
-      } else {
-        final uri = Uri.tryParse(actionUrl);
-        if (uri != null) {
-          await launchUrl(uri, mode: LaunchMode.externalApplication);
-          return;
-        }
+  void _handleLocalNotificationTap(NotificationResponse response) {
+    if (response.payload != null) {
+      try {
+        final data = jsonDecode(response.payload!);
+        debugPrint("Local Notification Tapped with payload: $data");
+        
+        // إذا أردت معالجة النقر على الإشعار المحلي بنفس طريقة إشعارات Firebase، 
+        // يمكنك تحويل الـ data إلى AppNotificationEntity وتمريرها عبر الـ Stream:
+        // _openedNotificationController.add(AppNotificationEntity.fromJson(data));
+      } catch (e) {
+        debugPrint("Error parsing local notification payload: $e");
       }
     }
-    AppRouter.router.push(AppRouter.notifications);
   }
 
-  @disposeMethod
-  Future<void> dispose() async {
-    await _onMessageSubscription?.cancel();
-    await _onMessageOpenedAppSubscription?.cancel();
-    await _onTokenRefreshSubscription?.cancel();
-    _onMessageSubscription = null;
-    _onMessageOpenedAppSubscription = null;
-    _onTokenRefreshSubscription = null;
-    _isInitialized = false;
+  void dispose() {
+    _foregroundNotificationController.close();
+    _openedNotificationController.close(); // تم الإغلاق لتفادي تسرب الذاكرة
   }
 }

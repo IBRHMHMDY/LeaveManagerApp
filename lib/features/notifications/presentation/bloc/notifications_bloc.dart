@@ -32,9 +32,11 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
   final DeleteNotificationUseCase _deleteNotification;
   final ClearAllNotificationsUseCase _clearAllNotifications;
   final PushNotificationService _pushNotificationService;
-  final TrackNotificationUseCase _trackNotification; // الـ UseCase الجديد
+  final TrackNotificationUseCase _trackNotification;
 
-  StreamSubscription<AppNotificationEntity>? _foregroundNotificationSubscription;
+  StreamSubscription<AppNotificationEntity>?
+  _foregroundNotificationSubscription;
+  StreamSubscription<AppNotificationEntity>? _openedNotificationSubscription;
 
   NotificationsBloc({
     required SyncDeviceWithServerUseCase syncDeviceWithServer,
@@ -57,8 +59,8 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
        _clearAllNotifications = clearAllNotifications,
        _pushNotificationService = pushNotificationService,
        _trackNotification = trackNotification,
+
        super(const NotificationsInitial()) {
-    
     on<LoadNotificationsEvent>(_onLoadNotifications);
     on<SyncDeviceTokenEvent>(_onSyncDeviceToken);
     on<ReceiveIncomingNotificationEvent>(_onReceiveIncomingNotification);
@@ -68,15 +70,26 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     on<DeleteNotificationItemEvent>(_onDeleteNotificationItem);
     on<ClearAllNotificationsEvent>(_onClearAllNotifications);
     on<RequestNotificationPermissionEvent>(_onRequestNotificationPermission);
-
+    on<NotificationOpenedFromBackgroundEvent>(
+      _onNotificationOpenedFromBackground,
+    );
     _foregroundNotificationSubscription = _pushNotificationService
         .onForegroundNotificationStream
         .listen((notification) {
           add(ReceiveIncomingNotificationEvent(notification));
         });
+
+    _openedNotificationSubscription = _pushNotificationService
+        .onNotificationOpenedStream
+        .listen((notification) {
+          add(NotificationOpenedFromBackgroundEvent(notification));
+        });
   }
 
-  Future<void> _onLoadNotifications(LoadNotificationsEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onLoadNotifications(
+    LoadNotificationsEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     if (state is! NotificationsLoaded) {
       emit(const NotificationsLoading());
     }
@@ -84,23 +97,34 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       _getLocalNotifications(const NoParams()),
       _getUnreadCount(const NoParams()),
     ]);
-    final listResult = results[0] as Either<Failure, List<AppNotificationEntity>>;
+    final listResult =
+        results[0] as Either<Failure, List<AppNotificationEntity>>;
     final countResult = results[1] as Either<Failure, int>;
 
-    listResult.fold((failure) => emit(NotificationsError(failure.message)), (notifications) {
+    listResult.fold((failure) => emit(NotificationsError(failure.message)), (
+      notifications,
+    ) {
       final unreadCount = countResult.getOrElse(() => 0);
-      emit(NotificationsLoaded(
-        notifications: List.unmodifiable(notifications),
-        unreadCount: unreadCount,
-      ));
+      emit(
+        NotificationsLoaded(
+          notifications: List.unmodifiable(notifications),
+          unreadCount: unreadCount,
+        ),
+      );
     });
   }
 
-  Future<void> _onSyncDeviceToken(SyncDeviceTokenEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onSyncDeviceToken(
+    SyncDeviceTokenEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     await _syncDeviceWithServer(event.params);
   }
 
-  Future<void> _onReceiveIncomingNotification(ReceiveIncomingNotificationEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onReceiveIncomingNotification(
+    ReceiveIncomingNotificationEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     final result = await _saveNotification(event.notification);
     result.fold((failure) => emit(NotificationsError(failure.message)), (_) {
       if (!event.notification.isRead) {
@@ -108,18 +132,31 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
       }
       // تتبع الاستلام (DELIVERED) إذا كان يحتوي على remoteId
       if (event.notification.remoteId != null) {
-        add(TrackNotificationStatusEvent(event.notification.remoteId!, 'DELIVERED'));
+        add(
+          TrackNotificationStatusEvent(
+            event.notification.remoteId!,
+            'DELIVERED',
+          ),
+        );
       }
       add(const LoadNotificationsEvent());
     });
   }
 
-  Future<void> _onTrackNotificationStatus(TrackNotificationStatusEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onTrackNotificationStatus(
+    TrackNotificationStatusEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     // تعمل بصمت (Fire and Forget) حتى لا تقاطع الـ UI
-    await _trackNotification(TrackNotificationParams(remoteId: event.remoteId, event: event.event));
+    await _trackNotification(
+      TrackNotificationParams(remoteId: event.remoteId, event: event.event),
+    );
   }
 
-  Future<void> _onMarkNotificationRead(MarkNotificationReadEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onMarkNotificationRead(
+    MarkNotificationReadEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     final result = await _markAsRead(event.notificationId);
     result.fold((failure) {
       emit(NotificationsError(failure.message));
@@ -127,7 +164,10 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     }, (_) => add(const LoadNotificationsEvent()));
   }
 
-  Future<void> _onMarkAllNotificationsRead(MarkAllNotificationsReadEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onMarkAllNotificationsRead(
+    MarkAllNotificationsReadEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     final result = await _markAllAsRead(const NoParams());
     result.fold(
       (failure) {
@@ -141,7 +181,10 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     );
   }
 
-  Future<void> _onDeleteNotificationItem(DeleteNotificationItemEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onDeleteNotificationItem(
+    DeleteNotificationItemEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     final result = await _deleteNotification(event.notificationId);
     result.fold(
       (failure) {
@@ -155,7 +198,10 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     );
   }
 
-  Future<void> _onClearAllNotifications(ClearAllNotificationsEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onClearAllNotifications(
+    ClearAllNotificationsEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     final result = await _clearAllNotifications(const NoParams());
     result.fold(
       (failure) {
@@ -169,20 +215,60 @@ class NotificationsBloc extends Bloc<NotificationsEvent, NotificationsState> {
     );
   }
 
-  Future<void> _onRequestNotificationPermission(RequestNotificationPermissionEvent event, Emitter<NotificationsState> emit) async {
+  Future<void> _onRequestNotificationPermission(
+    RequestNotificationPermissionEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
     try {
-      final isGranted = await _pushNotificationService.requestNotificationPermissions();
+      final isGranted = await _pushNotificationService
+          .requestNotificationPermissions();
       if (!isGranted) {
-        emit(const NotificationPermissionDeniedState('الرجاء تفعيل الإشعارات من إعدادات النظام لضمان استقبال التنبيهات المهمة.'));
+        emit(
+          const NotificationPermissionDeniedState(
+            'الرجاء تفعيل الإشعارات من إعدادات النظام لضمان استقبال التنبيهات المهمة.',
+          ),
+        );
       }
     } catch (e) {
       debugPrint('Permission Request Error: $e');
     }
   }
 
+  Future<void> _onNotificationOpenedFromBackground(
+    NotificationOpenedFromBackgroundEvent event,
+    Emitter<NotificationsState> emit,
+  ) async {
+    final notification = event.notification;
+
+    // 1. تحديث الإشعار كمقروء محلياً في قاعدة البيانات (Drift)
+    if (!notification.isRead) {
+      await _markAsRead(notification.id);
+    }
+
+    // 2. إرسال حدث التتبع (OPENED) للباك إند مباشرة (Fire and forget)
+    if (notification.remoteId != null) {
+      _trackNotification(
+        TrackNotificationParams(
+          remoteId: notification.remoteId!,
+          event: 'OPENED',
+        ),
+      );
+    }
+
+    // 3. إصدار أمر لإعادة تحميل قائمة الإشعارات في الواجهة
+    add(const LoadNotificationsEvent());
+
+    // 4. إصدار حالة التوجيه للـ UI إذا كان هناك رابط مرفق
+    if (notification.actionUrl != null &&
+        notification.actionUrl!.trim().isNotEmpty) {
+      emit(NotificationNavigationRequestedState(notification.actionUrl!));
+    }
+  }
+
   @override
   Future<void> close() async {
     await _foregroundNotificationSubscription?.cancel();
+    await _openedNotificationSubscription?.cancel();
     return super.close();
   }
 }

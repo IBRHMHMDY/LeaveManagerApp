@@ -92,3 +92,11 @@ class TrackNotificationStatusEvent extends NotificationsEvent {
   @override
   List<Object?> get props => [remoteId, event];
 }
+
+class NotificationOpenedFromBackgroundEvent extends NotificationsEvent {
+  final AppNotificationEntity notification;
+  const NotificationOpenedFromBackgroundEvent(this.notification);
+
+  @override
+  List<Object?> get props => [notification];
+}

@@ -1,6 +1,7 @@
 // lib/features/home/presentation/screens/home_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import 'package:leave_manager/core/constants/app_spacing.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_cubit.dart';
 import 'package:leave_manager/features/holidays/presentation/cubit/holidays_state.dart';
@@ -25,6 +26,7 @@ import 'package:leave_manager/features/rest_allowances/presentation/blocs/rest_a
 import 'package:leave_manager/features/settings/presentation/bloc/settings_bloc.dart';
 import 'package:leave_manager/features/settings/presentation/bloc/settings_state.dart';
 import 'package:leave_manager/shared/widgets/widgets.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 /// الشاشة الرئيسية لتطبيق مدير إجازاتي.
 class HomeScreen extends StatefulWidget {
@@ -43,7 +45,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
     // طلب الصلاحيات بمرونة بعد الدخول للشاشة الرئيسية
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<NotificationsBloc>().add(const RequestNotificationPermissionEvent());
+      context.read<NotificationsBloc>().add(
+        const RequestNotificationPermissionEvent(),
+      );
     });
   }
 
@@ -83,7 +87,7 @@ class _HomeScreenState extends State<HomeScreen> {
             },
           ),
           BlocListener<NotificationsBloc, NotificationsState>(
-            listener: (context, state) {
+            listener: (context, state) async {
               if (state is IncomingNotificationAlertState) {
                 AppToast.showSuccess(
                   context,
@@ -91,6 +95,17 @@ class _HomeScreenState extends State<HomeScreen> {
                 );
               } else if (state is NotificationPermissionDeniedState) {
                 AppToast.showWarning(context, state.message);
+              } else if (state is NotificationNavigationRequestedState) {
+                // التقاط حالة التوجيه وتنفيذها
+                final actionUrl = state.actionUrl.trim();
+                if (actionUrl.startsWith('/')) {
+                  context.push(actionUrl);
+                } else {
+                  final uri = Uri.tryParse(actionUrl);
+                  if (uri != null) {
+                    await launchUrl(uri, mode: LaunchMode.externalApplication);
+                  }
+                }
               }
             },
           ),
