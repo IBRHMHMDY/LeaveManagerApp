@@ -155,6 +155,11 @@ class PushNotificationService {
       _foregroundMessageController.add(entity);
     }
 
+    // إضافة الإرسال لحدث DELIVERED عند الاستلام في الـ Foreground
+    if (entity.remoteId != null) {
+      sl<NotificationsBloc>().add(TrackNotificationStatusEvent(entity.remoteId!, 'DELIVERED'));
+    }
+
     const androidDetails = AndroidNotificationDetails(
       kHighImportanceChannelId,
       'إشعارات مدير إجازاتي الهامة',

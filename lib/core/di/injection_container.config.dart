@@ -10,6 +10,7 @@
 
 // ignore_for_file: no_leading_underscores_for_library_prefixes
 import 'package:connectivity_plus/connectivity_plus.dart' as _i895;
+import 'package:dio/dio.dart' as _i361;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart' as _i558;
 import 'package:get_it/get_it.dart' as _i174;
 import 'package:injectable/injectable.dart' as _i526;
@@ -126,15 +127,15 @@ import '../../features/settings/domain/usecases/save_settings_usecase.dart'
 import '../../features/settings/presentation/bloc/settings_bloc.dart' as _i585;
 import '../../shared/themes/theme_cubit.dart' as _i202;
 import '../database/app_database.dart' as _i982;
+import '../network/api_interceptor.dart' as _i724;
 import '../network/dio_client.dart' as _i667;
-import '../network/interceptors/app_key_interceptor.dart' as _i833;
 import '../network/network_info.dart' as _i932;
 import '../services/device_identity_service.dart' as _i218;
 import '../services/push_notification_service.dart' as _i63;
 import '../usecases/check_date_overlap_usecase.dart' as _i707;
 import '../utils/share_service.dart' as _i518;
 import '../utils/store_launcher_service.dart' as _i967;
-import 'register_module.dart' as _i291;
+import 'core_module.dart' as _i154;
 
 extension GetItInjectableX on _i174.GetIt {
   // initializes the registration of main-scope dependencies inside of GetIt
@@ -143,26 +144,30 @@ extension GetItInjectableX on _i174.GetIt {
     _i526.EnvironmentFilter? environmentFilter,
   }) async {
     final gh = _i526.GetItHelper(this, environment, environmentFilter);
-    final registerModule = _$RegisterModule();
+    final coreInjectableModule = _$CoreInjectableModule();
     await gh.factoryAsync<_i460.SharedPreferences>(
-      () => registerModule.prefs,
+      () => coreInjectableModule.prefs,
       preResolve: true,
     );
     gh.factory<_i917.LayoutCubit>(() => _i917.LayoutCubit());
-    gh.lazySingleton<_i982.AppDatabase>(() => registerModule.appDatabase);
+    gh.lazySingleton<_i361.Dio>(() => coreInjectableModule.dio);
+    gh.lazySingleton<_i895.Connectivity>(
+      () => coreInjectableModule.connectivity,
+    );
+    gh.lazySingleton<_i982.AppDatabase>(() => coreInjectableModule.appDatabase);
     gh.lazySingleton<_i558.FlutterSecureStorage>(
-      () => registerModule.secureStorage,
+      () => coreInjectableModule.secureStorage,
     );
-    gh.lazySingleton<_i895.Connectivity>(() => registerModule.connectivity);
-    gh.lazySingleton<_i833.AppKeyInterceptor>(
-      () => const _i833.AppKeyInterceptor(),
-    );
+    gh.lazySingleton<_i724.ApiInterceptor>(() => _i724.ApiInterceptor());
     gh.lazySingleton<_i518.ShareService>(() => _i518.ShareService());
     gh.lazySingleton<_i967.StoreLauncherService>(
       () => _i967.StoreLauncherService(),
     );
     gh.lazySingleton<_i828.HolidaysLocalDataSource>(
       () => _i828.HolidaysLocalDataSourceImpl(gh<_i982.AppDatabase>()),
+    );
+    gh.lazySingleton<_i932.NetworkInfo>(
+      () => _i932.NetworkInfoImpl(gh<_i895.Connectivity>()),
     );
     gh.lazySingleton<_i776.LocalBackupDataSource>(
       () => _i776.LocalBackupDataSourceImpl(),
@@ -196,14 +201,11 @@ extension GetItInjectableX on _i174.GetIt {
     gh.lazySingleton<_i674.SettingsRepository>(
       () => _i955.SettingsRepositoryImpl(gh<_i599.SettingsLocalDataSource>()),
     );
-    gh.lazySingleton<_i932.NetworkInfo>(
-      () => _i932.NetworkInfoImpl(gh<_i895.Connectivity>()),
-    );
-    gh.lazySingleton<_i667.DioClient>(
-      () => _i667.DioClient(gh<_i833.AppKeyInterceptor>()),
-    );
     gh.factory<_i202.ThemeCubit>(
       () => _i202.ThemeCubit(sharedPreferences: gh<_i460.SharedPreferences>()),
+    );
+    gh.lazySingleton<_i667.DioClient>(
+      () => _i667.DioClient(gh<_i361.Dio>(), gh<_i724.ApiInterceptor>()),
     );
     gh.lazySingleton<_i218.DeviceIdentityService>(
       () => _i218.DeviceIdentityService(gh<_i558.FlutterSecureStorage>()),
@@ -432,4 +434,4 @@ extension GetItInjectableX on _i174.GetIt {
   }
 }
 
-class _$RegisterModule extends _i291.RegisterModule {}
+class _$CoreInjectableModule extends _i154.CoreInjectableModule {}

@@ -7,12 +7,14 @@ import 'package:leave_manager/core/constants/api_constants.dart';
 import 'package:leave_manager/core/errors/exceptions.dart';
 import 'package:leave_manager/core/network/dio_client.dart';
 import 'package:leave_manager/features/notifications/data/models/device_sync_request_model.dart';
+// تم الاستيراد لتمكين جلب deviceId
+import 'package:leave_manager/core/services/device_identity_service.dart';
+import 'package:leave_manager/core/di/injection_container.dart';
 
 abstract class NotificationsRemoteDataSource {
   
   Future<void> syncDevice(DeviceSyncRequestModel requestModel);
   
-  // الدالة الجديدة
   Future<void> trackNotification({
     required String remoteId,
     required String event,
@@ -53,11 +55,15 @@ class NotificationsRemoteDataSourceImpl implements NotificationsRemoteDataSource
     required String event,
   }) async {
     try {
+      // استخراج deviceId باستخدام الخدمة
+      final deviceId = await sl<DeviceIdentityService>().getDeviceId();
+
       final response = await _dioClient.dio.post(
         ApiConstants.trackNotification,
         data: {
-          'notification_id': remoteId, // نرسل الـ remoteId للباكند
+          'notification_id': remoteId, 
           'event': event,
+          'device_id': deviceId, // حقن deviceId في الـ Payload
         },
       );
 

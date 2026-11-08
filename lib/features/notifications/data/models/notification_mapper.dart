@@ -61,9 +61,13 @@ extension RemoteMessageMapper on RemoteMessage {
 
     final encodedPayload = data.isNotEmpty ? jsonEncode(data) : null;
 
+    // استخراج notification_id الذي نرسله من الباكند بشكل صحيح
+    // لا نعتمد على messageId الخاص بـ Firebase لأنه عبارة عن string عشوائي
+    final serverNotificationId = data['notification_id']?.toString();
+
     return AppNotificationEntity(
       id: 0,
-      remoteId: messageId ?? data['notification_id']?.toString(),
+      remoteId: serverNotificationId, // استخدام المعرف القادم من الباكند حصراً
       title: notificationTitle,
       body: notificationBody,
       imageUrl: image,

@@ -1,30 +1,27 @@
-// lib/core/network/dio_client.dart
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 import 'package:injectable/injectable.dart';
 import 'package:leave_manager/core/constants/api_constants.dart';
-import 'package:leave_manager/core/network/interceptors/app_key_interceptor.dart';
+import 'package:leave_manager/core/network/api_interceptor.dart';
 import 'package:pretty_dio_logger/pretty_dio_logger.dart';
 
-/// العميل المركزي للشبكة المسؤول عن إعداد Dio وربط الـ Interceptors.
 @lazySingleton
 class DioClient {
-  final Dio _dio;
+  final Dio dio;
+  final ApiInterceptor apiInterceptor;
 
-  /// يقوم بتهيئة إعدادات Dio الأساسية وإضافة المسجلات في وضع الـ Debug فقط.
-  DioClient(AppKeyInterceptor appKeyInterceptor)
-      : _dio = Dio(
-          BaseOptions(
-            baseUrl: ApiConstants.baseUrl,
-            connectTimeout: ApiConstants.connectTimeout,
-            receiveTimeout: ApiConstants.receiveTimeout,
-            responseType: ResponseType.json,
-          ),
-        ) {
-    _dio.interceptors.add(appKeyInterceptor);
+  DioClient(this.dio, this.apiInterceptor) {
+    dio.options = BaseOptions(
+      baseUrl: ApiConstants.baseUrl,
+      connectTimeout: const Duration(seconds: 15),
+      receiveTimeout: const Duration(seconds: 15),
+      sendTimeout: const Duration(seconds: 15),
+    );
 
-    if (kDebugMode) {
-      _dio.interceptors.add(
+    dio.interceptors.add(apiInterceptor);
+
+    // تفعيل الـ Logger في وضع الـ Debug فقط لعدم استهلاك الموارد في الإنتاج
+    assert(() {
+      dio.interceptors.add(
         PrettyDioLogger(
           requestHeader: true,
           requestBody: true,
@@ -34,9 +31,7 @@ class DioClient {
           compact: true,
         ),
       );
-    }
+      return true;
+    }());
   }
-
-  /// إرجاع نسخة Dio المهيأة للاستخدام في طبقة DataSources.
-  Dio get dio => _dio;
 }
